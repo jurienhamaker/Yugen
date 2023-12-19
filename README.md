@@ -13,6 +13,15 @@
 -   [Koto](https://github.com/jurienhamaker/Yugen/tree/main/apps/koto) - A multiplayer wordle bot
 -   [Kusari](https://github.com/jurienhamaker/Yugen/tree/main/apps/kusari) - A word chain bot
 
-## Connect with us!
+---
+
+## Stay in touch
 
 -   [Join the community](https://discord.gg/UttZbEd9zn)
+-   Author - [Jurien Hamaker](https://jurien.dev)
+-   Website - [jurien.dev](https://jurien.dev/)
+-   Ko-Fi - [ko-fi.com/jurienhamaker](https://ko-fi.com/jurienhamaker)
+
+## License
+
+KOTO is [GPL licensed](LICENSE).

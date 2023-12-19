@@ -11,7 +11,7 @@
 		"start:prod": "node",
 		"predocker:start": "yarn",
 		"docker:start": "yarn serve",
-		"prekoto:docker:start": "yarn",
+		"prekoto:docker:start": "yarn && yarn nx run prisma-koto:generate-client",
 		"koto:docker:start": "yarn koto:start",
 		"koto:start": "yarn serve koto",
 		"koto:start:prod": "yarn start:prod ./dist/apps/koto/main",

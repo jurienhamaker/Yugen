@@ -19,7 +19,8 @@
 $ git clone git@github.com:jurienhamaker/koto.git
 ```
 
-**Copy the `.env.example` to `.env` and change the values in the `.env file`**
+**Copy the `.env.example` to `.env` and change the values in the `.env` file**
+**Copy the `koto.env.example` to `koto.env` and change the values in the `koto.env` file**
 
 ---
 
@@ -39,7 +40,7 @@ $ docker-compose up koto
 ### Running migrations
 
 ```bash
-$ docker-compose exec -it koto yarn prisma migrate dev
+$ docker-compose exec -it koto yarn nx run prisma-koto:migrate-dev
 ```
 
 ---
@@ -55,18 +56,18 @@ $ docker-compose exec -it koto yarn prisma migrate dev
 
 ```bash
 $ yarn
-$ yarn prisma generate
-$ yarn prisma migrate dev
+$ yarn nx run prisma-koto:generate-client
+$ yarn nx run prisma-koto:migrate-dev
 ```
 
 ### Running the bot/api
 
 ```bash
 # watch mode (recommended)
-$ yarn start:dev
+$ yarn koto:start
 
 # production mode
-$ yarn start:prod
+$ yarn koto:start:prod
 ```
 
 ---
