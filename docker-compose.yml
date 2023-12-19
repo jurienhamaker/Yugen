@@ -1,0 +1,29 @@
+version: '3'
+
+services:
+    koto:
+        build:
+            context: .
+            target: base
+        tty: true
+        command: yarn koto:docker:start
+        env_file:
+            - ./.env
+            - ./koto.env
+        ports:
+            - '$EXPOSED_KOTO_API_PORT:3000'
+            - '$EXPOSED_KOTO_DEBUGGING_PORT:9229'
+        volumes:
+            - ./:/opt/app
+        depends_on:
+            - db
+    db:
+        image: postgres:12.2-alpine
+        volumes:
+            - ./pg-init-script:/docker-entrypoint-initdb.d/pg-init-scripts.sh
+        environment:
+            - 'POSTGRES_USER=$DATABASE_USER'
+            - 'POSTGRES_PASSWORD=$DATABASE_PASSWORD'
+            - 'POSTGRES_MULTIPLE_DATABASES=$DATABASE_NAME'
+        ports:
+            - '$EXPOSED_DATABASE_PORT:5432'

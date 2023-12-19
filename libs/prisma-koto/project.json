@@ -1,0 +1,40 @@
+{
+	"name": "prisma-koto",
+	"$schema": "../../node_modules/nx/schemas/project-schema.json",
+	"sourceRoot": "libs/prisma-koto/src",
+	"projectType": "library",
+	"targets": {
+		"prisma": {
+			"command": "prisma",
+			"options": {
+				"cwd": "libs/prisma-koto"
+			}
+		},
+		"generate-client": {
+			"command": "prisma generate",
+			"options": {
+				"cwd": "libs/prisma-koto"
+			}
+		},
+		"migrate-dev": {
+			"command": "prisma migrate dev",
+			"options": {
+				"cwd": "libs/prisma-koto"
+			}
+		},
+		"migrate-prod": {
+			"command": "prisma migrate deploy",
+			"options": {
+				"cwd": "libs/prisma-koto"
+			}
+		},
+		"lint": {
+			"executor": "@nx/eslint:lint",
+			"outputs": ["{options.outputFile}"],
+			"options": {
+				"lintFilePatterns": ["libs/prisma-koto/**/*.ts"]
+			}
+		}
+	},
+	"tags": []
+}

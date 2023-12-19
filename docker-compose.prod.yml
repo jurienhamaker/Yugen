@@ -1,0 +1,43 @@
+version: '3'
+
+services:
+    koto:
+        image: ghcr.io/jurienhamaker/koto:main
+        restart: unless-stopped
+        tty: true
+        env_file: ./.env
+        ports:
+            - '$EXPOSED_API_PORT:3000'
+        depends_on:
+            - db
+        labels:
+            - 'com.centurylinklabs.watchtower.enable=true'
+    db:
+        image: postgres:12.2
+        environment:
+            - 'POSTGRES_USER=$DATABASE_USER'
+            - 'POSTGRES_PASSWORD=$DATABASE_PASSWORD'
+            - 'POSTGRES_DB=$DATABASE_NAME'
+        ports:
+            - '$EXPOSED_DATABASE_PORT:5432'
+        volumes:
+            - ./pg-init-scripts:/docker-entrypoint-initdb.d
+            - '$DATA_LOCATION/db:/var/lib/postgresql/data'
+    pgbackups:
+        image: prodrigestivill/postgres-backup-local
+        restart: unless-stopped
+        volumes:
+            - '$DATA_LOCATION/db_backup:/backups'
+        depends_on:
+            - db
+        environment:
+            - POSTGRES_HOST=db
+            - 'POSTGRES_DB=$DATABASE_NAME'
+            - 'POSTGRES_USER=$DATABASE_USER'
+            - 'POSTGRES_PASSWORD=$DATABASE_PASSWORD'
+            - POSTGRES_EXTRA_OPTS=-Z9 --schema=public --blobs
+            - SCHEDULE=@every 12h00m00s
+            - BACKUP_KEEP_DAYS=7
+            - BACKUP_KEEP_WEEKS=4
+            - BACKUP_KEEP_MONTHS=6
+            - HEALTHCHECK_PORT=81

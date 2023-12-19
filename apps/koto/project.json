@@ -1,0 +1,53 @@
+{
+	"name": "koto",
+	"$schema": "../../node_modules/nx/schemas/project-schema.json",
+	"sourceRoot": "apps/koto/src",
+	"projectType": "application",
+	"targets": {
+		"build": {
+			"executor": "@nx/webpack:webpack",
+			"outputs": ["{options.outputPath}"],
+			"defaultConfiguration": "production",
+			"options": {
+				"target": "node",
+				"compiler": "tsc",
+				"outputPath": "dist/apps/koto",
+				"main": "apps/koto/src/main.ts",
+				"tsConfig": "apps/koto/tsconfig.app.json",
+				"assets": [],
+				"webpackConfig": "apps/koto/webpack.config.js"
+			},
+			"configurations": {
+				"development": {},
+				"production": {}
+			}
+		},
+		"serve": {
+			"executor": "@nx/js:node",
+			"defaultConfiguration": "development",
+			"options": {
+				"buildTarget": "koto:build"
+			},
+			"configurations": {
+				"development": {
+					"buildTarget": "koto:build:development"
+				},
+				"production": {
+					"buildTarget": "koto:build:production"
+				}
+			}
+		},
+		"lint": {
+			"executor": "@nx/eslint:lint",
+			"outputs": ["{options.outputFile}"]
+		},
+		"test": {
+			"executor": "@nx/jest:jest",
+			"outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+			"options": {
+				"jestConfig": "apps/koto/jest.config.ts"
+			}
+		}
+	},
+	"tags": []
+}
