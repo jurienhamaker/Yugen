@@ -20,8 +20,6 @@ export class HealthController {
 		private discord: DiscordHealthService,
 		private disk: DiskHealthIndicator,
 		private memory: MemoryHealthIndicator,
-		@Inject('HEALTH_DB_NAME')
-		private dbName: string,
 	) {}
 
 	@Get()
@@ -41,7 +39,7 @@ export class HealthController {
 					thresholdPercent: 0.5,
 					path: '/',
 				}),
-			() => this.db.pingCheck(this.dbName),
+			() => this.db.pingCheck(),
 			() => this.discord.pingCheck(),
 			() => this.memory.checkHeap('memory_heap', 300 * 1024 * 1024),
 			() => this.memory.checkRSS('memory_rss', 300 * 1024 * 1024),

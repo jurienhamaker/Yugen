@@ -17,13 +17,14 @@ export class DiscordHealthService extends HealthIndicator {
 			const ping = this._client.ws.ping;
 			const status = this._client.ws.status !== Status.Disconnected;
 
-			if (ping === -1 || !status) {
+			if (!status) {
 				throw new Error();
 			}
 
 			return {
 				ping: {
 					status: ping !== -1 ? 'up' : 'down',
+					value: ping,
 				},
 				status: {
 					status: status ? 'up' : 'down',

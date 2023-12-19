@@ -4,7 +4,6 @@ import { GeneralModule } from '@yugen/general';
 import { HealthModule } from '@yugen/health';
 import { LogsModule } from '@yugen/logs';
 import { MetricsModule } from '@yugen/metrics';
-import { PrismaService } from '@yugen/prisma/koto';
 import { SharedModule } from '@yugen/shared';
 import { TutorialCommands } from './commands/tutorial.commands';
 import { GuildEvents } from './events/guild.events';
@@ -18,16 +17,18 @@ import { intents } from './util/intents';
 
 @Module({
 	imports: [
+		// required
+		SettingsModule,
+		KotoSharedModule,
+
 		// libs
 		SharedModule.forRoot(intents),
 		GeneralModule.forRoot(EMBED_COLOR),
-		HealthModule.forRoot(PrismaService, 'koto'),
+		HealthModule,
 		MetricsModule,
 		LogsModule,
 
 		// app
-		SettingsModule,
-		KotoSharedModule,
 		WordsModule,
 		GameModule,
 		AdminModule,

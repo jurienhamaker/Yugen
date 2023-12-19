@@ -9,16 +9,20 @@ import { PrismaClient } from '@prisma/client';
 @Injectable()
 export class PrismaHealthService extends HealthIndicator {
 	constructor(
-		@Inject('HEALTH_PRISMA_SERVICE')
+		@Inject('PRISMA_SERVICE')
 		private readonly prismaService: PrismaClient,
+		@Inject('PRISMA_DB_NAME')
+		private readonly dbName: string,
 	) {
 		super();
 	}
 
-	async pingCheck(databaseName: string): Promise<HealthIndicatorResult> {
+	async pingCheck(): Promise<HealthIndicatorResult> {
 		try {
 			await this.prismaService.$queryRaw`SELECT 1`;
-			return this.getStatus(databaseName, true);
+			return this.getStatus('database', true, {
+				name: this.dbName,
+			});
 		} catch (e) {
 			throw new HealthCheckError('Prisma Health check failed', e);
 		}
