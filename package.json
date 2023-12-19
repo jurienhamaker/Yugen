@@ -34,7 +34,7 @@
 		"@nestjs/schedule": "^3.0.4",
 		"@nestjs/terminus": "^10.1.1",
 		"@ntegral/nestjs-sentry": "^4.0.0",
-		"@prisma/client": "5.4.2",
+		"@prisma/client": "^5.4.2",
 		"@sentry/node": "^7.74.1",
 		"@top-gg/sdk": "^3.1.6",
 		"@willsoto/nestjs-prometheus": "^6.0.0",
