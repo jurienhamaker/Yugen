@@ -80,4 +80,4 @@ $ yarn koto:start:prod
 
 ## License
 
-KOTO is [GPL licensed](LICENSE).
+YUGEN is [GPL licensed](LICENSE).
