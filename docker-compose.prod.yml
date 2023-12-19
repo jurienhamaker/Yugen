@@ -2,7 +2,7 @@ version: '3'
 
 services:
     koto:
-        image: koto:main
+        image: ghcr.io/jurienhamaker/koto:main
         restart: unless-stopped
         tty: true
         env_file:
