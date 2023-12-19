@@ -1,6 +1,6 @@
 import { EMBED_COLOR } from '@yugen/koto/util/constants';
+import { getEmbedFooter } from '@yugen/util';
 import { Client, CommandInteraction, EmbedBuilder } from 'discord.js';
-import { getEmbedFooter } from './get-embed-footer';
 
 export const noSettingsDescription = `Koto has not yet been set up in this server! Someone with \`Manage Server\` permissions must do the following:
     

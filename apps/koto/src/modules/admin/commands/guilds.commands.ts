@@ -1,6 +1,6 @@
 import { Injectable, UseFilters, UseGuards } from '@nestjs/common';
-import { ForbiddenExceptionFilter } from '@yugen/koto/filters';
-import { AdminGuard } from '@yugen/koto/guards';
+import { AdminGuard, ForbiddenExceptionFilter } from '@yugen/shared';
+import { getEmbedFooter } from '@yugen/util';
 import {
 	ActionRowBuilder,
 	ButtonBuilder,
@@ -20,7 +20,6 @@ import {
 	SlashCommandContext,
 	Subcommand,
 } from 'necord';
-import { getEmbedFooter } from '../../../util/get-embed-footer';
 import { AdminCommandDecorator } from '../admin.decorator';
 import { AdminGuildsService } from '../services/guilds.service';
 

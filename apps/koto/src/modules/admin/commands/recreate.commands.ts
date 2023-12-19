@@ -1,9 +1,8 @@
 import { Injectable, UseFilters, UseGuards } from '@nestjs/common';
-import { ForbiddenExceptionFilter } from '@yugen/koto/filters';
-import { AdminGuard } from '@yugen/koto/guards';
 import { SettingsService } from '@yugen/koto/modules/settings';
 import { WordsService } from '@yugen/koto/modules/words/services/words.service';
 import { noSettingsReply } from '@yugen/koto/util/no-settings-reply';
+import { AdminGuard, ForbiddenExceptionFilter } from '@yugen/shared';
 import { Client } from 'discord.js';
 import {
 	Context,

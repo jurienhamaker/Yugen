@@ -2,10 +2,12 @@ version: '3'
 
 services:
     koto:
-        image: ghcr.io/jurienhamaker/koto:main
+        image: koto:main
         restart: unless-stopped
         tty: true
-        env_file: ./.env
+        env_file:
+            - ./.env
+            - ./koto.env
         ports:
             - '$EXPOSED_API_PORT:3000'
         depends_on:

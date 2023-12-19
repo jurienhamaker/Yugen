@@ -4,7 +4,7 @@
 [discord]: https://discord.com
 [support]: https://discord.gg/UttZbEd9zn
 [language]: https://discord.com/developers/docs/dispatch/field-values#predefined-field-values-accepted-locales
-[Policy]: https://github.com/jurienhamaker/Koto/blob/main/Privacy%20Policy.md
+[Policy]: https://github.com/jurienhamaker/Yugen/blob/main/apps/koto/Privacy%20Policy.md
 
 ## Terms of Service
 

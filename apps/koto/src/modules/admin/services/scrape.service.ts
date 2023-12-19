@@ -1,6 +1,6 @@
 import { HttpService } from '@nestjs/axios';
 import { Injectable, Logger } from '@nestjs/common';
-import { delay } from '@yugen/koto/util/delay';
+import { delay } from '@yugen/util';
 import { AxiosResponse } from 'axios';
 import { Channel, ChannelType } from 'discord.js';
 import { writeFileSync } from 'fs';

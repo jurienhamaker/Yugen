@@ -2,12 +2,11 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Game, GameStatus, Guess } from '@prisma/koto';
 import { SettingsService } from '@yugen/koto/modules/settings';
 import { GameTypeEmojiColorMap, getEmoji } from '@yugen/koto/util/get-emoji';
-import { getTimestamp } from '@yugen/koto/util/get-timestamp';
 import { asciiNumbers } from '@yugen/koto/util/numbers';
-import { PrismaService } from '@yugen/prisma-koto';
+import { PrismaService } from '@yugen/prisma/koto';
+import { getEmbedFooter, getTimestamp } from '@yugen/util';
 import { startOfHour } from 'date-fns';
 import { Channel, ChannelType, Client, EmbedBuilder } from 'discord.js';
-import { getEmbedFooter } from '../../../util/get-embed-footer';
 import { GAME_TYPE, GameMeta, GameWithMetaAndGuesses } from '../types/meta';
 
 @Injectable()

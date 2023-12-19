@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { GameStatus } from '@prisma/koto';
-import { PrismaService } from '@yugen/prisma-koto';
+import { PrismaService } from '@yugen/prisma/koto';
 import { startOfHour } from 'date-fns';
 import { Client } from 'discord.js';
 import { GameService } from './game.service';

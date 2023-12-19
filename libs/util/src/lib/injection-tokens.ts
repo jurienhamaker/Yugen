@@ -1,0 +1,1 @@
+export const BOT_PRISMA_SERVICE = 'BOT_PRISMA_SERVICE';

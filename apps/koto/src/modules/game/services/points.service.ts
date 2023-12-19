@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Game, Guess, Prisma } from '@prisma/koto';
-import { PrismaService } from '@yugen/prisma-koto';
+import { PrismaService } from '@yugen/prisma/koto';
 import { Client } from 'discord.js';
 
 @Injectable()

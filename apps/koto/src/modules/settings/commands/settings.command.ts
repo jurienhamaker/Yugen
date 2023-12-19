@@ -1,7 +1,6 @@
 import { Injectable, UseFilters, UseGuards } from '@nestjs/common';
 import { Settings } from '@prisma/koto';
-import { ForbiddenExceptionFilter } from '@yugen/koto/filters';
-import { GuildAdminGuard } from '@yugen/koto/guards';
+import { ForbiddenExceptionFilter, GuildAdminGuard } from '@yugen/shared';
 import { ChannelType, Role, TextChannel } from 'discord.js';
 import {
 	ChannelOption,

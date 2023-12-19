@@ -1,6 +1,5 @@
 import { Injectable, UseFilters, UseGuards } from '@nestjs/common';
-import { ForbiddenExceptionFilter } from '@yugen/koto/filters';
-import { AdminGuard } from '@yugen/koto/guards';
+import { AdminGuard, ForbiddenExceptionFilter } from '@yugen/shared';
 import { Client } from 'discord.js';
 import { Context, SlashCommandContext, Subcommand } from 'necord';
 import { AdminCommandDecorator } from '../admin.decorator';

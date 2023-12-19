@@ -6,7 +6,7 @@ on:
         paths:
             [
                 'apps/koto/**',
-                'libs/prisma-koto/**',
+                'libs/**',
                 'Dockerfile.koto',
                 'docker-compose.prod.yml',
             ]

@@ -1,6 +1,6 @@
 import { HttpModule } from '@nestjs/axios';
 import { Module } from '@nestjs/common';
-import { SharedModule } from '@yugen/koto/shared.module';
+import { KotoSharedModule } from '@yugen/koto/shared.module';
 import { GameModule } from '../game/game.module';
 import { WordsModule } from '../words/words.module';
 import { AdminEmojisCommands } from './commands/emojis.commands';
@@ -13,7 +13,7 @@ import { AdminGuildsService } from './services/guilds.service';
 import { AdminScrapeService } from './services/scrape.service';
 
 @Module({
-	imports: [SharedModule, WordsModule, GameModule, HttpModule],
+	imports: [KotoSharedModule, WordsModule, GameModule, HttpModule],
 	providers: [
 		AdminScrapeService,
 		AdminGuildsService,

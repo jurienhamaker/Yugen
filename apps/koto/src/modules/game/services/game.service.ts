@@ -2,8 +2,8 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Game, GameStatus, Guess, Settings } from '@prisma/koto';
 import { SettingsService } from '@yugen/koto/modules/settings';
 import { WordsService } from '@yugen/koto/modules/words/services/words.service';
-import { getTimestamp } from '@yugen/koto/util/get-timestamp';
-import { PrismaService } from '@yugen/prisma-koto';
+import { PrismaService } from '@yugen/prisma/koto';
+import { getTimestamp } from '@yugen/util';
 import { addHours, addMinutes, startOfHour, subMinutes } from 'date-fns';
 import { Message } from 'discord.js';
 import {

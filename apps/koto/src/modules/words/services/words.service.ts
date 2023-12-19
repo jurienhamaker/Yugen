@@ -52,7 +52,6 @@ export class WordsService {
 	}
 
 	private _createMaps() {
-		console.log(words);
 		this._wordsByLetter = ((m, a) => (
 			a.forEach((s) => {
 				a = m.get(s[0]) || [];

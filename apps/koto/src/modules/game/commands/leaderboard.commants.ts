@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { getEmbedFooter } from '@yugen/util';
 import {
 	ActionRowBuilder,
 	ButtonBuilder,
@@ -19,7 +20,6 @@ import {
 	SlashCommandContext,
 	StringOption,
 } from 'necord';
-import { getEmbedFooter } from '../../../util/get-embed-footer';
 import { GamePointsService } from '../services/points.service';
 
 class GameLeaderboardOptions {
@@ -143,8 +143,8 @@ export class GameLeaderboardCommands {
 			type === 'points'
 				? 'Points'
 				: type === 'wins'
-				? 'Wins'
-				: 'Participation'
+					? 'Wins'
+					: 'Participation'
 		} leaderboard for ${interaction.guild.name}`;
 
 		const embed = new EmbedBuilder()

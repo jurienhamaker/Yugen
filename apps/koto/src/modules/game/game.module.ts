@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { SharedModule } from '@yugen/koto/shared.module';
+import { KotoSharedModule } from '@yugen/koto/shared.module';
 import { WordsModule } from '../words/words.module';
 import { GameLeaderboardCommands } from './commands/leaderboard.commants';
 import { GamePointsCommands } from './commands/points.commands';
@@ -13,7 +13,7 @@ import { GamePointsService } from './services/points.service';
 import { GameScheduleService } from './services/schedule.service';
 
 @Module({
-	imports: [SharedModule, WordsModule],
+	imports: [KotoSharedModule, WordsModule],
 	providers: [
 		GameMessageService,
 		GamePointsService,

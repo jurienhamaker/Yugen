@@ -20,7 +20,7 @@ FROM base as production
 ENV NODE_ENV=production
 
 COPY --from=BUILD /opt/app/dist/apps/koto /opt/app/dist/apps/koto
-COPY --from=BUILD /opt/app/libs/prisma-koto /opt/app/libs/prisma-koto
+COPY --from=BUILD /opt/app/libs/prisma/koto /opt/app/libs/prisma/koto
 COPY --from=BUILD /opt/app/node_modules /opt/app/node_modules
 COPY --from=BUILD /opt/app/package.json /opt/app/package.json
 COPY --from=BUILD /opt/app/nx.json /opt/app/nx.json

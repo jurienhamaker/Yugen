@@ -1,4 +1,4 @@
-import { getEmbedFooter } from '@yugen/koto/util/get-embed-footer';
+import { getEmbedFooter, kofiButton, supportServerButton } from '@yugen/util';
 import {
 	ActionRowBuilder,
 	ButtonBuilder,
@@ -7,7 +7,6 @@ import {
 	Client,
 	EmbedBuilder,
 } from 'discord.js';
-import { kofiButton, supportServerButton } from './buttons';
 import { EMBED_COLOR } from './constants';
 import { noSettingsDescription } from './no-settings-reply';
 
