@@ -27,12 +27,12 @@ import { intents } from './util/intents';
 		HealthModule,
 		MetricsModule,
 		LogsModule,
+		ExternalsModule,
 
 		// app
 		WordsModule,
 		GameModule,
 		AdminModule,
-		ExternalsModule,
 	],
 	providers: [
 		// commands

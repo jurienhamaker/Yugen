@@ -19,6 +19,7 @@
 			"@yugen/general": ["libs/general/src/index.ts"],
 			"@yugen/health": ["libs/health/src/index.ts"],
 			"@yugen/koto/*": ["apps/koto/src/*"],
+			"@yugen/kusari/*": ["apps/kusari/src/*"],
 			"@yugen/logs": ["libs/logs/src/index.ts"],
 			"@yugen/metrics": ["libs/metrics/src/index.ts"],
 			"@yugen/prisma/koto": ["libs/prisma/koto/src/index.ts"],

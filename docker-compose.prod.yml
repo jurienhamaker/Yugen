@@ -10,6 +10,16 @@ services:
             - ./koto.env
         environment:
             - 'DATABASE_URL=$KOTO_DATABASE_URL'
+            - 'INVITE_LINK=$KOTO_INVITE_LINK'
+            - 'DISCORD_TOKEN=$KOTO_DISCORD_TOKEN'
+            - 'SENTRY_DNS=$KOTO_SENTRY_DNS'
+            - 'CLIENT_ID=$KOTO_CLIENT_ID'
+            - 'TOP_GG_TOKEN=$KOTO_TOP_GG_TOKEN'
+            - 'TOP_GG_VOTE_LINK=$KOTO_TOP_GG_VOTE_LINK'
+            - 'DISCORDBOTLIST_TOKEN=$KOTO_DISCORDBOTLIST_TOKEN'
+            - 'DISCORDBOTLIST_VOTE_LINK=$KOTO_DISCORDBOTLIST_VOTE_LINK'
+            - 'BOTS_GG_TOKEN=$KOTO_BOTS_GG_TOKEN'
+            - 'BOTS_GG_VOTE_LINK=$KOTO_BOTS_GG_VOTE_LINK'
         ports:
             - '$EXPOSED_KOTO_API_PORT:3000'
         depends_on:
@@ -28,6 +38,16 @@ services:
             - ./kusari.env
         environment:
             - 'DATABASE_URL=$KUSARI_DATABASE_URL'
+            - 'INVITE_LINK=$KUSARI_INVITE_LINK'
+            - 'DISCORD_TOKEN=$KUSARI_DISCORD_TOKEN'
+            - 'SENTRY_DNS=$KUSARI_SENTRY_DNS'
+            - 'CLIENT_ID=$KUSARI_CLIENT_ID'
+            - 'TOP_GG_TOKEN=$KUSARI_TOP_GG_TOKEN'
+            - 'TOP_GG_VOTE_LINK=$KUSARI_TOP_GG_VOTE_LINK'
+            - 'DISCORDBOTLIST_TOKEN=$KUSARI_DISCORDBOTLIST_TOKEN'
+            - 'DISCORDBOTLIST_VOTE_LINK=$KUSARI_DISCORDBOTLIST_VOTE_LINK'
+            - 'BOTS_GG_TOKEN=$KUSARI_BOTS_GG_TOKEN'
+            - 'BOTS_GG_VOTE_LINK=$KUSARI_BOTS_GG_VOTE_LINK'
         ports:
             - '$EXPOSED_KUSARI_API_PORT:3000'
         depends_on:
@@ -46,7 +66,7 @@ services:
         ports:
             - '$EXPOSED_DATABASE_PORT:5432'
         volumes:
-            - ./pg-init-script:/docker-entrypoint-initdb.d/pg-init-scripts.sh
+            - '$DATA_LOCATION/db:/var/lib/postgresql/data'
             - '$DATA_LOCATION/pg-init-script:/docker-entrypoint-initdb.d/pg-init-scripts.sh'
         networks:
             - default
