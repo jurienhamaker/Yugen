@@ -16,7 +16,7 @@ model Settings {
   guildId           String      @unique
 
   channelId         String?
-  cooldown          Int         @default(2)
+  cooldown          Int         @default(1)
 
   games             Game[]
 
