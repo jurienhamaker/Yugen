@@ -8,6 +8,8 @@ services:
         env_file:
             - ./.env
             - ./koto.env
+        environment:
+            - 'DATABASE_URL=$KOTO_DATABASE_URL'
         ports:
             - '$EXPOSED_KOTO_API_PORT:3000'
         depends_on:
