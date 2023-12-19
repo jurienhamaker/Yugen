@@ -224,7 +224,7 @@ export class SettingsCommands {
 		@Context() [interaction]: SlashCommandContext,
 		@Options() { minutes }: SettingsSetCooldownOptions,
 	) {
-		if (!minutes || isNaN(minutes)) {
+		if (isNaN(minutes) || minutes === undefined || minutes === null) {
 			return interaction.reply({
 				content: 'A valid number for minutes must be provided.',
 				ephemeral: true,
