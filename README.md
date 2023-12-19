@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://discord.gg/UttZbEd9zn" target="blank"><img src="https://raw.githubusercontent.com/jurienhamaker/Koto/main/koto%20sticker.png" width="200" alt="Muse logo" /></a>
+  <a href="https://discord.gg/UttZbEd9zn" target="blank"><img src="https://raw.githubusercontent.com/jurienhamaker/Yugen/main/assets/yugen%20sticker.png" width="200" alt="Yugen logo" /></a>
 </p>
 
   <p align="center"><b>✨ The Yugen Discord bot stack ✨</b></p>

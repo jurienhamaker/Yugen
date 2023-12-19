@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://discord.gg/UttZbEd9zn" target="blank"><img src="https://raw.githubusercontent.com/jurienhamaker/Koto/main/koto%20sticker.png" width="200" alt="Muse logo" /></a>
+  <a href="https://discord.gg/UttZbEd9zn" target="blank"><img src="https://raw.githubusercontent.com/jurienhamaker/Yugen/main/assets/koto%20sticker.png" width="200" alt="Koto logo" /></a>
 </p>
 
   <p align="center">A wordle on <a href="http://discord.com" target="_blank">Discord</a> bot.</p>
