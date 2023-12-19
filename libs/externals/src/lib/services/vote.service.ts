@@ -5,17 +5,10 @@ import { ChannelType, Client } from 'discord.js';
 export class ExternalsVoteService {
 	private readonly _logger = new Logger(ExternalsVoteService.name);
 
-	private _sourceNames = {
-		'top-gg': 'Top.GG',
-		'bots-gg': 'Bots.GG',
-		discords: 'Discords.com',
-		'discord-bot-list': 'Discord Bot List',
-	};
-
 	constructor(private _client: Client) {}
 
 	public async sendVoteMessage(
-		source: 'top-gg' | 'bots-gg' | 'discords' | 'discord-bot-list',
+		source: 'top-gg' | 'bots-gg' | 'discord-bot-list',
 		userId: string,
 	) {
 		const guild = await this._client.guilds.fetch(

@@ -54,15 +54,6 @@ Please use any of the links below to vote for ${this._client.user?.displayName}!
 			);
 		}
 
-		if (process.env.DISCORDS_VOTE_LINK?.length) {
-			buttons.push(
-				new ButtonBuilder()
-					.setURL(process.env.DISCORDS_VOTE_LINK)
-					.setLabel('Vote on Discords')
-					.setStyle(ButtonStyle.Link),
-			);
-		}
-
 		if (process.env.BOTS_GG_VOTE_LINK?.length) {
 			buttons.push(
 				new ButtonBuilder()
