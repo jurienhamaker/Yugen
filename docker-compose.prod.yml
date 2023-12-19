@@ -9,22 +9,27 @@ services:
             - ./.env
             - ./koto.env
         ports:
-            - '$EXPOSED_API_PORT:3000'
+            - '$EXPOSED_KOTO_API_PORT:3000'
         depends_on:
             - db
         labels:
             - 'com.centurylinklabs.watchtower.enable=true'
+        networks:
+            - default
+            - web
     db:
         image: postgres:12.2
         environment:
             - 'POSTGRES_USER=$DATABASE_USER'
             - 'POSTGRES_PASSWORD=$DATABASE_PASSWORD'
-            - 'POSTGRES_DB=$DATABASE_NAME'
+            - 'POSTGRES_MULTIPLE_DATABASES=$DATABASE_NAME'
         ports:
             - '$EXPOSED_DATABASE_PORT:5432'
         volumes:
-            - ./pg-init-scripts:/docker-entrypoint-initdb.d
-            - '$DATA_LOCATION/db:/var/lib/postgresql/data'
+            - ./pg-init-script:/docker-entrypoint-initdb.d/pg-init-scripts.sh
+            - '$DATA_LOCATION/pg-init-script:/docker-entrypoint-initdb.d/pg-init-scripts.sh'
+        networks:
+            - default
     pgbackups:
         image: prodrigestivill/postgres-backup-local
         restart: unless-stopped
@@ -43,3 +48,11 @@ services:
             - BACKUP_KEEP_WEEKS=4
             - BACKUP_KEEP_MONTHS=6
             - HEALTHCHECK_PORT=81
+        networks:
+            - default
+
+networks:
+    default:
+        driver: bridge
+    web:
+        external: true
