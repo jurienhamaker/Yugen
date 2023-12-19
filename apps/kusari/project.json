@@ -1,0 +1,53 @@
+{
+	"name": "kusari",
+	"$schema": "../../node_modules/nx/schemas/project-schema.json",
+	"sourceRoot": "apps/kusari/src",
+	"projectType": "application",
+	"targets": {
+		"build": {
+			"executor": "@nx/webpack:webpack",
+			"outputs": ["{options.outputPath}"],
+			"defaultConfiguration": "production",
+			"options": {
+				"target": "node",
+				"compiler": "tsc",
+				"outputPath": "dist/apps/kusari",
+				"main": "apps/kusari/src/main.ts",
+				"tsConfig": "apps/kusari/tsconfig.app.json",
+				"assets": [],
+				"webpackConfig": "apps/kusari/webpack.config.js"
+			},
+			"configurations": {
+				"development": {},
+				"production": {}
+			}
+		},
+		"serve": {
+			"executor": "@nx/js:node",
+			"defaultConfiguration": "development",
+			"options": {
+				"buildTarget": "kusari:build"
+			},
+			"configurations": {
+				"development": {
+					"buildTarget": "kusari:build:development"
+				},
+				"production": {
+					"buildTarget": "kusari:build:production"
+				}
+			}
+		},
+		"lint": {
+			"executor": "@nx/eslint:lint",
+			"outputs": ["{options.outputFile}"]
+		},
+		"test": {
+			"executor": "@nx/jest:jest",
+			"outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+			"options": {
+				"jestConfig": "apps/kusari/jest.config.ts"
+			}
+		}
+	},
+	"tags": []
+}

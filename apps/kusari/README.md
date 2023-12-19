@@ -1,17 +1,17 @@
 <p align="center">
-  <a href="https://discord.gg/UttZbEd9zn" target="blank"><img src="https://raw.githubusercontent.com/jurienhamaker/Yugen/main/assets/koto%20sticker.png" width="200" alt="Koto logo" /></a>
+  <a href="https://discord.gg/UttZbEd9zn" target="blank"><img src="https://raw.githubusercontent.com/jurienhamaker/Yugen/main/assets/kusari%20sticker.png" width="200" alt="Kusari logo" /></a>
 </p>
 
-  <p align="center">A wordle on <a href="http://discord.com" target="_blank">Discord</a> bot.</p>
+  <p align="center">A word-chain on <a href="http://discord.com" target="_blank">Discord</a> bot.</p>
     <p align="center">
       <img src="https://img.shields.io/github/license/jurrienhamaker/yugen" alt="Package License" />
-      <img src="https://img.shields.io/github/actions/workflow/status/jurienhamaker/yugen/koto.yml" alt="CircleCI" />
+      <img src="https://img.shields.io/github/actions/workflow/status/jurienhamaker/yugen/yugen.yml" alt="CircleCI" />
       <a href="https://discord.gg/UttZbEd9zn" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
     </p>
   <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
   [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
 
-## Running Koto
+## Running Kusari
 
 ### Getting started
 
@@ -20,7 +20,7 @@ $ git clone git@github.com:jurienhamaker/yugen.git
 ```
 
 **Copy the `.env.example` to `.env` and change the values in the `.env` file**
-**Copy the `koto.env.example` to `koto.env` and change the values in the `koto.env` file**
+**Copy the `kusari.env.example` to `kusari.env` and change the values in the `kusari.env` file**
 
 ---
 
@@ -34,13 +34,13 @@ $ git clone git@github.com:jurienhamaker/yugen.git
 
 ```bash
 $ docker-compose up -d db
-$ docker-compose up koto
+$ docker-compose up kusari
 ```
 
 ### Running migrations
 
 ```bash
-$ docker-compose exec -it koto yarn nx run prisma-koto:migrate-dev
+$ docker-compose exec -it kusari yarn nx run prisma-kusari:migrate-dev
 ```
 
 ---
@@ -56,18 +56,18 @@ $ docker-compose exec -it koto yarn nx run prisma-koto:migrate-dev
 
 ```bash
 $ yarn
-$ yarn nx run prisma-koto:generate-client
-$ yarn nx run prisma-koto:migrate-dev
+$ yarn nx run prisma-kusari:generate-client
+$ yarn nx run prisma-kusari:migrate-dev
 ```
 
 ### Running the bot/api
 
 ```bash
 # watch mode (recommended)
-$ yarn koto:start
+$ yarn kusari:start
 
 # production mode
-$ yarn koto:start:prod
+$ yarn kusari:start:prod
 ```
 
 ---
@@ -80,4 +80,4 @@ $ yarn koto:start:prod
 
 ## License
 
-KOTO is [GPL licensed](LICENSE).
+KUSARI is [GPL licensed](LICENSE).

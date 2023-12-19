@@ -17,6 +17,22 @@ services:
             - ./:/opt/app
         depends_on:
             - db
+    kusari:
+        build:
+            context: .
+            target: base
+        tty: true
+        command: yarn kusari:docker:start
+        env_file:
+            - ./.env
+            - ./kusari.env
+        ports:
+            - '$EXPOSED_KUSARI_API_PORT:3000'
+            - '$EXPOSED_KUSARI_DEBUGGING_PORT:9229'
+        volumes:
+            - ./:/opt/app
+        depends_on:
+            - db
     db:
         image: postgres:12.2-alpine
         volumes:

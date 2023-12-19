@@ -19,6 +19,24 @@ services:
         networks:
             - default
             - web
+    kusari:
+        image: ghcr.io/jurienhamaker/kusari:main
+        restart: unless-stopped
+        tty: true
+        env_file:
+            - ./.env
+            - ./kusari.env
+        environment:
+            - 'DATABASE_URL=$KUSARI_DATABASE_URL'
+        ports:
+            - '$EXPOSED_KUSARI_API_PORT:3000'
+        depends_on:
+            - db
+        labels:
+            - 'com.centurylinklabs.watchtower.enable=true'
+        networks:
+            - default
+            - web
     db:
         image: postgres:12.2
         environment:
