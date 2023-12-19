@@ -3,13 +3,7 @@ name: Build & Deploy Koto docker image
 on:
     push:
         branches: ['main']
-        paths:
-            [
-                'apps/koto/**',
-                'libs/**',
-                'Dockerfile.koto',
-                'docker-compose.prod.yml',
-            ]
+        paths: ['apps/koto/**', 'libs/**', 'Dockerfile.koto']
     workflow_dispatch:
 
 env:
