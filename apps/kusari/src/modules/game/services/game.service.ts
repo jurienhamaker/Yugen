@@ -151,7 +151,7 @@ Used **1 of your own** saves, You have **${saves}/2** saves left.`);
 Used **1 server** save, There are **${saves}/${maxSaves}** server saves left.`);
 			}
 
-			const highscore = this._checkStreak(settings, count);
+			const highscore = await this._checkStreak(settings, count);
 
 			await message.reply(
 				`The word ${word} does not start with the letter **${lastLetter}**
@@ -201,7 +201,7 @@ Used **1 server** save, There are **${saves}/${maxSaves}** server saves left.`);
 		});
 
 		const count = await this._getCount(game.id);
-		const highscore = this._checkStreak(settings, count);
+		const highscore = await this._checkStreak(settings, count);
 		await message.react(highscore ? '☑️' : '✅').catch(() => null);
 
 		this._setNumber(message, count);
@@ -265,12 +265,17 @@ Used **1 server** save, There are **${saves}/${maxSaves}** server saves left.`);
 		});
 	}
 
-	private _checkStreak(settings: Settings, count: number) {
+	private async _checkStreak(settings: Settings, count: number) {
 		let isHighscore = false;
+		console.log(count, settings.highscore);
 		if (count > settings.highscore) {
 			isHighscore = true;
-			this._settings.set(settings.guildId, 'highscore', count);
-			this._settings.set(settings.guildId, 'highscoreDate', new Date());
+			await this._settings.set(settings.guildId, 'highscore', count);
+			await this._settings.set(
+				settings.guildId,
+				'highscoreDate',
+				new Date(),
+			);
 		}
 
 		return isHighscore;
