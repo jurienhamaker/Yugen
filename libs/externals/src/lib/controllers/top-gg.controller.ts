@@ -6,13 +6,17 @@ import {
 	Post,
 	Req,
 } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { ExternalsVoteService } from '../services/vote.service';
 import { TopGGBody } from '../types/top-gg-body';
 import { checkAuthorization } from '../util/check-authorization';
 
 @Controller('top-gg')
 export class TopGGController {
-	constructor(private _vote: ExternalsVoteService) {}
+	constructor(
+		private _vote: ExternalsVoteService,
+		private _events: EventEmitter2,
+	) {}
 
 	@Post('/webhook')
 	async webhook(@Req() req: Request, @Body() body: TopGGBody) {
@@ -40,6 +44,11 @@ export class TopGGController {
 				HttpStatus.BAD_REQUEST,
 			);
 		}
+
+		this._events.emit('webhook.vote.received', {
+			userId: body.user,
+			source: 'top-gg',
+		});
 
 		await this._vote.sendVoteMessage('top-gg', body.user);
 

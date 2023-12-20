@@ -1,5 +1,6 @@
 import { DynamicModule, Module } from '@nestjs/common';
 import { APP_INTERCEPTOR } from '@nestjs/core';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 import { ScheduleModule } from '@nestjs/schedule';
 import { SentryInterceptor, SentryModule } from '@ntegral/nestjs-sentry';
 import { NecordModule } from 'necord';
@@ -34,6 +35,7 @@ export class SharedModule {
 					},
 				}),
 				ScheduleModule.forRoot(),
+				EventEmitterModule.forRoot(),
 			],
 			providers: [
 				{

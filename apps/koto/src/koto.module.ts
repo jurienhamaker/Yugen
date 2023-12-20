@@ -23,7 +23,7 @@ import { intents } from './util/intents';
 
 		// libs
 		SharedModule.forRoot(intents),
-		GeneralModule.forRoot(EMBED_COLOR),
+		GeneralModule.forRoot(EMBED_COLOR, () => `*Rewards Coming Soon*`),
 		HealthModule,
 		MetricsModule,
 		LogsModule,
@@ -37,6 +37,7 @@ import { intents } from './util/intents';
 	providers: [
 		// commands
 		TutorialCommands,
+		VoteCommands
 
 		// events
 		GuildEvents,

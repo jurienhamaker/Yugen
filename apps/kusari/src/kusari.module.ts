@@ -5,6 +5,7 @@ import { HealthModule } from '@yugen/health';
 import { LogsModule } from '@yugen/logs';
 import { MetricsModule } from '@yugen/metrics';
 import { SharedModule } from '@yugen/shared';
+import { isWeekend } from 'date-fns';
 import { TutorialCommands } from './commands/tutorial.commands';
 import { GuildEvents } from './events/guild.events';
 import { AdminModule } from './modules/admin/admin.module';
@@ -13,7 +14,6 @@ import { SettingsModule } from './modules/settings';
 import { KusariSharedModule } from './shared.module';
 import { EMBED_COLOR } from './util/constants';
 import { intents } from './util/intents';
-
 @Module({
 	imports: [
 		SettingsModule,
@@ -21,7 +21,13 @@ import { intents } from './util/intents';
 
 		// libs
 		SharedModule.forRoot(intents),
-		GeneralModule.forRoot(EMBED_COLOR),
+		GeneralModule.forRoot(
+			EMBED_COLOR,
+			() =>
+				`You will receive **${
+					isWeekend(new Date()) ? '0.5' : '0.25'
+				}** saves for **each vote**.`,
+		),
 		HealthModule,
 		MetricsModule,
 		LogsModule,

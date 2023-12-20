@@ -15,6 +15,7 @@ export class GeneralVoteCommands {
 	constructor(
 		private _client: Client,
 		@Inject('EMBED_COLOR') private _embedColor: ColorResolvable,
+		@Inject('VOTE_REWARD') private _voteReward: () => string,
 	) {}
 
 	@SlashCommand({
@@ -26,10 +27,11 @@ export class GeneralVoteCommands {
 		const embed = new EmbedBuilder()
 			.setTitle(`Vote information`)
 			.setDescription(
-				`Like what ${this._client.user?.displayName} is doing and want to support it's growth?
+				`Like what ${this._client.user
+					?.displayName} is doing and want to support it's growth?
 Please use any of the links below to vote for ${this._client.user?.displayName}!
 
-*Rewards Coming Soon*`,
+${this._voteReward()}`,
 			)
 			.setColor(this._embedColor)
 			.setFooter(footer);

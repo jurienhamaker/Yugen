@@ -6,13 +6,17 @@ import {
 	Post,
 	Req,
 } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { ExternalsVoteService } from '../services/vote.service';
 import { DiscordBotListBody } from '../types/discordbotlist-body';
 import { checkAuthorization } from '../util/check-authorization';
 
 @Controller('discordbotlist')
 export class DiscordBotListController {
-	constructor(private _vote: ExternalsVoteService) {}
+	constructor(
+		private _vote: ExternalsVoteService,
+		private _events: EventEmitter2,
+	) {}
 
 	@Post('/webhook')
 	async webhook(@Req() req: Request, @Body() body: DiscordBotListBody) {
@@ -32,6 +36,11 @@ export class DiscordBotListController {
 				HttpStatus.BAD_REQUEST,
 			);
 		}
+
+		this._events.emit('webhook.vote.received', {
+			userId: body.id,
+			source: 'discordbotlist',
+		});
 
 		await this._vote.sendVoteMessage('discord-bot-list', body.id);
 

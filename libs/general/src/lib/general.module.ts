@@ -9,13 +9,20 @@ import { InteractionEvents } from './events/interaction.events';
 
 @Module({})
 export class GeneralModule {
-	static forRoot(embedColor: ColorResolvable): DynamicModule {
+	static forRoot(
+		embedColor: ColorResolvable,
+		voteReward: () => string,
+	): DynamicModule {
 		return {
 			module: GeneralModule,
 			providers: [
 				{
 					provide: 'EMBED_COLOR',
 					useValue: embedColor,
+				},
+				{
+					provide: 'VOTE_REWARD',
+					useValue: voteReward,
 				},
 				// events
 				AppEvents,

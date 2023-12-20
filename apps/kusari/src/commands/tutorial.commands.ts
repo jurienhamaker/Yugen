@@ -22,8 +22,14 @@ export class TutorialCommands {
 - Each word afterwards has to start with the last letter of the previous word
 - That's it! Enjoy!
 
+**Saves:**
+You can earn saves by voting for Kusari! Each vote is worth 0.25 save & 0.5 on the weekends!
+A save can also be donated to the server, this will increase the server saves for collaborative save system.
+Donating a save will turn 1 personal save into 0.2 server saves.
+
 **Server Settings:**
-- Channel, specify a dedicated channel`,
+- Channel, specify a dedicated channel
+- Cooldown, specify a cooldown before users can add a word again`,
 			)
 			.setColor(EMBED_COLOR)
 			.setFooter(footer);

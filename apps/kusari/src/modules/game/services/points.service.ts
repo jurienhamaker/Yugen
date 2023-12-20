@@ -1,6 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { OnEvent } from '@nestjs/event-emitter';
 import { Prisma } from '@prisma/kusari';
 import { PrismaService } from '@yugen/prisma/kusari';
+import { isWeekend } from 'date-fns';
 import { Client } from 'discord.js';
 
 @Injectable()
@@ -11,6 +13,15 @@ export class GamePointsService {
 		private _prisma: PrismaService,
 		private _client: Client,
 	) {}
+
+	@OnEvent('webhook.vote.received')
+	onVote({ userId }: { userId }) {
+		const saves = isWeekend(new Date()) ? 0.5 : 0.25;
+		this._logger.log(
+			`Received webhook vote, adding ${saves} saves to ${userId}`,
+		);
+		this.addSave(userId, saves);
+	}
 
 	async getPlayer(
 		guildId: string,
@@ -116,6 +127,49 @@ export class GamePointsService {
 			},
 			data: {
 				points: user.points + 1,
+			},
+		});
+	}
+
+	async addSave(userId: string, amount: number) {
+		const players = await this._prisma.player.findMany({
+			where: {
+				userId,
+			},
+		});
+
+		const promises = [];
+		for (const player of players) {
+			if (player.saves == 2) {
+				continue;
+			}
+
+			const newSaves = player.saves + amount;
+			const update = this._prisma.player.update({
+				where: {
+					id: player.id,
+				},
+				data: {
+					saves: newSaves > 2 ? 2 : newSaves,
+				},
+			});
+
+			promises.push(update);
+		}
+
+		return Promise.allSettled(promises);
+	}
+
+	async deductSave(guildId: string, userId: string, amount: number) {
+		const player = await this.getPlayer(guildId, userId);
+
+		const newSave = player.saves - amount;
+		return this._prisma.player.update({
+			where: {
+				id: player.id,
+			},
+			data: {
+				saves: newSave < 0 ? 0 : newSave,
 			},
 		});
 	}
