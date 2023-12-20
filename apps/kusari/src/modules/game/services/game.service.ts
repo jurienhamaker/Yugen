@@ -267,7 +267,6 @@ Used **1 server** save, There are **${saves}/${maxSaves}** server saves left.`);
 
 	private async _checkStreak(settings: Settings, count: number) {
 		let isHighscore = false;
-		console.log(count, settings.highscore);
 		if (count > settings.highscore) {
 			isHighscore = true;
 			await this._settings.set(settings.guildId, 'highscore', count);
