@@ -1,4 +1,4 @@
-name: Build & Deploy Koto docker image
+name: 'Koto: Build & Deploy docker image'
 
 on:
     push:

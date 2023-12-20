@@ -1,4 +1,4 @@
-name: Build & Deploy Kusari docker image
+name: 'Kusari: Build & Deploy docker image'
 
 on:
     push:
