@@ -37,7 +37,6 @@ import { intents } from './util/intents';
 	providers: [
 		// commands
 		TutorialCommands,
-		VoteCommands
 
 		// events
 		GuildEvents,
