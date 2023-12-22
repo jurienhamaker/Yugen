@@ -5,6 +5,7 @@ import { HealthModule } from '@yugen/health';
 import { LogsModule } from '@yugen/logs';
 import { MetricsModule } from '@yugen/metrics';
 import { SharedModule } from '@yugen/shared';
+import { HelpCommands } from './commands/help.commands';
 import { TutorialCommands } from './commands/tutorial.commands';
 import { GuildEvents } from './events/guild.events';
 import { AdminModule } from './modules/admin/admin.module';
@@ -37,6 +38,7 @@ import { intents } from './util/intents';
 	providers: [
 		// commands
 		TutorialCommands,
+		HelpCommands,
 
 		// events
 		GuildEvents,
