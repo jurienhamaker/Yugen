@@ -18,9 +18,9 @@ export const sendWelcomeMessage = async (channel: Channel, _client: Client) => {
 	const footer = await getEmbedFooter(_client);
 	const embed = new EmbedBuilder()
 		.setThumbnail(_client.user.avatarURL())
-		.setTitle(`Thank you for inviting Koto!`)
+		.setTitle(`Thank you for inviting Kusari!`)
 		.setDescription(
-			`Koto has not yet been set up in this server! ${noSettingsDescription}`,
+			`Kusari has not yet been set up in this server! ${noSettingsDescription}`,
 		)
 		.setColor(EMBED_COLOR)
 		.setFooter(footer);

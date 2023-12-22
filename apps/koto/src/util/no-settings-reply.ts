@@ -2,7 +2,7 @@ import { EMBED_COLOR } from '@yugen/koto/util/constants';
 import { getEmbedFooter } from '@yugen/util';
 import { Client, CommandInteraction, EmbedBuilder } from 'discord.js';
 
-export const noSettingsDescription = `Koto has not yet been set up in this server! Someone with \`Manage Server\` permissions must do the following:
+export const noSettingsDescription = `Someone with \`Manage Server\` permissions must do the following:
     
 - Create a new channel where Koto games will be played
 - Use the \`/settings channel\` command to configure the channel
@@ -17,7 +17,9 @@ export const noSettingsReply = async (
 	const footer = await getEmbedFooter(_client);
 	const embed = new EmbedBuilder()
 		.setTitle('Koto Setup')
-		.setDescription(noSettingsDescription)
+		.setDescription(
+			`Koto has not yet been set up in this server! ${noSettingsDescription}`,
+		)
 		.setColor(EMBED_COLOR)
 		.setFooter(footer);
 

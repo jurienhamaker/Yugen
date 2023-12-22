@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { Client, Events } from 'discord.js';
+import { ChannelType, Client, Events, PermissionsBitField } from 'discord.js';
 import { Context, ContextOf, On } from 'necord';
+import { sendWelcomeMessage } from '../util/send-welcome-message';
 
 @Injectable()
 export class GuildEvents {
@@ -13,6 +14,22 @@ export class GuildEvents {
 		@Context() [guild]: ContextOf<Events.GuildCreate>,
 	) {
 		this._logger.log(`Joined a new guild ${guild.name}`);
+
+		const channel = guild.channels.cache.find(
+			(c) =>
+				c.type === ChannelType.GuildText &&
+				c
+					.permissionsFor(this._client.user)
+					.has(PermissionsBitField.Flags.SendMessages),
+		);
+
+		if (channel) {
+			this._logger.log(
+				`Sending welcome message to ${channel.id} in ${guild.id}`,
+			);
+
+			await sendWelcomeMessage(channel, this._client);
+		}
 	}
 
 	@On(Events.GuildDelete)
