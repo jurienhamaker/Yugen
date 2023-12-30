@@ -67,7 +67,8 @@ export class SettingsService {
 			return;
 		}
 
-		const { channelId, pingRoleId, cooldown, frequency } = settings;
+		const { channelId, pingRoleId, pingOnlyNew, cooldown, frequency } =
+			settings;
 
 		const embed = new EmbedBuilder()
 			.setColor(EMBED_COLOR)
@@ -87,8 +88,8 @@ export class SettingsService {
 					inline: true,
 				},
 				{
-					name: ' ',
-					value: ' ',
+					name: 'Ping type',
+					value: pingOnlyNew ? 'New games' : 'Every change',
 					inline: true,
 				},
 				{
@@ -101,6 +102,11 @@ export class SettingsService {
 					value: `Every ${frequency} hour${
 						frequency === 1 ? '' : 's'
 					}`,
+					inline: true,
+				},
+				{
+					name: ' ',
+					value: ' ',
 					inline: true,
 				},
 			);
