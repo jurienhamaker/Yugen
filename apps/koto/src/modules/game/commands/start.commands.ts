@@ -1,13 +1,14 @@
 import { Injectable, UseFilters, UseGuards } from '@nestjs/common';
 import { SettingsService } from '@yugen/koto/modules/settings';
 import { noSettingsReply } from '@yugen/koto/util/no-settings-reply';
-import { ForbiddenExceptionFilter, GuildModeratorGuard } from '@yugen/shared';
+import { ForbiddenExceptionFilter } from '@yugen/shared';
 import { Client, CommandInteraction } from 'discord.js';
 import { Context, SlashCommandContext, Subcommand } from 'necord';
+import { GameStartGuard } from '../filters/game-start.guard';
 import { GameCommandDecorator } from '../game.decorator';
 import { GameService } from '../services/game.service';
 
-@UseGuards(GuildModeratorGuard)
+@UseGuards(GameStartGuard)
 @UseFilters(ForbiddenExceptionFilter)
 @GameCommandDecorator()
 @Injectable()

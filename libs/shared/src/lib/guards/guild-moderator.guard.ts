@@ -9,9 +9,10 @@ import { NecordExecutionContext } from 'necord';
 
 @Injectable()
 export class GuildModeratorGuard implements CanActivate {
-	private readonly _logger = new Logger(GuildModeratorGuard.name);
+	protected readonly _logger = new Logger(GuildModeratorGuard.name);
 
-	constructor(private _client: Client) {}
+	constructor(protected _client: Client) {}
+
 	async canActivate(context: ExecutionContext): Promise<boolean> {
 		const ctx = NecordExecutionContext.create(context);
 		const [interaction] = ctx.getContext<'interactionCreate'>();

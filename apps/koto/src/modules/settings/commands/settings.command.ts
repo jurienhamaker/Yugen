@@ -72,10 +72,23 @@ class SettingsSetAutoStartOptions {
 	autoStart: boolean;
 }
 
+class SettingsSetMembersPrivilegeOptions {
+	@BooleanOption({
+		name: 'value',
+		description: 'Wether server members van start games themselves.',
+		required: true,
+	})
+	membersCanStart: boolean;
+}
+
 const settingsResetOptionsChoices = [
 	{
 		name: 'Channel',
 		value: 'channelId',
+	},
+	{
+		name: 'Member privilege',
+		value: 'membersCanStart',
 	},
 	{
 		name: 'Ping role',
@@ -411,6 +424,28 @@ export class SettingsCommands {
 			content: autoStart
 				? 'I will **automatically** start a new game when the previous one ended.'
 				: 'I will **not** start a new game after the previous one ended.',
+			ephemeral: true,
+		});
+	}
+
+	@Subcommand({
+		name: 'members-privilege',
+		description: 'Wether server members van start games themselves.',
+	})
+	public async setMemberCanStart(
+		@Context() [interaction]: SlashCommandContext,
+		@Options() { membersCanStart }: SettingsSetMembersPrivilegeOptions,
+	) {
+		await this._settings.set(
+			interaction.guildId,
+			'membersCanStart',
+			membersCanStart,
+		);
+
+		return interaction.reply({
+			content: `Members are **${
+				membersCanStart ? '' : 'not '
+			}allowed** to start games themselves.`,
 			ephemeral: true,
 		});
 	}

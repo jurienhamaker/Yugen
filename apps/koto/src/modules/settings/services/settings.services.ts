@@ -76,6 +76,7 @@ export class SettingsService {
 			frequency,
 			timeLimit,
 			autoStart,
+			membersCanStart,
 		} = settings;
 
 		const frequencyFormatted = formatMinutes(frequency);
@@ -93,6 +94,18 @@ export class SettingsService {
 					inline: true,
 				},
 				{
+					name: 'Members privilege',
+					value: membersCanStart
+						? `Allowed to start games`
+						: "Can't start games",
+					inline: true,
+				},
+				{
+					name: ' ',
+					value: ' ',
+					inline: true,
+				},
+				{
 					name: 'Ping role',
 					value: pingRoleId ? `<@&${pingRoleId}>` : '-',
 					inline: true,
@@ -100,6 +113,11 @@ export class SettingsService {
 				{
 					name: 'Ping type',
 					value: pingOnlyNew ? 'New games' : 'Every change',
+					inline: true,
+				},
+				{
+					name: 'Auto start games',
+					value: autoStart ? 'Yes' : 'No',
 					inline: true,
 				},
 				{
@@ -147,11 +165,6 @@ export class SettingsService {
 								}`
 							: ''
 					}`,
-					inline: true,
-				},
-				{
-					name: 'Auto start',
-					value: autoStart ? 'Yes' : 'No',
 					inline: true,
 				},
 			);

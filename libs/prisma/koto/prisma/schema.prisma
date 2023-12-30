@@ -20,6 +20,8 @@ model Settings {
   pingRoleId        String?
   pingOnlyNew       Boolean     @default(true)
 
+  membersCanStart   Boolean     @default(false)
+
   cooldown          Int         @default(10)
   frequency         Int         @default(60)
   timeLimit         Int         @default(60)
