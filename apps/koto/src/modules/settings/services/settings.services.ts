@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Settings } from '@prisma/koto';
 import { EMBED_COLOR } from '@yugen/koto/util/constants';
 import { PrismaService } from '@yugen/prisma/koto';
+import { formatMinutes } from '@yugen/util';
 import {
 	CommandInteraction,
 	EmbedBuilder,
@@ -67,9 +68,18 @@ export class SettingsService {
 			return;
 		}
 
-		const { channelId, pingRoleId, pingOnlyNew, cooldown, frequency } =
-			settings;
+		const {
+			channelId,
+			pingRoleId,
+			pingOnlyNew,
+			cooldown,
+			frequency,
+			timeLimit,
+			autoStart,
+		} = settings;
 
+		const frequencyFormatted = formatMinutes(frequency);
+		const timeLimitFormatted = formatMinutes(timeLimit);
 		const embed = new EmbedBuilder()
 			.setColor(EMBED_COLOR)
 			.setTitle('Koto settings')
@@ -99,14 +109,49 @@ export class SettingsService {
 				},
 				{
 					name: 'Game frequency',
-					value: `Every ${frequency} hour${
-						frequency === 1 ? '' : 's'
+					value: `Every ${
+						frequencyFormatted.hours
+							? `${frequencyFormatted.hours} hour${
+									frequencyFormatted.hours === 1 ? '' : 's'
+								}`
+							: ''
+					}${
+						frequencyFormatted.hours && frequencyFormatted.minutes
+							? ' & '
+							: ''
+					}${
+						frequencyFormatted.minutes
+							? `${frequencyFormatted.minutes} minute${
+									frequencyFormatted.minutes === 1 ? '' : 's'
+								}`
+							: ''
 					}`,
 					inline: true,
 				},
 				{
-					name: ' ',
-					value: ' ',
+					name: 'Time limit',
+					value: `${
+						timeLimitFormatted.hours
+							? `${timeLimitFormatted.hours} hour${
+									timeLimitFormatted.hours === 1 ? '' : 's'
+								}`
+							: ''
+					}${
+						timeLimitFormatted.hours && timeLimitFormatted.minutes
+							? ' & '
+							: ''
+					}${
+						timeLimitFormatted.minutes
+							? `${timeLimitFormatted.minutes} minute${
+									timeLimitFormatted.minutes === 1 ? '' : 's'
+								}`
+							: ''
+					}`,
+					inline: true,
+				},
+				{
+					name: 'Auto start',
+					value: autoStart ? 'Yes' : 'No',
 					inline: true,
 				},
 			);

@@ -79,6 +79,7 @@ export class AdminRecreateCommands {
 
 		const started = await this._game.start(
 			guildId ?? interaction.guildId,
+			false,
 			true,
 			word,
 		);

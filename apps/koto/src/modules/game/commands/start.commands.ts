@@ -44,7 +44,11 @@ export class GameStartCommands {
 			return noSettingsReply(interaction, this._client);
 		}
 
-		const started = await this._game.start(interaction.guildId, recreate);
+		const started = await this._game.start(
+			interaction.guildId,
+			true,
+			recreate,
+		);
 
 		return interaction.reply({
 			content:

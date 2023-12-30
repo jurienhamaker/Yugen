@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { SettingsService } from '@yugen/koto/modules/settings';
 import { EMBED_COLOR } from '@yugen/koto/util/constants';
 import { noSettingsReply } from '@yugen/koto/util/no-settings-reply';
-import { getEmbedFooter } from '@yugen/util';
+import { formatMinutes, getEmbedFooter } from '@yugen/util';
 import { Client, EmbedBuilder } from 'discord.js';
 import { Context, SlashCommand, SlashCommandContext } from 'necord';
 
@@ -24,6 +24,9 @@ export class TutorialCommands {
 			return noSettingsReply(interaction, this._client);
 		}
 
+		const frequencyFormatted = formatMinutes(settings.frequency);
+		const timeLimitFormatted = formatMinutes(settings.timeLimit);
+
 		const footer = await getEmbedFooter(this._client);
 		const embed = new EmbedBuilder()
 			.setTitle(`Koto Tutorial`)
@@ -36,9 +39,43 @@ export class TutorialCommands {
 
 **Server Settings:**
 - There is a cooldown of **${settings.cooldown}** minutes between guesses
-- A new game is posted every **${settings.frequency}** hour${
-					settings.frequency !== 1 ? 's' : ''
-				}
+- A new game is posted every **${
+					frequencyFormatted.hours
+						? `${frequencyFormatted.hours} hour${
+								frequencyFormatted.hours === 1 ? '' : 's'
+							}`
+						: ''
+				}${
+					frequencyFormatted.hours && frequencyFormatted.minutes
+						? ' & '
+						: ''
+				}${
+					frequencyFormatted.minutes
+						? `${frequencyFormatted.minutes} minute${
+								frequencyFormatted.minutes === 1 ? '' : 's'
+							}`
+						: ''
+				}**.
+- The time limit of each game is **${
+					timeLimitFormatted.hours
+						? `${timeLimitFormatted.hours} hour${
+								timeLimitFormatted.hours === 1 ? '' : 's'
+							}`
+						: ''
+				}${
+					timeLimitFormatted.hours && timeLimitFormatted.minutes
+						? ' & '
+						: ''
+				}${
+					timeLimitFormatted.minutes
+						? `${timeLimitFormatted.minutes} minute${
+								timeLimitFormatted.minutes === 1 ? '' : 's'
+							}`
+						: ''
+				}**.
+- A game will ${
+					settings.autoStart ? '' : 'not '
+				}be automatically started after the previous one has ended 
 
 **Point Rewards:**
 - 1 point for finding a yellow letter

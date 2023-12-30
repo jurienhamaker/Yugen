@@ -1,6 +1,7 @@
 export * from './lib/bootstrap';
 export * from './lib/buttons';
 export * from './lib/delay';
+export * from './lib/format-minutes';
 export * from './lib/get-bot-author';
 export * from './lib/get-embed-footer';
 export * from './lib/get-interaction-command-name';

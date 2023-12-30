@@ -1,6 +1,7 @@
 import { Injectable, UseFilters, UseGuards } from '@nestjs/common';
 import { Settings } from '@prisma/koto';
 import { ForbiddenExceptionFilter, GuildAdminGuard } from '@yugen/shared';
+import { formatMinutes } from '@yugen/util';
 import { ChannelType, Role, TextChannel } from 'discord.js';
 import {
 	BooleanOption,
@@ -41,15 +42,14 @@ class SettingsSetRoleOptions {
 	onlyNew: boolean;
 }
 
-class SettingsSetFrequencyOptions {
+class SettingsSetFrequencyOrTimeLimitOptions {
 	@NumberOption({
-		name: 'hours',
-		description: 'The amount of hours between games.',
+		name: 'minutes',
+		description: 'The amount of minutes between games.',
 		required: true,
-		min_value: 1,
-		max_value: 24,
+		min_value: 10,
 	})
-	hours: number | undefined;
+	minutes: number | undefined;
 }
 
 class SettingsSetCooldownOptions {
@@ -63,6 +63,15 @@ class SettingsSetCooldownOptions {
 	minutes: number | undefined;
 }
 
+class SettingsSetAutoStartOptions {
+	@BooleanOption({
+		name: 'value',
+		description: 'Wether to automatically start a game after it ends.',
+		required: true,
+	})
+	autoStart: boolean;
+}
+
 const settingsResetOptionsChoices = [
 	{
 		name: 'Channel',
@@ -73,12 +82,20 @@ const settingsResetOptionsChoices = [
 		value: 'pingRoleId',
 	},
 	{
+		name: 'Answer Cooldown',
+		value: 'cooldown',
+	},
+	{
 		name: 'Game frequency',
 		value: 'frequency',
 	},
 	{
-		name: 'Answer Cooldown',
-		value: 'cooldown',
+		name: 'Time limit',
+		value: 'timeLimit',
+	},
+	{
+		name: 'Auto Start',
+		value: 'autoStart',
 	},
 ];
 class SettingsResetOptions {
@@ -176,8 +193,16 @@ export class SettingsCommands {
 			value = 10;
 		}
 
-		if (setting === 'frequency') {
-			value = 1;
+		if (setting === 'frequency' || setting === 'timeLimit') {
+			value = 60;
+		}
+
+		if (setting === 'autoStart') {
+			value = false;
+		}
+
+		if (setting === 'pingRoleId') {
+			await this._settings.set(interaction.guildId, 'pingOnlyNew', false);
 		}
 
 		await this._settings.set(interaction.guildId, setting, value);
@@ -200,28 +225,139 @@ export class SettingsCommands {
 	})
 	public async setFrequency(
 		@Context() [interaction]: SlashCommandContext,
-		@Options() { hours }: SettingsSetFrequencyOptions,
+		@Options() { minutes }: SettingsSetFrequencyOrTimeLimitOptions,
 	) {
-		if (!hours || isNaN(hours)) {
+		const settings = await this._settings.getSettings(interaction.guildId);
+		if (!minutes || isNaN(minutes)) {
 			return interaction.reply({
-				content: 'A valid number for hours must be provided.',
+				content: 'A valid number for minutes must be provided.',
 				ephemeral: true,
 			});
 		}
 
-		if (hours < 1 || hours > 24) {
+		if (minutes < 10) {
 			return interaction.reply({
-				content:
-					'A minimum of 1 & a maximum of 24 hours must be provided.',
+				content: 'A minimum of 10 minutes must be provided.',
 				ephemeral: true,
 			});
 		}
 
-		await this._settings.set(interaction.guildId, 'frequency', hours);
+		if (minutes < settings.timeLimit) {
+			const timeLimitFormatted = formatMinutes(settings.timeLimit);
+			return interaction.reply({
+				content: `The frequency can not be lower than the time limit of ${
+					timeLimitFormatted.hours
+						? `${timeLimitFormatted.hours} hour${
+								timeLimitFormatted.hours === 1 ? '' : 's'
+							}`
+						: ''
+				}${
+					timeLimitFormatted.hours && timeLimitFormatted.minutes
+						? ' & '
+						: ''
+				}${
+					timeLimitFormatted.minutes
+						? `${timeLimitFormatted.minutes} minute${
+								timeLimitFormatted.minutes === 1 ? '' : 's'
+							}`
+						: ''
+				}.`,
+				ephemeral: true,
+			});
+		}
 
+		await this._settings.set(interaction.guildId, 'frequency', minutes);
+
+		const frequencyFormatted = formatMinutes(minutes);
 		return interaction.reply({
-			content: `I will start a new game every ${hours} hour${
-				hours === 1 ? '' : 's'
+			content: `I will start a new game every ${
+				frequencyFormatted.hours
+					? `${frequencyFormatted.hours} hour${
+							frequencyFormatted.hours === 1 ? '' : 's'
+						}`
+					: ''
+			}${
+				frequencyFormatted.hours && frequencyFormatted.minutes
+					? ' & '
+					: ''
+			}${
+				frequencyFormatted.minutes
+					? `${frequencyFormatted.minutes} minute${
+							frequencyFormatted.minutes === 1 ? '' : 's'
+						}`
+					: ''
+			}.`,
+			ephemeral: true,
+		});
+	}
+
+	@Subcommand({
+		name: 'time-limit',
+		description: 'Set the time limit of games.',
+	})
+	public async setTimeLimit(
+		@Context() [interaction]: SlashCommandContext,
+		@Options() { minutes }: SettingsSetFrequencyOrTimeLimitOptions,
+	) {
+		const settings = await this._settings.getSettings(interaction.guildId);
+		if (!minutes || isNaN(minutes)) {
+			return interaction.reply({
+				content: 'A valid number for minutes must be provided.',
+				ephemeral: true,
+			});
+		}
+
+		if (minutes < 10) {
+			return interaction.reply({
+				content: 'A minimum of 10 minutes must be provided.',
+				ephemeral: true,
+			});
+		}
+
+		if (minutes > settings.frequency) {
+			const frequencyFormatted = formatMinutes(settings.frequency);
+			return interaction.reply({
+				content: `The time limit can not be higher than the frequency of ${
+					frequencyFormatted.hours
+						? `${frequencyFormatted.hours} hour${
+								frequencyFormatted.hours === 1 ? '' : 's'
+							}`
+						: ''
+				}${
+					frequencyFormatted.hours && frequencyFormatted.minutes
+						? ' & '
+						: ''
+				}${
+					frequencyFormatted.minutes
+						? `${frequencyFormatted.minutes} minute${
+								frequencyFormatted.minutes === 1 ? '' : 's'
+							}`
+						: ''
+				}.`,
+				ephemeral: true,
+			});
+		}
+
+		await this._settings.set(interaction.guildId, 'timeLimit', minutes);
+
+		const timeLimitFormatted = formatMinutes(minutes);
+		return interaction.reply({
+			content: `The time limit has been set to ${
+				timeLimitFormatted.hours
+					? `${timeLimitFormatted.hours} hour${
+							timeLimitFormatted.hours === 1 ? '' : 's'
+						}`
+					: ''
+			}${
+				timeLimitFormatted.hours && timeLimitFormatted.minutes
+					? ' & '
+					: ''
+			}${
+				timeLimitFormatted.minutes
+					? `${timeLimitFormatted.minutes} minute${
+							timeLimitFormatted.minutes === 1 ? '' : 's'
+						}`
+					: ''
 			}.`,
 			ephemeral: true,
 		});
@@ -256,6 +392,25 @@ export class SettingsCommands {
 			content: `Members will now be able to provide an answer every ${minutes} minute${
 				minutes === 1 ? '' : 's'
 			}.`,
+			ephemeral: true,
+		});
+	}
+
+	@Subcommand({
+		name: 'auto-start',
+		description:
+			'Wether a game should automatically start a new one after the previous ended.',
+	})
+	public async setAutoStart(
+		@Context() [interaction]: SlashCommandContext,
+		@Options() { autoStart }: SettingsSetAutoStartOptions,
+	) {
+		await this._settings.set(interaction.guildId, 'autoStart', autoStart);
+
+		return interaction.reply({
+			content: autoStart
+				? 'I will **automatically** start a new game when the previous one ended.'
+				: 'I will **not** start a new game after the previous one ended.',
 			ephemeral: true,
 		});
 	}

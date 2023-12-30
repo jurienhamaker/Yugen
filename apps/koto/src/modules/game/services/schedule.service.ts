@@ -2,8 +2,9 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { GameStatus } from '@prisma/koto';
 import { PrismaService } from '@yugen/prisma/koto';
-import { startOfHour } from 'date-fns';
+import { addMinutes } from 'date-fns';
 import { Client } from 'discord.js';
+import { SettingsService } from '../../settings';
 import { GameService } from './game.service';
 
 @Injectable()
@@ -14,17 +15,21 @@ export class GameScheduleService {
 		private _prisma: PrismaService,
 		private _client: Client,
 		private _game: GameService,
+		private _settings: SettingsService,
 	) {}
 
-	@Cron('0 */30 * * * *')
+	@Cron(`0 ${process.env.NODE_ENV === 'production' ? '*/10' : '*'} * * * *`)
 	async check() {
 		const outOfTimeGames = await this._prisma.game.findMany({
 			where: {
 				status: GameStatus.IN_PROGRESS,
-				endingAt: startOfHour(new Date()),
+				endingAt: {
+					lte: new Date(),
+				},
 			},
 			select: {
 				id: true,
+				guildId: true,
 			},
 		});
 
@@ -32,8 +37,8 @@ export class GameScheduleService {
 			`Checking finished game, ending ${outOfTimeGames.length} games.`,
 		);
 		const endPromises = [];
-		for (let { id } of outOfTimeGames) {
-			endPromises.push(this._game.endGame(id));
+		for (const game of outOfTimeGames) {
+			endPromises.push(this._endGame(game.id, game.guildId));
 		}
 		await Promise.allSettled(endPromises);
 		this._logger.log(`Ended ${outOfTimeGames.length} games.`);
@@ -49,7 +54,7 @@ export class GameScheduleService {
 
 		this._logger.log(`Checking ${guildsWithChannelId.length} guilds.`);
 		const promises = [];
-		for (let { guildId } of guildsWithChannelId) {
+		for (const { guildId } of guildsWithChannelId) {
 			const guild = await this._client.guilds
 				.fetch(guildId)
 				.catch(() => null);
@@ -66,19 +71,47 @@ export class GameScheduleService {
 		this._logger.log(`Started ${startedGames.length} games.`);
 	}
 
+	private async _endGame(id: number, guildId: string) {
+		await this._game.endGame(id);
+
+		const settings = await this._settings.getSettings(guildId);
+		if (settings.autoStart) {
+			await this._game.start(guildId, false);
+		}
+	}
+
 	private async _checkGuild(guildId) {
-		const lastGame = await this._prisma.game.findFirst({
+		const settings = await this._settings.getSettings(guildId);
+		const currentGame = await this._prisma.game.findFirst({
 			where: {
 				guildId,
-				endingAt: { gt: startOfHour(new Date()) },
+				status: GameStatus.IN_PROGRESS,
+				endingAt: { gt: new Date() },
 			},
 		});
 
-		if (lastGame) {
+		if (currentGame) {
 			return false;
 		}
 
-		await this._game.start(guildId);
+		const scheduleStartedGame = await this._prisma.game.findFirst({
+			where: {
+				guildId,
+				scheduleStarted: true,
+			},
+			orderBy: {
+				createdAt: 'desc',
+			},
+		});
+
+		if (
+			addMinutes(scheduleStartedGame.createdAt, settings.frequency) >
+			new Date()
+		) {
+			return false;
+		}
+
+		await this._game.start(guildId, true);
 		return true;
 	}
 }

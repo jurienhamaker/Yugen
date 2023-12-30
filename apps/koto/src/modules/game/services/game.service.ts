@@ -4,7 +4,7 @@ import { SettingsService } from '@yugen/koto/modules/settings';
 import { WordsService } from '@yugen/koto/modules/words/services/words.service';
 import { PrismaService } from '@yugen/prisma/koto';
 import { getTimestamp } from '@yugen/util';
-import { addHours, addMinutes, startOfHour, subMinutes } from 'date-fns';
+import { addMinutes, subMinutes } from 'date-fns';
 import { Message } from 'discord.js';
 import {
 	GAME_TYPE,
@@ -27,7 +27,12 @@ export class GameService {
 		private _points: GamePointsService,
 	) {}
 
-	async start(guildId: string, recreate = false, word = null) {
+	async start(
+		guildId: string,
+		schedule = false,
+		recreate = false,
+		word = null,
+	) {
 		this._logger.log(`Trying to start a game for ${guildId}`);
 
 		const currentGame = await this.getCurrentGame(guildId);
@@ -65,7 +70,8 @@ export class GameService {
 			data: {
 				guildId,
 				word,
-				endingAt: startOfHour(addHours(new Date(), settings.frequency)),
+				scheduleStarted: schedule,
+				endingAt: addMinutes(new Date(), settings.timeLimit),
 				meta: this._createBaseState(word) as any,
 			},
 			include: {
@@ -161,6 +167,10 @@ export class GameService {
 		);
 
 		await Promise.allSettled(promises);
+
+		if (status !== GameStatus.IN_PROGRESS && settings.autoStart) {
+			return this.start(guildId);
+		}
 	}
 
 	async endGame(gameId: number, status: GameStatus = GameStatus.OUT_OF_TIME) {
