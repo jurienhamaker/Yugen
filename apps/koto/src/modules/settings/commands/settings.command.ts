@@ -3,6 +3,7 @@ import { Settings } from '@prisma/koto';
 import { ForbiddenExceptionFilter, GuildAdminGuard } from '@yugen/shared';
 import { ChannelType, Role, TextChannel } from 'discord.js';
 import {
+	BooleanOption,
 	ChannelOption,
 	Context,
 	NumberOption,
@@ -31,6 +32,13 @@ class SettingsSetRoleOptions {
 		required: true,
 	})
 	role: Role | undefined;
+
+	@BooleanOption({
+		name: 'only-new',
+		description: 'Ping only the first message of a new game',
+		required: true,
+	})
+	onlyNew: boolean;
 }
 
 class SettingsSetFrequencyOptions {
@@ -127,7 +135,7 @@ export class SettingsCommands {
 	})
 	public async setRole(
 		@Context() [interaction]: SlashCommandContext,
-		@Options() { role }: SettingsSetRoleOptions,
+		@Options() { role, onlyNew }: SettingsSetRoleOptions,
 	) {
 		if (!role) {
 			return interaction.reply({
@@ -137,9 +145,12 @@ export class SettingsCommands {
 		}
 
 		await this._settings.set(interaction.guildId, 'pingRoleId', role.id);
+		await this._settings.set(interaction.guildId, 'pingOnlyNew', onlyNew);
 
 		return interaction.reply({
-			content: `I will use <@&${role.id}> to notify members of a new game.`,
+			content: `I will use <@&${role.id}> to notify members of ${
+				onlyNew ? 'a new game' : 'every change in a game'
+			}.`,
 			ephemeral: true,
 		});
 	}

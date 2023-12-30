@@ -16,7 +16,10 @@ model Settings {
   guildId           String      @unique
 
   channelId         String?
+  
   pingRoleId        String?
+  pingOnlyNew       Boolean     @default(true)
+
   cooldown          Int         @default(10)
   frequency         Int         @default(1)
 

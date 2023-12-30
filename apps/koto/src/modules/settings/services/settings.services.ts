@@ -41,7 +41,7 @@ export class SettingsService {
 	async set(
 		guildId: string,
 		property: keyof Settings,
-		value: string | number,
+		value: string | number | boolean,
 	) {
 		let settings = await this.getSettings(guildId);
 

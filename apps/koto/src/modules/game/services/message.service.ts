@@ -41,10 +41,14 @@ export class GameMessageService {
 
 		const embed = await this._createEmbed(game);
 		const message = await channel.send({
-			content: settings.pingRoleId ? `<@&${settings.pingRoleId}>` : '',
+			content:
+				settings.pingRoleId && (isNew || !settings.pingOnlyNew)
+					? `<@&${settings.pingRoleId}>`
+					: '',
 			embeds: [embed],
 			allowedMentions: {
 				users: [],
+				roles: [settings.pingRoleId],
 			},
 		});
 
@@ -148,7 +152,7 @@ ${this._getGameInformation(game)}`,
 								!receivedBonus.includes(row.userId)
 									? ' (+2)'
 									: ''
-						  }**`
+							}**`
 						: ''
 				}` +
 				'\n';
@@ -176,7 +180,7 @@ ${this._getGameInformation(game)}`,
 										game.meta.keyboard?.[l] ?? 'DEFAULT'
 									],
 									l,
-							  ),
+								),
 					)
 					.join('') + '\n';
 			return str;
