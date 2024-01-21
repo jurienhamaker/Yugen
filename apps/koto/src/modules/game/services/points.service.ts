@@ -58,6 +58,19 @@ export class GamePointsService {
 		});
 	}
 
+	resetLeaderboard(
+		guildId: string
+	) {
+		return this._prisma.player.updateMany({
+			where: {
+				guildId
+			},
+			data: {
+				points: 0
+			}
+		});
+	}
+
 	async getLeaderboard(
 		guildId: string,
 		type: 'points' | 'wins' | 'participated' = 'points',

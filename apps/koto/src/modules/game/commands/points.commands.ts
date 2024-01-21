@@ -21,6 +21,7 @@ export class GamePointsCommands {
 
 Participated in **${user.participated}** games.
 And you finished **${user.wins}** games with the correct guess!`,
+			ephemeral: true
 		});
 	}
 }

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UseFilters, UseGuards } from '@nestjs/common';
 import { getEmbedFooter } from '@yugen/util';
 import {
 	ActionRowBuilder,
@@ -20,6 +20,7 @@ import {
 	SlashCommandContext,
 } from 'necord';
 import { GamePointsService } from '../services/points.service';
+import { ForbiddenExceptionFilter, GuildAdminGuard } from '@yugen/shared';
 
 class GameLeaderboardOptions {
 	// @StringOption({
@@ -63,6 +64,64 @@ export class GameLeaderboardCommands {
 		@Options() { page }: GameLeaderboardOptions,
 	) {
 		return this._listLeaderboard(interaction, 'points', page);
+	}
+
+	@UseGuards(GuildAdminGuard)
+	@UseFilters(ForbiddenExceptionFilter)
+	@SlashCommand({
+		name: 'reset-leaderboard',
+		description: 'Reset all player points and completely reset the leaderboard',
+	})
+	public async reset(
+		@Context() [interaction]: SlashCommandContext,
+	) {
+		const footer = await getEmbedFooter(
+			this._client,
+		);
+		const embed = new EmbedBuilder()
+			.setTitle(`Reset leaderboard`)
+			.setDescription(`Are you sure you want to reset the leaderboard of **${interaction.guild.name}**
+**This action is irreversible**`)
+			.setFooter(footer);
+
+		return interaction.reply({
+			embeds: [embed],
+			components: [new ActionRowBuilder<ButtonBuilder>().addComponents([
+				new ButtonBuilder()
+					.setCustomId(`RESET_LEADERBOARD/yes`)
+					.setLabel('Reset leaderboard')
+					.setStyle(ButtonStyle.Success),
+				new ButtonBuilder()
+					.setCustomId(`RESET_LEADERBOARD/no`)
+					.setLabel('Cancel')
+					.setStyle(ButtonStyle.Danger),
+			])],
+			ephemeral: true
+		})
+	}
+
+	@UseGuards(GuildAdminGuard)
+	@UseFilters(ForbiddenExceptionFilter)
+	@Button('RESET_LEADERBOARD/:type')
+	public async resetButton(
+		@Context()
+		[interaction]: ButtonContext,
+		@ComponentParam('type') type: 'yes' | 'no',
+	) {
+		if(type !== 'yes') {
+			return interaction.update({
+				content: `I have not reset the leaderboard`,
+				components: [],
+				embeds: []
+			});
+		}
+		
+		await this._points.resetLeaderboard(interaction.guildId);
+		return interaction.update({
+			content: `The leaderboard has been reset.`,
+			components: [],
+			embeds: []
+		});
 	}
 
 	@Button('LEADERBOARD_LIST/:type/:page')
@@ -189,6 +248,7 @@ export class GameLeaderboardCommands {
 		return interaction.reply({
 			embeds: [embed],
 			components,
+			ephemeral: true,
 		});
 	}
 }

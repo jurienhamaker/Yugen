@@ -61,6 +61,7 @@ And you have **${user.saves}/2** saves available!`,
 		return interaction.reply({
 			content: `**Save donated!**
 The server now has **${saves}/${maxSaves}** saves!`,
+			ephemeral: true,
 		});
 	}
 
@@ -105,6 +106,7 @@ Saves used: **${settings.savesUsed}**
 		return interaction.reply({
 			content: ``,
 			embeds: [embed],
+			ephemeral: true,
 		});
 	}
 }
