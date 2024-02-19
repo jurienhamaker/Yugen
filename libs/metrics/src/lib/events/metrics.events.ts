@@ -20,8 +20,6 @@ export class MetricsEvents {
 		public totalGuilds: Gauge<string>,
 		@InjectMetric('discord_stat_total_channels')
 		public totalChannels: Gauge<string>,
-		@InjectMetric('discord_stat_total_users')
-		public totalUsers: Gauge<string>,
 		@InjectMetric('discord_stat_total_interactions')
 		public totalInteractions: Gauge<string>,
 		@InjectMetric('discord_event_on_interaction_total')
@@ -41,7 +39,6 @@ export class MetricsEvents {
 	public async onReady(@Context() [client]: ContextOf<Events.ClientReady>) {
 		this._logger.log(`Initializing metrics`);
 
-		await this._loadMembers(client);
 		await this._reloadGauges(client);
 
 		this.connected.labels('None').set(1);
@@ -104,16 +101,6 @@ export class MetricsEvents {
 		this._reloadGauges();
 	}
 
-	@On(Events.GuildMemberAdd)
-	public onGuildMemberAdd() {
-		this._reloadGauges();
-	}
-
-	@On(Events.GuildMemberRemove)
-	public onGuildMemberRemove() {
-		this._reloadGauges();
-	}
-
 	private _getCommandsCount() {
 		const commands = this._commands.getCommands();
 		let totalCommands = 0;
@@ -129,23 +116,6 @@ export class MetricsEvents {
 	private async _reloadGauges(client = this._client) {
 		this.totalGuilds.set(client.guilds.cache.size);
 		this.totalChannels.set(client.channels.cache.size);
-
-		const totalUsers = await client.guilds.cache.reduce(
-			async (total, guild) => {
-				const members = guild.members.cache;
-				return (await total) + members.filter((m) => !m.user.bot).size;
-			},
-			Promise.resolve(0),
-		);
-		this.totalUsers.set(totalUsers);
-
 		this.totalInteractions.set(this._getCommandsCount());
-	}
-
-	private async _loadMembers(client = this._client) {
-		const promises = client.guilds.cache.map((guild) =>
-			guild.members.fetch(),
-		);
-		return Promise.allSettled(promises);
 	}
 }

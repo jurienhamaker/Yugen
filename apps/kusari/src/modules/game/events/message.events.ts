@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { SettingsService } from '@yugen/kusari/modules/settings/services';
+import { SettingsService } from '../../settings/services/settings.services';
 import { Events } from 'discord.js';
 import { Context, ContextOf, On } from 'necord';
 import { GameService } from '../services/game.service';

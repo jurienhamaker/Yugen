@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { SettingsService } from '@yugen/koto/modules/settings/services';
-import { WordsService } from '@yugen/koto/modules/words/services/words.service';
+import { SettingsService } from '../../settings/services/settings.services';
+import { WordsService } from '../../words/services/words.service';
 import { Events } from 'discord.js';
 import { Context, ContextOf, On } from 'necord';
 import { GameService } from '../services/game.service';
@@ -29,7 +29,7 @@ export class GameMessageEvents {
 			return;
 		}
 
-		let word = words[0].toLowerCase();
+		const word = words[0].toLowerCase();
 
 		if (word.length !== 6) {
 			return;
