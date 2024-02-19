@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Game, GameStatus, Guess, Settings } from '@prisma/koto';
 import { SettingsService } from '@yugen/koto/modules/settings';
-import { WordsService } from '@yugen/koto/modules/words/services/words.service';
+import { WordsService } from '../../words/services/words.service';
 import { PrismaService } from '@yugen/prisma/koto';
 import { getTimestamp } from '@yugen/util';
 import { addMinutes, subMinutes } from 'date-fns';
@@ -168,8 +168,17 @@ export class GameService {
 
 		await Promise.allSettled(promises);
 
-		if (status !== GameStatus.IN_PROGRESS && settings.autoStart) {
-			return this.start(guildId);
+		if (status !== GameStatus.IN_PROGRESS) {
+			// after the message has been send, we can delete the guesses so we don't keep any message content ever.
+			await this._prisma.guess.deleteMany({
+				where: {
+					gameId: game.id,
+				},
+			});
+
+			if (settings.autoStart) {
+				return this.start(guildId);
+			}
 		}
 	}
 
@@ -186,7 +195,14 @@ export class GameService {
 			},
 		});
 
-		return this._message.create(game as GameWithMetaAndGuesses, false);
+		await this._message.create(game as GameWithMetaAndGuesses, false);
+
+		// after the message has been send, we can delete the guesses so we don't keep any message content ever.
+		return this._prisma.guess.deleteMany({
+			where: {
+				gameId: game.id,
+			},
+		});
 	}
 
 	getCurrentGame(guildId: string): Promise<Game & { guesses: Guess[] }> {
@@ -215,7 +231,7 @@ export class GameService {
 		// color matched guess letters as correct-spot,
 		// and count unmatched word letters
 		for (let i = 0; i < word.length; i++) {
-			let letter = word[i];
+			const letter = word[i];
 			if (letter === guess[i]) {
 				letterCount[letter] = (letterCount[letter] || 0) + 1;
 
@@ -258,7 +274,7 @@ export class GameService {
 		// allocating remaining word letters as wrong-spot,
 		// otherwise, as not-any-spot
 		for (let i = 0; i < word.length; i++) {
-			let letter = guess[i];
+			const letter = guess[i];
 			if (letter !== word[i]) {
 				if (unmatched[letter]) {
 					letterCount[letter] = (letterCount[letter] || 0) + 1;
