@@ -33,6 +33,22 @@ services:
             - ./:/opt/app
         depends_on:
             - db
+    hoshi:
+        build:
+            context: .
+            target: base
+        tty: true
+        command: yarn hoshi:docker:start
+        env_file:
+            - ./.env
+            - ./hoshi.env
+        ports:
+            - '$EXPOSED_HOSHI_API_PORT:3000'
+            - '$EXPOSED_HOSHI_DEBUGGING_PORT:9229'
+        volumes:
+            - ./:/opt/app
+        depends_on:
+            - db
     db:
         image: postgres:12.2-alpine
         volumes:

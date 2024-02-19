@@ -10,3 +10,7 @@ export * from './lib/get-username';
 export * from './lib/injection-tokens';
 export * from './lib/interaction-replies';
 export * from './lib/util';
+export * from './lib/emoji-is-unicode';
+export * from './lib/resolve-emoji';
+export * from './lib/filters';
+export * from './lib/errors';

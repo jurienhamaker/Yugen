@@ -1,0 +1,51 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../../../../node_modules/@prisma/hoshi"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Settings {
+  id                Int         @id @default(autoincrement())
+  guildId           String      @unique
+
+  enabled                          Boolean     @default(true)
+  channelId                        String?
+  treshold                         Int         @default(3)
+  emoji                            String      @default("⭐")
+  self                             Boolean     @default(false)
+  ignoredChannelIds                String[]    @default([])
+
+  // timestamps
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+}
+
+model SpecificChannels {
+  id                                        Int         @id @default(autoincrement())
+  guildId                                   String
+  sourceChannelId                           String
+  channelId                                 String
+
+  // timestamps
+  createdAt                                 DateTime    @default(now())
+  updatedAt                                 DateTime    @updatedAt
+}
+
+model Log {
+  id                                        Int         @id @default(autoincrement())
+  guildId                                   String
+  channelId                                 String
+  messageId                                 String      @unique
+  originalMessageId                         String      @unique
+
+  // timestamps
+  createdAt                                 DateTime    @default(now())
+  updatedAt                                 DateTime    @updatedAt
+}

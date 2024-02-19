@@ -20,10 +20,12 @@
 			"@yugen/health": ["libs/health/src/index.ts"],
 			"@yugen/koto/*": ["apps/koto/src/*"],
 			"@yugen/kusari/*": ["apps/kusari/src/*"],
+			"@yugen/hoshi/*": ["apps/hoshi/src/*"],
 			"@yugen/logs": ["libs/logs/src/index.ts"],
 			"@yugen/metrics": ["libs/metrics/src/index.ts"],
 			"@yugen/prisma/koto": ["libs/prisma/koto/src/index.ts"],
 			"@yugen/prisma/kusari": ["libs/prisma/kusari/src/index.ts"],
+			"@yugen/prisma/hoshi": ["libs/prisma/hoshi/src/index.ts"],
 			"@yugen/shared": ["libs/shared/src/index.ts"],
 			"@yugen/util": ["libs/util/src/index.ts"]
 		}
