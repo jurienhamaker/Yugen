@@ -1,5 +1,5 @@
 import { Injectable, UseFilters, UseGuards } from '@nestjs/common';
-import { GameService } from '@yugen/koto/modules/game/services/game.service';
+import { GameService } from '../../game/services/game.service';
 import { AdminGuard, ForbiddenExceptionFilter } from '@yugen/shared';
 import { Client } from 'discord.js';
 import {

@@ -37,7 +37,7 @@ export class AdminScrapeService {
 					Accept: 'application/json',
 				},
 			}),
-		).catch((e) => {
+		).catch(() => {
 			if (this._retries === 5) {
 				return this._run(channel);
 			}
@@ -73,7 +73,8 @@ export class AdminScrapeService {
 		}
 	}
 
-	_parseData(data: any, offset = 0) {
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	_parseData(data: any) {
 		if (!data?.data?._groups?.[0]?._items) {
 			return;
 		}

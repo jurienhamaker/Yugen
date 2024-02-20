@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { SettingsService } from '@yugen/koto/modules/settings';
-import { EMBED_COLOR } from '@yugen/koto/util/constants';
-import { noSettingsReply } from '@yugen/koto/util/no-settings-reply';
+import { EMBED_COLOR } from '../util/constants';
+import { noSettingsReply } from '../util/no-settings-reply';
 import { formatMinutes, getEmbedFooter } from '@yugen/util';
 import { Client, EmbedBuilder } from 'discord.js';
 import { Context, SlashCommand, SlashCommandContext } from 'necord';
+import { SettingsService } from '../modules/settings';
 
 @Injectable()
 export class TutorialCommands {
@@ -75,7 +75,7 @@ export class TutorialCommands {
 				}**.
 - A game will ${
 					settings.autoStart ? '' : 'not '
-				}be automatically started after the previous one has ended 
+				}be automatically started after the previous one has ended
 
 **Point Rewards:**
 - 1 point for finding a yellow letter

@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { PrismaModule } from '@yugen/prisma/koto';
+import { PrismaModule } from '@yugen/prisma/hoshi';
 import { SettingsSharedModule } from './modules/settings';
 
 @Module({

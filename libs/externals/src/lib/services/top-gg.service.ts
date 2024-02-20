@@ -11,8 +11,8 @@ export class TopGGService {
 
 	@Once(Events.ClientReady)
 	public onReady() {
-		if (process.env.TOP_GG_TOKEN && process.env.NODE_ENV === 'production') {
-			const ap = AutoPoster(process.env.TOP_GG_TOKEN, this._client);
+		if (process.env['TOP_GG_TOKEN'] && process.env['NODE_ENV'] === 'production') {
+			const ap = AutoPoster(process.env['TOP_GG_TOKEN'], this._client);
 			ap.on('posted', () => this._logger.log(`Updated top.gg stats`));
 		}
 	}

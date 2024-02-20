@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { EMBED_COLOR } from '@yugen/koto/util/constants';
-import { noSettingsDescription } from '@yugen/koto/util/no-settings-reply';
+import { EMBED_COLOR } from '../util/constants';
+import { noSettingsDescription } from '../util/no-settings-reply';
 import { getEmbedFooter } from '@yugen/util';
 import { Client, EmbedBuilder } from 'discord.js';
 import { Context, SlashCommand, SlashCommandContext } from 'necord';

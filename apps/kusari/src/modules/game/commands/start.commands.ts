@@ -1,7 +1,6 @@
 import { Injectable, UseFilters, UseGuards } from '@nestjs/common';
 import { GameType } from '@prisma/kusari';
-import { SettingsService } from '@yugen/kusari/modules/settings';
-import { noSettingsReply } from '@yugen/kusari/util/no-settings-reply';
+import { noSettingsReply } from '../../../util/no-settings-reply';
 import { ForbiddenExceptionFilter, GuildModeratorGuard } from '@yugen/shared';
 import { Client, CommandInteraction } from 'discord.js';
 import {
@@ -13,6 +12,7 @@ import {
 } from 'necord';
 import { GameCommandDecorator } from '../game.decorator';
 import { GameService } from '../services/game.service';
+import { SettingsService } from '../../settings';
 
 const GameStartOptionsChoices = [
 	{

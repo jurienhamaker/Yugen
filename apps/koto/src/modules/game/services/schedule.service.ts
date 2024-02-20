@@ -18,7 +18,7 @@ export class GameScheduleService {
 		private _settings: SettingsService,
 	) {}
 
-	@Cron(`0 ${process.env.NODE_ENV === 'production' ? '*/10' : '*'} * * * *`)
+	@Cron(`0 ${process.env['NODE_ENV'] === 'production' ? '*/10' : '*'} * * * *`)
 	async check() {
 		const outOfTimeGames = await this._prisma.game.findMany({
 			where: {

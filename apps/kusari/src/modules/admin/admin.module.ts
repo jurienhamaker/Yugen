@@ -1,6 +1,6 @@
 import { HttpModule } from '@nestjs/axios';
 import { Module } from '@nestjs/common';
-import { KusariSharedModule } from '@yugen/kusari/shared.module';
+import { KusariSharedModule } from '../../shared.module';
 import { AdminGuildsCommands } from './commands/guilds.commands';
 import { AdminGuildsService } from './services/guilds.service';
 

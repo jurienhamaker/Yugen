@@ -12,14 +12,14 @@ export class ExternalsVoteService {
 		userId: string,
 	) {
 		const guild = await this._client.guilds.fetch(
-			process.env.DEVELOPMENT_SERVER_ID,
+			process.env['DEVELOPMENT_SERVER_ID'],
 		);
 		if (!guild) {
 			return false;
 		}
 
 		const channel = await guild.channels.fetch(
-			process.env.VOTE_REPORT_CHANNEL_ID,
+			process.env['VOTE_REPORT_CHANNEL_ID'],
 		);
 		if (!channel) {
 			return false;

@@ -38,7 +38,7 @@ export class TopGGController {
 			);
 		}
 
-		if (body.bot != process.env.CLIENT_ID) {
+		if (body.bot != process.env['CLIENT_ID']) {
 			throw new HttpException(
 				'Incorrect bot client ID',
 				HttpStatus.BAD_REQUEST,

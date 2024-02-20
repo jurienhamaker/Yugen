@@ -1,4 +1,4 @@
-import { EMBED_COLOR } from '@yugen/koto/util/constants';
+import { EMBED_COLOR } from './constants';
 import { getEmbedFooter } from '@yugen/util';
 import { Client, CommandInteraction, EmbedBuilder } from 'discord.js';
 

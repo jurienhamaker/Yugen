@@ -1,6 +1,6 @@
 import { HttpModule } from '@nestjs/axios';
 import { Module } from '@nestjs/common';
-import { KotoSharedModule } from '@yugen/koto/shared.module';
+import { KotoSharedModule } from '../../shared.module';
 import { GameModule } from '../game/game.module';
 import { WordsModule } from '../words/words.module';
 import { AdminEmojisCommands } from './commands/emojis.commands';
@@ -25,7 +25,7 @@ import { AdminScrapeService } from './services/scrape.service';
 		AdminGetWordCommands,
 		AdminGuildsCommands,
 
-		...(process.env.NODE_ENV !== 'production'
+		...(process.env['NODE_ENV'] !== 'production'
 			? [AdminScrapeWordsCommands]
 			: []),
 	],

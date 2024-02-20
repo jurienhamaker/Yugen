@@ -107,6 +107,7 @@ export class MetricsEvents {
 
 		for (const command of commands) {
 			totalCommands += 1;
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			totalCommands += (command as any).subcommands?.size ?? 0;
 		}
 

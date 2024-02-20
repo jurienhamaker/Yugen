@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Settings } from '@prisma/koto';
-import { EMBED_COLOR } from '@yugen/koto/util/constants';
+import { EMBED_COLOR } from '../../../util/constants';
 import { PrismaService } from '@yugen/prisma/koto';
 import { formatMinutes } from '@yugen/util';
 import {

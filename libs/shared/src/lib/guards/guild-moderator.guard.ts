@@ -28,7 +28,7 @@ export class GuildModeratorGuard implements CanActivate {
 			return false;
 		}
 
-		const admins = process.env.OWNER_IDS!.split(',');
+		const admins = process.env['OWNER_IDS']!.split(',');
 		if (admins.includes(interaction?.user?.id)) {
 			return true;
 		}

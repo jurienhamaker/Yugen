@@ -1,5 +1,5 @@
 import { Injectable, UseFilters, UseGuards } from '@nestjs/common';
-import { sendWelcomeMessage } from '@yugen/koto/util/send-welcome-message';
+import { sendWelcomeMessage } from '../../../util/send-welcome-message';
 import { AdminGuard, ForbiddenExceptionFilter } from '@yugen/shared';
 import { ChannelType, Client, PermissionsBitField } from 'discord.js';
 import {

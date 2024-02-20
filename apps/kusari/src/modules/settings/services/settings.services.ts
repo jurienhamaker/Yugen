@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Settings } from '@prisma/kusari';
-import { EMBED_COLOR } from '@yugen/kusari/util/constants';
+import { EMBED_COLOR } from '../../../util/constants';
 import { PrismaService } from '@yugen/prisma/kusari';
 import {
 	Client,

@@ -37,7 +37,7 @@ Don't hesitate now and **invite ${this._client.user?.displayName}** wherever you
 			components: [
 				new ActionRowBuilder<ButtonBuilder>().addComponents(
 					new ButtonBuilder()
-						.setURL(process.env.INVITE_LINK)
+						.setURL(process.env['INVITE_LINK'])
 						.setLabel(
 							`Invite ${this._client.user?.displayName} to your Server 🎉`,
 						)

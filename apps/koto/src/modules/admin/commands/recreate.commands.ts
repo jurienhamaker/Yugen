@@ -1,7 +1,6 @@
 import { Injectable, UseFilters, UseGuards } from '@nestjs/common';
-import { SettingsService } from '@yugen/koto/modules/settings';
-import { WordsService } from '@yugen/koto/modules/words/services/words.service';
-import { noSettingsReply } from '@yugen/koto/util/no-settings-reply';
+import { WordsService } from '../../words/services/words.service';
+import { noSettingsReply } from '../../../util/no-settings-reply';
 import { AdminGuard, ForbiddenExceptionFilter } from '@yugen/shared';
 import { Client } from 'discord.js';
 import {
@@ -13,6 +12,7 @@ import {
 } from 'necord';
 import { GameService } from '../../game/services/game.service';
 import { AdminCommandDecorator } from '../admin.decorator';
+import { SettingsService } from '../../settings';
 
 class AdminRecreateOptions {
 	@StringOption({

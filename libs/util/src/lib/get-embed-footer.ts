@@ -1,5 +1,6 @@
-import { getBotAuthor, getUsername } from '@yugen/util';
+import { getBotAuthor } from './get-bot-author';
 import { Client } from 'discord.js';
+import { getUsername } from './get-username';
 
 export const getEmbedFooter = async (
 	_client: Client,

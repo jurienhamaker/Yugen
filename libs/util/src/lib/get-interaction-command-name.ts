@@ -9,10 +9,10 @@ export const getInteractionCommandName = (
 		!interaction.isMessageContextMenuCommand() &&
 		!interaction.isUserContextMenuCommand()
 	) {
-		return (interaction as any)['customId'];
+		return (interaction as never)['customId'];
 	}
 
-	const { _group, _subcommand } = interaction.options as any;
+	const { _group, _subcommand } = interaction.options as never;
 
 	const commandNames = [interaction.commandName];
 	if (_group) {

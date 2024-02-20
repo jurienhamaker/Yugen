@@ -18,19 +18,19 @@ export class BotsGGService {
 	@Cron('0 */30 * * * *')
 	public async sendInformation() {
 		if (
-			process.env.BOTS_GG_TOKEN &&
-			process.env.NODE_ENV === 'production'
+			process.env['BOTS_GG_TOKEN'] &&
+			process.env['NODE_ENV'] === 'production'
 		) {
 			await lastValueFrom(
 				this._http.post(
-					`https://discord.bots.gg/api/v1/bots/${process.env.CLIENT_ID}/stats`,
+					`https://discord.bots.gg/api/v1/bots/${process.env['CLIENT_ID']}/stats`,
 					{
 						guildCount: this._client.guilds.cache.size,
 						shardCount: this._client.shard?.count,
 					},
 					{
 						headers: {
-							Authorization: process.env.BOTS_GG_TOKEN,
+							Authorization: process.env['BOTS_GG_TOKEN'],
 						},
 					},
 				),

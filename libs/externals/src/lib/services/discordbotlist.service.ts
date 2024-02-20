@@ -24,19 +24,19 @@ export class DiscordBotListService {
 	@Cron('0 */30 * * * *')
 	public async sendInformation() {
 		if (
-			process.env.DISCORDBOTLIST_TOKEN &&
-			process.env.NODE_ENV === 'production'
+			process.env['DISCORDBOTLIST_TOKEN'] &&
+			process.env['NODE_ENV'] === 'production'
 		) {
 			await lastValueFrom(
 				this._http.post(
-					`https://discordbotlist.com/api/v1/bots/${process.env.CLIENT_ID}/stats`,
+					`https://discordbotlist.com/api/v1/bots/${process.env['CLIENT_ID']}/stats`,
 					{
 						guilds: this._client.guilds.cache.size,
 						users: this._client.users.cache.size,
 					},
 					{
 						headers: {
-							Authorization: process.env.DISCORDBOTLIST_TOKEN,
+							Authorization: process.env['DISCORDBOTLIST_TOKEN'],
 						},
 					},
 				),
@@ -53,13 +53,13 @@ export class DiscordBotListService {
 
 	private async _sendCommands() {
 		if (
-			process.env.DISCORDBOTLIST_TOKEN &&
-			process.env.NODE_ENV === 'production'
+			process.env['DISCORDBOTLIST_TOKEN'] &&
+			process.env['NODE_ENV'] === 'production'
 		) {
 			const commands = this._commands.getCommands();
 
 			const data = [];
-			for (let command of commands) {
+			for (const command of commands) {
 				if (command.isSlashCommand()) {
 					if (command.getName() === 'admin') {
 						continue;
@@ -76,11 +76,11 @@ export class DiscordBotListService {
 
 			await lastValueFrom(
 				this._http.post(
-					`https://discordbotlist.com/api/v1/bots/${process.env.CLIENT_ID}/commands`,
+					`https://discordbotlist.com/api/v1/bots/${process.env['CLIENT_ID']}/commands`,
 					data,
 					{
 						headers: {
-							Authorization: process.env.DISCORDBOTLIST_TOKEN,
+							Authorization: process.env['DISCORDBOTLIST_TOKEN'],
 						},
 					},
 				),

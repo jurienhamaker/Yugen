@@ -44,28 +44,28 @@ ${voteReward}`
 
 		const buttons = [];
 
-		if (process.env.TOP_GG_VOTE_LINK?.length) {
+		if (process.env['TOP_GG_VOTE_LINK']?.length) {
 			buttons.push(
 				new ButtonBuilder()
-					.setURL(process.env.TOP_GG_VOTE_LINK)
+					.setURL(process.env['TOP_GG_VOTE_LINK'])
 					.setLabel('Vote on Top.GG')
 					.setStyle(ButtonStyle.Link),
 			);
 		}
 
-		if (process.env.DISCORDBOTLIST_VOTE_LINK?.length) {
+		if (process.env['DISCORDBOTLIST_VOTE_LINK']?.length) {
 			buttons.push(
 				new ButtonBuilder()
-					.setURL(process.env.DISCORDBOTLIST_VOTE_LINK)
+					.setURL(process.env['DISCORDBOTLIST_VOTE_LINK'])
 					.setLabel('Vote on Discord Bot List')
 					.setStyle(ButtonStyle.Link),
 			);
 		}
 
-		if (process.env.BOTS_GG_VOTE_LINK?.length) {
+		if (process.env['BOTS_GG_VOTE_LINK']?.length) {
 			buttons.push(
 				new ButtonBuilder()
-					.setURL(process.env.BOTS_GG_VOTE_LINK)
+					.setURL(process.env['BOTS_GG_VOTE_LINK'])
 					.setLabel('Vote on Bots.GG')
 					.setStyle(ButtonStyle.Link),
 			);

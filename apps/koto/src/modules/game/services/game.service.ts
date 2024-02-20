@@ -1,6 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Game, GameStatus, Guess, Settings } from '@prisma/koto';
-import { SettingsService } from '@yugen/koto/modules/settings';
 import { WordsService } from '../../words/services/words.service';
 import { PrismaService } from '@yugen/prisma/koto';
 import { getTimestamp } from '@yugen/util';
@@ -14,6 +13,7 @@ import {
 } from '../types/meta';
 import { GameMessageService } from './message.service';
 import { GamePointsService } from './points.service';
+import { SettingsService } from '../../settings';
 
 @Injectable()
 export class GameService {
@@ -58,7 +58,7 @@ export class GameService {
 			take: 50,
 		});
 
-		const ignoredWords = pastFiftyGames.map((g) => g.word);
+		const ignoredWords = pastFiftyGames.map((g: Game) => g.word);
 		word = word ?? this._words.getRandom(ignoredWords);
 
 		if (!word) {
@@ -72,7 +72,7 @@ export class GameService {
 				word,
 				scheduleStarted: schedule,
 				endingAt: addMinutes(new Date(), settings.timeLimit),
-				meta: this._createBaseState(word) as any,
+				meta: this._createBaseState(word) as never,
 			},
 			include: {
 				guesses: true,
@@ -97,10 +97,13 @@ export class GameService {
 		}
 
 		const alreadyGuessedIndex = game.guesses.findIndex(
-			(g) => g.word === word,
+			(g: Guess) => g.word === word,
 		);
 
-		if (alreadyGuessedIndex >= 0 && process.env.NODE_ENV === 'production') {
+		if (
+			alreadyGuessedIndex >= 0 &&
+			process.env['NODE_ENV'] === 'production'
+		) {
 			await message.react('❌');
 			return;
 		}
@@ -123,7 +126,7 @@ export class GameService {
 		const { meta, guessed, points, gameMeta } = this._checkWord(
 			game.word,
 			word,
-			game.meta as any,
+			game.meta as never,
 		);
 
 		await this._prisma.guess.create({
@@ -134,7 +137,7 @@ export class GameService {
 				points,
 				userId: message.author.id,
 				word,
-				meta: meta as any,
+				meta: meta as never,
 			},
 		});
 
@@ -149,7 +152,7 @@ export class GameService {
 			},
 			data: {
 				status,
-				meta: gameMeta as any,
+				meta: gameMeta as never,
 			},
 			include: {
 				guesses: true,
@@ -331,7 +334,7 @@ export class GameService {
 		gameId: number,
 		cooldown: number,
 	): Promise<Date | undefined> {
-		if (process.env.NODE_ENV !== 'production') {
+		if (process.env['NODE_ENV'] !== 'production') {
 			return;
 		}
 

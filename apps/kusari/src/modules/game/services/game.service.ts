@@ -104,7 +104,7 @@ The first letter is: **${letter.toUpperCase()}**`);
 
 		if (
 			lastWord.userId === message.author.id &&
-			process.env.NODE_ENV === 'production'
+			process.env['NODE_ENV'] === 'production'
 		) {
 			return this._doReply(
 				message,
@@ -303,7 +303,7 @@ Used **1 server** save, There are **${saves}/${maxSaves}** server saves left.`);
 		gameId: number,
 		cooldown: number,
 	): Promise<Date | undefined> {
-		if (process.env.NODE_ENV !== 'production') {
+		if (process.env['NODE_ENV'] !== 'production') {
 			return;
 		}
 

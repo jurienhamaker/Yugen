@@ -9,7 +9,7 @@ export class LogsService {
 
 	public async log(message: string) {
 		const devGuild = await this._client.guilds.fetch(
-			process.env.DEVELOPMENT_SERVER_ID,
+			process.env['DEVELOPMENT_SERVER_ID'],
 		);
 
 		if (!devGuild) {
@@ -17,7 +17,7 @@ export class LogsService {
 		}
 
 		const channel = await devGuild.channels.fetch(
-			process.env.LOGS_REPORT_CHANNEL_ID,
+			process.env['LOGS_REPORT_CHANNEL_ID'],
 		);
 
 		if (!channel) {

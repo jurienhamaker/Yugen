@@ -1,13 +1,13 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Game, GameStatus, Guess } from '@prisma/koto';
-import { SettingsService } from '@yugen/koto/modules/settings';
-import { GameTypeEmojiColorMap, getEmoji } from '@yugen/koto/util/get-emoji';
-import { asciiNumbers } from '@yugen/koto/util/numbers';
+import { GameTypeEmojiColorMap, getEmoji } from '../../../util/get-emoji';
+import { asciiNumbers } from '../../../util/numbers';
 import { PrismaService } from '@yugen/prisma/koto';
 import { getEmbedFooter, getTimestamp } from '@yugen/util';
 import { startOfHour } from 'date-fns';
 import { Channel, ChannelType, Client, EmbedBuilder } from 'discord.js';
 import { GAME_TYPE, GameMeta, GameWithMetaAndGuesses } from '../types/meta';
+import { SettingsService } from '../../settings';
 
 @Injectable()
 export class GameMessageService {
@@ -62,7 +62,7 @@ export class GameMessageService {
 		});
 	}
 
-	private async _delete(channel: Channel, messageId) {
+	private async _delete(channel: Channel, messageId: string) {
 		if (!channel || channel.type !== ChannelType.GuildText) {
 			return;
 		}
@@ -108,7 +108,7 @@ ${this._getGameInformation(game)}`,
 		guesses: Guess[],
 		status: GameStatus = GameStatus.IN_PROGRESS,
 	) {
-		let rows = guesses.map((guess) => ({
+		const rows = guesses.map((guess) => ({
 			meta: guess.meta,
 			userId: guess.userId,
 			points: guess.points,
@@ -189,7 +189,7 @@ ${this._getGameInformation(game)}`,
 
 	private _getGameInformation(game: GameWithMetaAndGuesses) {
 		const footer = `Don't know how to play? Use the /tutorial commands for detailed instructions.${
-			process.env.NODE_ENV !== 'production'
+			process.env['NODE_ENV'] !== 'production'
 				? `\nDevelopment mode: **${game.word}**`
 				: ''
 		}`;
