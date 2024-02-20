@@ -40,7 +40,7 @@ $ docker-compose up koto
 ### Running migrations
 
 ```bash
-$ docker-compose exec -it koto yarn nx run prisma-koto:migrate-dev
+$ docker-compose exec -it koto yarn koto:primsa:migrate:dev
 ```
 
 ---
@@ -56,8 +56,8 @@ $ docker-compose exec -it koto yarn nx run prisma-koto:migrate-dev
 
 ```bash
 $ yarn
-$ yarn nx run prisma-koto:generate-client
-$ yarn nx run prisma-koto:migrate-dev
+$ yarn koto:primsa:generate
+$ yarn koto:prisma:migrate:dev
 ```
 
 ### Running the bot/api

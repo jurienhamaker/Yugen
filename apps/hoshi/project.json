@@ -1,0 +1,53 @@
+{
+	"name": "hoshi",
+	"$schema": "../../node_modules/nx/schemas/project-schema.json",
+	"sourceRoot": "apps/hoshi/src",
+	"projectType": "application",
+	"targets": {
+		"build": {
+			"executor": "@nx/webpack:webpack",
+			"outputs": ["{options.outputPath}"],
+			"defaultConfiguration": "production",
+			"options": {
+				"target": "node",
+				"compiler": "tsc",
+				"outputPath": "dist/apps/hoshi",
+				"main": "apps/hoshi/src/main.ts",
+				"tsConfig": "apps/hoshi/tsconfig.app.json",
+				"assets": [],
+				"webpackConfig": "apps/hoshi/webpack.config.js"
+			},
+			"configurations": {
+				"development": {},
+				"production": {}
+			}
+		},
+		"serve": {
+			"executor": "@nx/js:node",
+			"defaultConfiguration": "development",
+			"options": {
+				"buildTarget": "hoshi:build"
+			},
+			"configurations": {
+				"development": {
+					"buildTarget": "hoshi:build:development"
+				},
+				"production": {
+					"buildTarget": "hoshi:build:production"
+				}
+			}
+		},
+		"lint": {
+			"executor": "@nx/eslint:lint",
+			"outputs": ["{options.outputFile}"]
+		},
+		"test": {
+			"executor": "@nx/jest:jest",
+			"outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+			"options": {
+				"jestConfig": "apps/hoshi/jest.config.ts"
+			}
+		}
+	},
+	"tags": []
+}

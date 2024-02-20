@@ -1,6 +1,9 @@
 export * from './lib/bootstrap';
 export * from './lib/buttons';
 export * from './lib/delay';
+export * from './lib/emoji-is-unicode';
+export * from './lib/errors';
+export * from './lib/filters';
 export * from './lib/format-minutes';
 export * from './lib/get-bot-author';
 export * from './lib/get-embed-footer';
@@ -9,4 +12,6 @@ export * from './lib/get-timestamp';
 export * from './lib/get-username';
 export * from './lib/injection-tokens';
 export * from './lib/interaction-replies';
+export * from './lib/resolve-emoji';
+export * from './lib/types';
 export * from './lib/util';

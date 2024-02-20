@@ -40,7 +40,7 @@ $ docker-compose up kusari
 ### Running migrations
 
 ```bash
-$ docker-compose exec -it kusari yarn nx run prisma-kusari:migrate-dev
+$ docker-compose exec -it kusari yarn kusari:prima:migrate:dev
 ```
 
 ---
@@ -56,8 +56,8 @@ $ docker-compose exec -it kusari yarn nx run prisma-kusari:migrate-dev
 
 ```bash
 $ yarn
-$ yarn nx run prisma-kusari:generate-client
-$ yarn nx run prisma-kusari:migrate-dev
+$ yarn kusari:prisma:generate
+$ yarn kusari:prisma:migrate:dev
 ```
 
 ### Running the bot/api
