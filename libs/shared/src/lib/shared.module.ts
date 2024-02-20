@@ -18,7 +18,7 @@ export class SharedModule {
 							? [process.env['DEVELOPMENT_SERVER_ID']!]
 							: false,
 					skipRegistration:
-						process.env['REGISTER_COMMANDS'] !== 'false',
+						process.env['REGISTER_COMMANDS'] === 'false',
 					token: process.env['DISCORD_TOKEN']!,
 					intents,
 				}),
