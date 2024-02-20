@@ -26,11 +26,11 @@ export class StarboardService {
 		const settings = await this._settings.getSettings(
 			reaction.message.guildId,
 		);
-		const { enabled, emoji, treshold, self, ignoredChannelIds } = settings;
+		const { emoji, treshold, self, ignoredChannelIds } = settings;
 
 		let { channelId } = settings;
 
-		if (!enabled) {
+		if (!channelId) {
 			return;
 		}
 

@@ -15,7 +15,6 @@ model Settings {
   id                Int         @id @default(autoincrement())
   guildId           String      @unique
 
-  enabled                          Boolean     @default(true)
   channelId                        String?
   treshold                         Int         @default(3)
   emoji                            String      @default("⭐")
