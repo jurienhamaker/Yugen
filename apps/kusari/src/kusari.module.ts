@@ -15,6 +15,8 @@ import { SettingsModule } from './modules/settings';
 import { KusariSharedModule } from './shared.module';
 import { EMBED_COLOR } from './util/constants';
 import { intents } from './util/intents';
+import { AppEvents } from './events/app.events';
+
 @Module({
 	imports: [
 		SettingsModule,
@@ -44,6 +46,7 @@ import { intents } from './util/intents';
 		HelpCommands,
 
 		// events
+		AppEvents,
 		GuildEvents,
 	],
 })

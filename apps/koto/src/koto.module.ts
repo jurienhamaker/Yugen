@@ -15,6 +15,7 @@ import { WordsModule } from './modules/words/words.module';
 import { KotoSharedModule } from './shared.module';
 import { EMBED_COLOR } from './util/constants';
 import { intents } from './util/intents';
+import { AppEvents } from './events/app.events';
 
 @Module({
 	imports: [
@@ -41,6 +42,7 @@ import { intents } from './util/intents';
 		HelpCommands,
 
 		// events
+		AppEvents,
 		GuildEvents,
 	],
 })
