@@ -15,4 +15,11 @@ export class AppEvents {
 	public onWarn(@Context() [message]: ContextOf<Events.Warn>) {
 		this._logger.warn(message);
 	}
+
+	@On(Events.Error)
+	public onError() {
+		// This will make sure our process is not stopped on an error event
+		// NestJS will log it, and Sentry will catch it.
+		return;
+	}
 }

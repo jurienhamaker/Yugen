@@ -5,9 +5,15 @@ import { Client, CommandInteraction, EmbedBuilder } from 'discord.js';
 export const noSettingsDescription = `Someone with \`Manage Server\` permissions must do the following:
 
 - Create a new channel for the default starboard
-- Use the \`/settings channel\` command to configure the channel
+- Use the \`/settings channel\` command to configure the default channel
 
-That's it! Hoshi will start keeping a starboard!`;
+That's it! Hoshi will start keeping a starboard!
+
+**Multiple starboards:**
+To add another starboard, use \`/starboard add\`.
+
+*Notes:*
+- Hoshi does not *yet* support super reactions!`;
 
 export const noSettingsReply = async (
 	interaction: CommandInteraction,

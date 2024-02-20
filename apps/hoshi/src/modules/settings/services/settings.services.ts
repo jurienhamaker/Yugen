@@ -25,7 +25,7 @@ export class SettingsService {
 
 		if (!settings) {
 			return this._prisma.settings.create({
-				data: { guildId },
+				data: { guildId, emoji: '⭐' },
 			});
 		}
 
@@ -69,7 +69,7 @@ export class SettingsService {
 			return;
 		}
 
-		const { enabled, channelId, treshold, emoji, self, ignoredChannelIds } =
+		const { channelId, treshold, emoji, self, ignoredChannelIds } =
 			settings;
 
 		const {
@@ -85,11 +85,6 @@ export class SettingsService {
 				`These are the settings currently configured for Hoshi`,
 			)
 			.addFields(
-				{
-					name: 'Status',
-					value: enabled ? 'Enabled' : 'Disabled',
-					inline: true,
-				},
 				{
 					name: 'Default channel',
 					value: channelId?.length ? `<#${channelId}>` : '-',
@@ -107,7 +102,7 @@ export class SettingsService {
 				},
 				{
 					name: 'Author starring',
-					value: self ? 'Enabled' : 'Disabled',
+					value: self ? 'Allowed' : 'Disallowed',
 					inline: true,
 				},
 				{

@@ -11,6 +11,7 @@ import { EMBED_COLOR } from './util/constants';
 import { intents } from './util/intents';
 import { GuildEvents } from './events/guild.events';
 import { StarboardModule } from './modules/starboard';
+import { AppEvents } from './events/app.events';
 
 @Module({
 	imports: [
@@ -19,7 +20,7 @@ import { StarboardModule } from './modules/starboard';
 
 		// libs
 		SharedModule.forRoot(intents),
-		GeneralModule.forRoot(EMBED_COLOR, () => `*Rewards Coming Soon*`),
+		GeneralModule.forRoot(EMBED_COLOR, () => ``),
 		HealthModule,
 		MetricsModule,
 		LogsModule,
@@ -33,6 +34,7 @@ import { StarboardModule } from './modules/starboard';
 		HelpCommands,
 
 		// events
+		AppEvents,
 		GuildEvents,
 	],
 })

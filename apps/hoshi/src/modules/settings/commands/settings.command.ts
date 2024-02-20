@@ -6,6 +6,7 @@ import {
 	GuildModeratorGuard,
 } from '@yugen/shared';
 import {
+	BooleanOption,
 	ChannelOption,
 	Context,
 	NumberOption,
@@ -17,7 +18,7 @@ import {
 import { SettingsService } from '../services';
 import { SettingsCommandDecorator } from '../settings.decorator';
 import { SETTINGS_CHOICES } from '../util/constants';
-import { TextChannel } from 'discord.js';
+import { ChannelType, TextChannel } from 'discord.js';
 import { resolveEmoji } from '@yugen/util';
 
 class SettingsResetOptions {
@@ -55,6 +56,25 @@ class SetTresholdOptions {
 		required: true,
 	})
 	treshold: string;
+}
+
+class SetSelfOptions {
+	@BooleanOption({
+		name: 'allowed',
+		description:
+			'Wether message authors are allowed to star their own message',
+		required: true,
+	})
+	self: boolean;
+}
+
+class SetChannelOptions {
+	@ChannelOption({
+		name: 'channel',
+		description: 'The default channel for the starboard.',
+		required: true,
+	})
+	channel: TextChannel | undefined;
 }
 
 @UseFilters(ForbiddenExceptionFilter)
@@ -122,7 +142,7 @@ export class SettingsCommands {
 
 	@UseGuards(GuildAdminGuard)
 	@Subcommand({
-		name: 'set-emoji',
+		name: 'emoji',
 		description: 'Show starboard settings',
 	})
 	public async setEmoji(
@@ -153,8 +173,8 @@ export class SettingsCommands {
 
 	@UseGuards(GuildAdminGuard)
 	@Subcommand({
-		name: 'set-treshold',
-		description: 'Show starboard settings',
+		name: 'treshold',
+		description: 'Set starboard threshold',
 	})
 	public async setTreshold(
 		@Context() [interaction]: SlashCommandContext,
@@ -173,6 +193,49 @@ export class SettingsCommands {
 
 		return interaction.reply({
 			content: `Starboard treshold has been set to **${parsed}**.`,
+			ephemeral: true,
+		});
+	}
+
+	@UseGuards(GuildAdminGuard)
+	@Subcommand({
+		name: 'author-starring',
+		description: 'Set wether message author starring counts',
+	})
+	public async setSelf(
+		@Context() [interaction]: SlashCommandContext,
+		@Options() { self }: SetSelfOptions,
+	) {
+		await this._settings.set(interaction.guildId!, 'self', self);
+
+		return interaction.reply({
+			content: `Message authors are now **${
+				self ? 'allowed' : 'disallowed'
+			}** to star their own message.`,
+			ephemeral: true,
+		});
+	}
+
+	@UseGuards(GuildAdminGuard)
+	@Subcommand({
+		name: 'channel',
+		description: 'Set the default starboard channel',
+	})
+	public async setChannel(
+		@Context() [interaction]: SlashCommandContext,
+		@Options() { channel }: SetChannelOptions,
+	) {
+		if (!channel || channel.type !== ChannelType.GuildText) {
+			return interaction.reply({
+				content: 'Selected channel must be a text channel.',
+				ephemeral: true,
+			});
+		}
+
+		await this._settings.set(interaction.guildId, 'channelId', channel.id);
+
+		return interaction.reply({
+			content: `I will run in <#${channel.id}> from now on.`,
 			ephemeral: true,
 		});
 	}

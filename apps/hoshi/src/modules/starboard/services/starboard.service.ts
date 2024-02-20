@@ -43,12 +43,18 @@ export class StarboardService {
 		);
 
 		const reactionEmoji = reaction.emoji.id ?? reaction.emoji.name;
-
 		if (reactionEmoji !== emoji) {
 			return;
 		}
 
+		const isStarboard = await this.getLogByMessageId(reaction.message.id);
+		if (isStarboard) {
+			return;
+		}
+
+		console.log('1');
 		const users = await reaction.users.fetch();
+		console.log(users);
 		const filteredUsers = users.filter(
 			(u) => (self || u.id !== reaction.message.author.id) && !u.bot,
 		);
@@ -57,11 +63,13 @@ export class StarboardService {
 		if (filteredUsers.size === 0 && log) {
 			return this._deleteStarboard(log);
 		}
+		console.log('2');
 
 		if (filteredUsers.size < treshold) {
 			return;
 		}
 
+		console.log('3');
 		const embed = this._createEmbed(reaction.message as Message);
 
 		if (!embed) {
@@ -81,12 +89,10 @@ export class StarboardService {
 			);
 		}
 
-		const configuration = await this._prisma.specificChannels.findFirst({
-			where: {
-				guildId: reaction.message.guildId,
-				sourceChannelId: reaction.message.channel.id,
-			},
-		});
+		const configuration = await this.getSpecificChannelBySourceId(
+			reaction.message.guildId,
+			reaction.message.channel.id,
+		);
 		if (configuration) {
 			channelId = configuration.channelId;
 		}
@@ -108,22 +114,51 @@ export class StarboardService {
 		});
 	}
 
+	getLogByMessageId(id: string) {
+		return this._prisma.log.findUnique({
+			where: {
+				messageId: id,
+			},
+		});
+	}
+
+	getSpecificChannelBySourceId(guildId: string, sourceChannelId: string) {
+		return this._prisma.specificChannels.findFirst({
+			where: {
+				guildId,
+				sourceChannelId,
+			},
+		});
+	}
+
 	async getSpecificChannels(guildId: string, page = 1) {
+		const { channelId } = await this._settings.getSettings(guildId);
+
 		const where = {
 			guildId,
 		};
 
 		const configurations = await this._prisma.specificChannels.findMany({
 			where,
-			skip: (page - 1) * 10,
-			take: 10,
+			skip: page === 1 ? 0 : 9 + (page - 2) * 10,
+			take: page === 1 ? 9 : 10,
 		});
 		const total = await this._prisma.specificChannels.count({
 			where,
 		});
 
 		return {
-			configurations,
+			configurations:
+				page === 1
+					? [
+							{
+								id: null,
+								sourceChannelId: null,
+								channelId,
+							},
+							...configurations,
+						]
+					: configurations,
 			total,
 		};
 	}

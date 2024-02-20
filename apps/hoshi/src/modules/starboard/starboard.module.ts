@@ -1,8 +1,9 @@
 import { Module } from '@nestjs/common';
-import { StarboardReactionEvents } from './events/reaction.events';
+import { ReactionEvents } from './events/reaction.events';
 import { StarboardService } from './services/starboard.service';
 import { SharedModule } from '@yugen/shared';
 import { SettingsSharedModule } from '../settings';
+import { StarboardCommands } from './commands/starboard.commands';
 
 @Module({
 	imports: [SharedModule, SettingsSharedModule],
@@ -11,9 +12,10 @@ import { SettingsSharedModule } from '../settings';
 		StarboardService,
 
 		// events
-		StarboardReactionEvents,
+		ReactionEvents,
 
 		// commands
+		StarboardCommands,
 	],
 })
 export class StarboardModule {}

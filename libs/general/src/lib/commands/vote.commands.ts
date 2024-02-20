@@ -24,14 +24,20 @@ export class GeneralVoteCommands {
 	})
 	public async invite(@Context() [interaction]: SlashCommandContext) {
 		const footer = await getEmbedFooter(this._client, null, false);
+		const voteReward = this._voteReward();
 		const embed = new EmbedBuilder()
 			.setTitle(`Vote information`)
 			.setDescription(
 				`Like what ${this._client.user
 					?.displayName} is doing and want to support it's growth?
-Please use any of the links below to vote for ${this._client.user?.displayName}!
+Please use any of the links below to vote for ${this._client.user
+					?.displayName}!${
+					voteReward?.length
+						? `
 
-${this._voteReward()}`,
+${voteReward}`
+						: ''
+				}`,
 			)
 			.setColor(this._embedColor)
 			.setFooter(footer);

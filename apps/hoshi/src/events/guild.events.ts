@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { sendWelcomeMessage } from '@yugen/hoshi/util/send-welcome-message';
+import { sendWelcomeMessage } from '../util/send-welcome-message';
 import { ChannelType, Client, Events, PermissionsBitField } from 'discord.js';
 import { Context, ContextOf, On } from 'necord';
 

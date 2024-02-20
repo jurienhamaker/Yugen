@@ -4,8 +4,8 @@ import { Context, ContextOf, On } from 'necord';
 import { StarboardService } from '../services/starboard.service';
 
 @Injectable()
-export class StarboardReactionEvents {
-	private readonly _logger = new Logger(StarboardReactionEvents.name);
+export class ReactionEvents {
+	private readonly _logger = new Logger(ReactionEvents.name);
 
 	private _debounceMap = new Map<string, NodeJS.Timer>();
 
