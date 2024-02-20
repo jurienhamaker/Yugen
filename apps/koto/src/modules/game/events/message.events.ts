@@ -44,7 +44,7 @@ export class GameMessageEvents {
 		const exists = this._words.exists(word);
 		if (!exists) {
 			return message.reply({
-				content: `Sorry, I couldn't find "**${word}**" in the my database.`,
+				content: `Sorry, I couldn't find "**${word}**" in my database.`,
 			});
 		}
 
