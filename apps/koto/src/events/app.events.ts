@@ -20,5 +20,14 @@ export class AppEvents {
 				},
 			],
 		});
+
+		if (process.env['KOTO_AVATAR_URL']) {
+			client.user
+				.setAvatar(process.env['KOTO_AVATAR_URL'])
+				.then((u) =>
+					this._logger.log(`Set client avatar to ${u.avatarURL()}`),
+				)
+				.catch(() => this._logger.warn('Failed to set bot avatar'));
+		}
 	}
 }
