@@ -52,9 +52,7 @@ export class StarboardService {
 			return;
 		}
 
-		console.log('1');
 		const users = await reaction.users.fetch();
-		console.log(users);
 		const filteredUsers = users.filter(
 			(u) => (self || u.id !== reaction.message.author.id) && !u.bot,
 		);
@@ -63,13 +61,11 @@ export class StarboardService {
 		if (filteredUsers.size === 0 && log) {
 			return this._deleteStarboard(log);
 		}
-		console.log('2');
 
 		if (filteredUsers.size < treshold) {
 			return;
 		}
 
-		console.log('3');
 		const embed = this._createEmbed(reaction.message as Message);
 
 		if (!embed) {
@@ -222,6 +218,7 @@ export class StarboardService {
 		});
 
 		await starboardMessage.react(emoji);
+		await message.react('🌟');
 	}
 
 	private async _updateStarboard(
