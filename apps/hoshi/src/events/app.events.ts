@@ -15,8 +15,8 @@ export class AppEvents {
 		client.user!.setPresence({
 			activities: [
 				{
-					name: `to the ✨`,
-					type: ActivityType.Listening,
+					name: `the ✨`,
+					type: ActivityType.Watching,
 				},
 			],
 		});
