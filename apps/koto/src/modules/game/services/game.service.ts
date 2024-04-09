@@ -1,10 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Game, GameStatus, Guess, Settings } from '@prisma/koto';
-import { WordsService } from '../../words/services/words.service';
 import { PrismaService } from '@yugen/prisma/koto';
-import { getTimestamp } from '@yugen/util';
-import { addMinutes, subMinutes } from 'date-fns';
+import { delay, getTimestamp } from '@yugen/util';
+import { addMinutes, roundToNearestMinutes, subMinutes } from 'date-fns';
 import { Message } from 'discord.js';
+import { SettingsService } from '../../settings';
+import { WordsService } from '../../words/services/words.service';
 import {
 	GAME_TYPE,
 	GameGuessMeta,
@@ -13,7 +14,6 @@ import {
 } from '../types/meta';
 import { GameMessageService } from './message.service';
 import { GamePointsService } from './points.service';
-import { SettingsService } from '../../settings';
 
 @Injectable()
 export class GameService {
@@ -43,6 +43,7 @@ export class GameService {
 
 		if (currentGame && recreate) {
 			await this.endGame(currentGame.id, GameStatus.FAILED);
+			await delay(500);
 		}
 
 		const pastFiftyGames = await this._prisma.game.findMany({
@@ -71,7 +72,9 @@ export class GameService {
 				guildId,
 				word,
 				scheduleStarted: schedule,
-				endingAt: addMinutes(new Date(), settings.timeLimit),
+				endingAt: roundToNearestMinutes(
+					addMinutes(new Date(), settings.timeLimit),
+				),
 				meta: this._createBaseState(word) as never,
 			},
 			include: {
@@ -180,6 +183,7 @@ export class GameService {
 			});
 
 			if (settings.autoStart) {
+				await delay(500);
 				return this.start(guildId);
 			}
 		}
