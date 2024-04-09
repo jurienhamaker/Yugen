@@ -90,15 +90,6 @@ The first letter is: **${letter.toUpperCase()}**`);
 		}
 
 		const exists = await this._dictionary.checkDictionary(word);
-
-		if (!exists) {
-			return this._doReply(
-				message,
-				`Sorry, I couldn't find "**${word}**" in the english dictionary, try again!`,
-				'❌',
-			);
-		}
-
 		const lastWord = await this.getLastWord(game);
 		const lastLetter = lastWord.word[lastWord.word.length - 1];
 
@@ -113,7 +104,12 @@ The first letter is: **${letter.toUpperCase()}**`);
 			);
 		}
 
-		if (word[0] !== lastLetter) {
+		const isLastLetter = word[0] === lastLetter;
+		if (!exists || !isLastLetter) {
+			const failReason = !exists
+				? `Sorry, I couldn't find "**${word}**" in the [English dictionary](https://en.wiktionary.org/wiki/${word}), try again!`
+				: `The word ${word} does not start with the letter **${lastLetter}**`;
+
 			const saveAvailable = await this._getSaves(
 				settings,
 				message.author.id,
@@ -128,12 +124,14 @@ The first letter is: **${letter.toUpperCase()}**`);
 					message.author.id,
 					1,
 				);
+
 				await this._settings.set(
 					guildId,
 					'savesUsed',
 					settings.savesUsed + 1,
 				);
-				return message.reply(`The word ${word} does not start with the letter **${lastLetter}**
+
+				return message.reply(`${failReason}
 Used **1 of your own** saves, You have **${saves}/2** saves left.`);
 			}
 
@@ -142,19 +140,21 @@ Used **1 of your own** saves, You have **${saves}/2** saves left.`);
 					guildId,
 					1,
 				);
+
 				await this._settings.set(
 					guildId,
 					'savesUsed',
 					settings.savesUsed + 1,
 				);
-				return message.reply(`The word ${word} does not start with the letter **${lastLetter}**
+
+				return message.reply(`${failReason}
 Used **1 server** save, There are **${saves}/${maxSaves}** server saves left.`);
 			}
 
 			const highscore = await this._checkStreak(settings, count);
 
 			await message.reply(
-				`The word ${word} does not start with the letter **${lastLetter}**
+				`${failReason}
 **The game has ended on a streak of ${count}!**${
 					highscore
 						? `
@@ -162,8 +162,9 @@ Used **1 server** save, There are **${saves}/${maxSaves}** server saves left.`);
 						: ''
 				}
 
-**Want to save the game?** Make sure to **vote** for Kusari and earn yourself saves to save the game!`,
+**Want to save the game?** Make sure to **/vote** for Kusari and earn yourself saves to save the game!`,
 			);
+
 			this.start(guildId, game.type, true);
 		}
 
