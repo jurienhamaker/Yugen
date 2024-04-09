@@ -2,7 +2,8 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { GameStatus } from '@prisma/koto';
 import { PrismaService } from '@yugen/prisma/koto';
-import { addMinutes } from 'date-fns';
+import { delay } from '@yugen/util';
+import { addMinutes, addSeconds, isAfter } from 'date-fns';
 import { Client } from 'discord.js';
 import { SettingsService } from '../../settings';
 import { GameService } from './game.service';
@@ -18,8 +19,14 @@ export class GameScheduleService {
 		private _settings: SettingsService,
 	) {}
 
-	@Cron(`0 ${process.env['NODE_ENV'] === 'production' ? '*/10' : '*'} * * * *`)
+	@Cron(`0 * * * * *`)
 	async check() {
+		const stats = {
+			outOfTimeGames: 0,
+			checkedGuilds: 0,
+			startedGames: 0,
+		};
+
 		const outOfTimeGames = await this._prisma.game.findMany({
 			where: {
 				status: GameStatus.IN_PROGRESS,
@@ -33,15 +40,15 @@ export class GameScheduleService {
 			},
 		});
 
-		this._logger.log(
-			`Checking finished game, ending ${outOfTimeGames.length} games.`,
-		);
+		stats.outOfTimeGames = outOfTimeGames.length;
 		const endPromises = [];
 		for (const game of outOfTimeGames) {
 			endPromises.push(this._endGame(game.id, game.guildId));
 		}
-		await Promise.allSettled(endPromises);
-		this._logger.log(`Ended ${outOfTimeGames.length} games.`);
+		const endGames = await Promise.allSettled(endPromises);
+		const startedAfterEndgames = endGames.filter(
+			(r) => r.status === 'fulfilled' && !!r.value,
+		);
 
 		const guildsWithChannelId = await this._prisma.settings.findMany({
 			where: {
@@ -52,7 +59,7 @@ export class GameScheduleService {
 			},
 		});
 
-		this._logger.log(`Checking ${guildsWithChannelId.length} guilds.`);
+		stats.checkedGuilds = guildsWithChannelId.length;
 		const promises = [];
 		for (const { guildId } of guildsWithChannelId) {
 			const guild = await this._client.guilds
@@ -68,7 +75,10 @@ export class GameScheduleService {
 			(r) => r.status === 'fulfilled' && !!r.value,
 		);
 
-		this._logger.log(`Started ${startedGames.length} games.`);
+		stats.startedGames = startedGames.length + startedAfterEndgames.length;
+		this._logger.log(
+			`Ended ${stats.outOfTimeGames} games. Checked ${stats.checkedGuilds} guilds. Started ${stats.startedGames} games.`,
+		);
 	}
 
 	private async _endGame(id: number, guildId: string) {
@@ -76,11 +86,15 @@ export class GameScheduleService {
 
 		const settings = await this._settings.getSettings(guildId);
 		if (settings.autoStart) {
+			await delay(500);
 			await this._game.start(guildId, false);
+			return true;
 		}
+
+		return false;
 	}
 
-	private async _checkGuild(guildId) {
+	private async _checkGuild(guildId: string) {
 		const settings = await this._settings.getSettings(guildId);
 		const currentGame = await this._prisma.game.findFirst({
 			where: {
@@ -94,10 +108,12 @@ export class GameScheduleService {
 			return false;
 		}
 
-		const scheduleStartedGame = await this._prisma.game.findFirst({
+		const lastGame = await this._prisma.game.findFirst({
 			where: {
 				guildId,
-				scheduleStarted: true,
+				status: {
+					not: GameStatus.IN_PROGRESS,
+				},
 			},
 			orderBy: {
 				createdAt: 'desc',
@@ -105,8 +121,11 @@ export class GameScheduleService {
 		});
 
 		if (
-			addMinutes(scheduleStartedGame.createdAt, settings.frequency) >
-			new Date()
+			!lastGame ||
+			isAfter(
+				addMinutes(lastGame.createdAt, settings.frequency),
+				addSeconds(new Date(), 30),
+			)
 		) {
 			return false;
 		}
