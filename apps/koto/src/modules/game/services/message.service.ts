@@ -211,9 +211,7 @@ ${this._getGameInformation(game)}`,
 				? `\nDevelopment mode: **${game.word}**`
 				: ''
 		}`;
-		const nextKoto = `Next koto (word) in <t:${getTimestamp(
-			game.endingAt,
-		)}:R>`;
+		const nextKoto = `Next koto <t:${getTimestamp(game.endingAt)}:R>`;
 
 		switch (game.status) {
 			case GameStatus.COMPLETED:
