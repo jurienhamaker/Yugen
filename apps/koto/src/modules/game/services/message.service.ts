@@ -2,7 +2,6 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Game, GameStatus, Guess } from '@prisma/koto';
 import { PrismaService } from '@yugen/prisma/koto';
 import { getEmbedFooter, getTimestamp } from '@yugen/util';
-import { startOfHour } from 'date-fns';
 import { Channel, ChannelType, Client, EmbedBuilder } from 'discord.js';
 import { GameTypeEmojiColorMap, getEmoji } from '../../../util/get-emoji';
 import { asciiNumbers } from '../../../util/numbers';
@@ -87,10 +86,17 @@ export class GameMessageService {
 		game: Game & { guesses: Guess[]; meta: GameMeta },
 	) {
 		const footer = await getEmbedFooter(this._client);
+		const gamesCount = await this._prisma.game.count({
+			where: {
+				guildId: game.guildId,
+				id: {
+					not: game.id,
+				},
+			},
+		});
+
 		return new EmbedBuilder()
-			.setTitle(
-				`Koto for <t:${getTimestamp(startOfHour(game.createdAt))}:f>`,
-			)
+			.setTitle(`Koto #${gamesCount + 1}`)
 			.setColor(this._getEmbedColor(game.status))
 			.setDescription(
 				`${this._getMessageRows(game.guesses, game.status)}

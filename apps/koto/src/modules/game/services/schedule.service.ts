@@ -21,6 +21,7 @@ export class GameScheduleService {
 
 	@Cron(`0 * * * * *`)
 	async check() {
+		console.time('scheduler');
 		const stats = {
 			outOfTimeGames: 0,
 			checkedGuilds: 0,
@@ -79,6 +80,7 @@ export class GameScheduleService {
 		this._logger.log(
 			`Ended ${stats.outOfTimeGames} games. Checked ${stats.checkedGuilds} guilds. Started ${stats.startedGames} games.`,
 		);
+		console.timeEnd('scheduler');
 	}
 
 	private async _endGame(id: number, guildId: string) {
