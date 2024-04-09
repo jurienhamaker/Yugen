@@ -5,6 +5,8 @@ import {
 	GuildAdminGuard,
 	GuildModeratorGuard,
 } from '@yugen/shared';
+import { resolveEmoji } from '@yugen/util';
+import { ChannelType, TextChannel } from 'discord.js';
 import {
 	BooleanOption,
 	ChannelOption,
@@ -18,8 +20,6 @@ import {
 import { SettingsService } from '../services';
 import { SettingsCommandDecorator } from '../settings.decorator';
 import { SETTINGS_CHOICES } from '../util/constants';
-import { ChannelType, TextChannel } from 'discord.js';
-import { resolveEmoji } from '@yugen/util';
 
 class SettingsResetOptions {
 	@StringOption({
@@ -62,7 +62,7 @@ class SetSelfOptions {
 	@BooleanOption({
 		name: 'allowed',
 		description:
-			'Wether message authors are allowed to star their own message',
+			'Whether message authors are allowed to star their own message',
 		required: true,
 	})
 	self: boolean;
@@ -200,7 +200,7 @@ export class SettingsCommands {
 	@UseGuards(GuildAdminGuard)
 	@Subcommand({
 		name: 'author-starring',
-		description: 'Set wether message author starring counts',
+		description: 'Set whether message author starring counts',
 	})
 	public async setSelf(
 		@Context() [interaction]: SlashCommandContext,

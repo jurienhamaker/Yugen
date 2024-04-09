@@ -18,7 +18,7 @@ Users partaking in any of the Koto games will have the following information sto
 -   `id` with the User's ID as a value.
 -   `participated` with the amount of games it participated in as value.
 -   `wins` with the amount of games it won as value.
--   `inGuild` wether the user is still part of the Server.
+-   `inGuild` whether the user is still part of the Server.
 
 ### Updating Data
 

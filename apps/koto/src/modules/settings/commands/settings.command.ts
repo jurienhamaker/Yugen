@@ -66,7 +66,7 @@ class SettingsSetCooldownOptions {
 class SettingsSetAutoStartOptions {
 	@BooleanOption({
 		name: 'value',
-		description: 'Wether to automatically start a game after it ends.',
+		description: 'Whether to automatically start a game after it ends.',
 		required: true,
 	})
 	autoStart: boolean;
@@ -75,7 +75,7 @@ class SettingsSetAutoStartOptions {
 class SettingsSetMembersPrivilegeOptions {
 	@BooleanOption({
 		name: 'value',
-		description: 'Wether server members van start games themselves.',
+		description: 'Whether server members can start games themselves.',
 		required: true,
 	})
 	membersCanStart: boolean;
@@ -412,7 +412,7 @@ export class SettingsCommands {
 	@Subcommand({
 		name: 'auto-start',
 		description:
-			'Wether a game should automatically start a new one after the previous ended.',
+			'Whether a game should automatically start a new one after the previous ended.',
 	})
 	public async setAutoStart(
 		@Context() [interaction]: SlashCommandContext,
@@ -430,7 +430,7 @@ export class SettingsCommands {
 
 	@Subcommand({
 		name: 'members-privilege',
-		description: 'Wether server members van start games themselves.',
+		description: 'Whether server members van start games themselves.',
 	})
 	public async setMemberCanStart(
 		@Context() [interaction]: SlashCommandContext,
