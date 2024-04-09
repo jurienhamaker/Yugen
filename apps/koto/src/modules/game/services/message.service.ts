@@ -1,13 +1,13 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Game, GameStatus, Guess } from '@prisma/koto';
-import { GameTypeEmojiColorMap, getEmoji } from '../../../util/get-emoji';
-import { asciiNumbers } from '../../../util/numbers';
 import { PrismaService } from '@yugen/prisma/koto';
 import { getEmbedFooter, getTimestamp } from '@yugen/util';
 import { startOfHour } from 'date-fns';
 import { Channel, ChannelType, Client, EmbedBuilder } from 'discord.js';
-import { GAME_TYPE, GameMeta, GameWithMetaAndGuesses } from '../types/meta';
+import { GameTypeEmojiColorMap, getEmoji } from '../../../util/get-emoji';
+import { asciiNumbers } from '../../../util/numbers';
 import { SettingsService } from '../../settings';
+import { GAME_TYPE, GameMeta, GameWithMetaAndGuesses } from '../types/meta';
 
 @Injectable()
 export class GameMessageService {
@@ -32,7 +32,7 @@ export class GameMessageService {
 
 		const channel = await this._client.channels.fetch(settings.channelId);
 		if (game.lastMessageId) {
-			this._delete(channel, game.lastMessageId);
+			await this._delete(channel, game.lastMessageId);
 		}
 
 		if (!channel || channel.type !== ChannelType.GuildText) {
@@ -40,19 +40,27 @@ export class GameMessageService {
 		}
 
 		const embed = await this._createEmbed(game);
-		const message = await channel.send({
-			content:
-				settings.pingRoleId && (isNew || !settings.pingOnlyNew)
-					? `<@&${settings.pingRoleId}>`
-					: '',
-			embeds: [embed],
-			allowedMentions: {
-				users: [],
-				roles: [settings.pingRoleId],
-			},
-		});
+		const message = await channel
+			.send({
+				content:
+					settings.pingRoleId && (isNew || !settings.pingOnlyNew)
+						? `<@&${settings.pingRoleId}>`
+						: '',
+				embeds: [embed],
+				allowedMentions: {
+					users: [],
+					roles: [settings.pingRoleId],
+				},
+			})
+			.catch((err) => {
+				if (err.message?.contains('Missing Permissions')) {
+					return null;
+				}
 
-		await this._prisma.game.update({
+				throw err;
+			});
+
+		return await this._prisma.game.update({
 			where: {
 				id: game.id,
 			},
@@ -72,7 +80,7 @@ export class GameMessageService {
 			return;
 		}
 
-		message.delete().catch(() => null);
+		return message.delete().catch(() => null);
 	}
 
 	private async _createEmbed(
@@ -112,6 +120,7 @@ ${this._getGameInformation(game)}`,
 			meta: guess.meta,
 			userId: guess.userId,
 			points: guess.points,
+			createdAt: guess.createdAt,
 		}));
 
 		const receivedBonus = [];
@@ -130,36 +139,39 @@ ${this._getGameInformation(game)}`,
 						}, {}),
 					userId: this._client.user.id,
 					points: 0,
+					createdAt: new Date(),
 				});
 			}
 		}
 
-		return rows.reduce((str, row, i) => {
-			str +=
-				`${asciiNumbers[i + 1]}` +
-				Object.keys(row.meta)
-					.map((key) =>
-						getEmoji(
-							GameTypeEmojiColorMap[row.meta[key].type],
-							row.meta[key].letter,
-						),
-					)
-					.join('') +
-				`${
-					row.userId !== this._client.user.id
-						? ` <@${row.userId}> **+${row.points}${
-								status === GameStatus.COMPLETED &&
-								!receivedBonus.includes(row.userId)
-									? ' (+2)'
-									: ''
-							}**`
-						: ''
-				}` +
-				'\n';
+		return rows
+			.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime())
+			.reduce((str, row, i) => {
+				str +=
+					`${asciiNumbers[i + 1]}` +
+					Object.keys(row.meta)
+						.map((key) =>
+							getEmoji(
+								GameTypeEmojiColorMap[row.meta[key].type],
+								row.meta[key].letter,
+							),
+						)
+						.join('') +
+					`${
+						row.userId !== this._client.user.id
+							? ` <@${row.userId}> **+${row.points}${
+									status === GameStatus.COMPLETED &&
+									!receivedBonus.includes(row.userId)
+										? ' (+2)'
+										: ''
+								}**`
+							: ''
+					}` +
+					'\n';
 
-			receivedBonus.push(row.userId);
-			return str;
-		}, '');
+				receivedBonus.push(row.userId);
+				return str;
+			}, '');
 	}
 
 	private _getMessageKeyboard(game: GameWithMetaAndGuesses) {
