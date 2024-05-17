@@ -118,7 +118,7 @@ The first letter is: **${letter.toUpperCase()}**`);
 			const count = await this._getCount(game.id);
 			message.react('❌').catch(() => null);
 
-			if (saveAvailable.player > 1) {
+			if (saveAvailable.player >= 1) {
 				const { saves } = await this._points.deductSave(
 					guildId,
 					message.author.id,
@@ -135,7 +135,7 @@ The first letter is: **${letter.toUpperCase()}**`);
 Used **1 of your own** saves, You have **${saves}/2** saves left.`);
 			}
 
-			if (saveAvailable.guild > 1) {
+			if (saveAvailable.guild >= 1) {
 				const { saves, maxSaves } = await this._settings.deductSave(
 					guildId,
 					1,
