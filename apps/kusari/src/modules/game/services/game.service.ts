@@ -165,7 +165,7 @@ Used **1 server** save, There are **${saves}/${maxSaves}** server saves left.`);
 **Want to save the game?** Make sure to **/vote** for Kusari and earn yourself saves to save the game!`,
 			);
 
-			this.start(guildId, game.type, true);
+			return this.start(guildId, game.type, true);
 		}
 
 		const usedInPastHundred = await this._checkUsed(game, word);
