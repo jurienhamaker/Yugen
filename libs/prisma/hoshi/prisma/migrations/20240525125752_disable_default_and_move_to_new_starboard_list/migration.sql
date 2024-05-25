@@ -16,7 +16,7 @@ ALTER TABLE "SpecificChannels" ALTER COLUMN "sourceChannelId" DROP NOT NULL;
 INSERT INTO "SpecificChannels" ("guildId", "targetChannelId", "sourceEmoji", "updatedAt", "createdAt")
 SELECT "guildId", "channelId", "emoji", "updatedAt", "createdAt"
 FROM "Settings"
-WHERE "channelId" NOT NULL;
+WHERE "channelId" IS NOT NULL;
 
 
 -- AlterTable
