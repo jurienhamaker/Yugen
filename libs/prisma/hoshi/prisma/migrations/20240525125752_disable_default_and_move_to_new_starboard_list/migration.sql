@@ -15,7 +15,8 @@ ALTER TABLE "SpecificChannels" ALTER COLUMN "sourceChannelId" DROP NOT NULL;
 -- Create default starboards
 INSERT INTO "SpecificChannels" ("guildId", "targetChannelId", "sourceEmoji", "updatedAt", "createdAt")
 SELECT "guildId", "channelId", "emoji", "updatedAt", "createdAt"
-FROM "Settings";
+FROM "Settings"
+WHERE "channelId" NOT NULL;
 
 
 -- AlterTable
