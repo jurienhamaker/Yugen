@@ -1,4 +1,6 @@
 import { Logger, UseFilters, UseGuards } from '@nestjs/common';
+import { ForbiddenExceptionFilter, GuildModeratorGuard } from '@yugen/shared';
+import { DiscordComponentsArrayDTO, resolveEmoji } from '@yugen/util';
 import {
 	ActionRowBuilder,
 	ButtonBuilder,
@@ -17,13 +19,12 @@ import {
 	NumberOption,
 	Options,
 	SlashCommandContext,
+	StringOption,
 	Subcommand,
 } from 'necord';
-import { StarboardCommandDecorator } from '../starboard.decorator';
-import { StarboardService } from '../services/starboard.service';
-import { ForbiddenExceptionFilter, GuildModeratorGuard } from '@yugen/shared';
 import { EMBED_COLOR } from '../../../util/constants';
-import { DiscordComponentsArrayDTO } from '@yugen/util';
+import { StarboardService } from '../services/starboard.service';
+import { StarboardCommandDecorator } from '../starboard.decorator';
 
 class ListOptions {
 	@NumberOption({
@@ -38,18 +39,23 @@ class ListOptions {
 
 class AddOptions {
 	@ChannelOption({
-		name: 'source',
-		description: 'The source channel to check',
-		required: true,
-	})
-	sourceChannel: TextChannel;
-
-	@ChannelOption({
 		name: 'destination',
 		description: 'The destination channel to keep the starboard in',
 		required: true,
 	})
 	destinationChannel: TextChannel;
+
+	@StringOption({
+		name: 'emoji',
+		description: 'An emoji to check for',
+	})
+	emojiString: string;
+
+	@ChannelOption({
+		name: 'source',
+		description: 'A source channel to check',
+	})
+	sourceChannel: TextChannel;
 }
 
 class RemoveOptions {
@@ -71,7 +77,7 @@ export class StarboardCommands {
 
 	@Subcommand({
 		name: 'list',
-		description: 'List the starboard specific configurations',
+		description: 'List the starboards',
 	})
 	public async show(
 		@Context() [interaction]: SlashCommandContext,
@@ -92,44 +98,70 @@ export class StarboardCommands {
 
 	@Subcommand({
 		name: 'add',
-		description: 'Add a starboard specific configuration',
+		description: 'Add a starboard',
 	})
 	public async add(
 		@Context() [interaction]: SlashCommandContext,
-		@Options() { sourceChannel, destinationChannel }: AddOptions,
+		@Options()
+		{ emojiString, sourceChannel, destinationChannel }: AddOptions,
 	) {
 		this._logger.verbose(
-			`Adding starboard configuration for ${interaction.guildId} - source: ${sourceChannel.id} destination: ${destinationChannel.id}`,
+			`Adding starboard configuration for ${
+				interaction.guildId
+			} - source: ${sourceChannel?.id ?? 'none'} emoji: ${
+				emojiString ?? '⭐'
+			} destination: ${destinationChannel.id}`,
 		);
 
-		const configuration =
-			await this._starboard.getSpecificChannelBySourceId(
-				interaction.guildId,
-				sourceChannel.id,
-			);
+		emojiString = emojiString ?? '⭐';
 
-		if (configuration) {
+		const emojiData = resolveEmoji(emojiString, interaction.client);
+		const { found } = emojiData;
+
+		if (!found) {
 			return interaction.reply({
-				content: `A starboard for the channel <#${sourceChannel.id}> already exists.`,
+				content: `You can only use emojis from guilds that the bot is in.`,
 				ephemeral: true,
 			});
 		}
 
-		await this._starboard.addSpecificChannel(
+		const configuration =
+			await this._starboard.getStarboardBySourceIdAndEmoji(
+				interaction.guildId,
+				emojiData.emoji,
+				sourceChannel?.id ?? null,
+			);
+
+		if (configuration) {
+			return interaction.reply({
+				content: `A starboard for the supplied rules already exists.`,
+				ephemeral: true,
+			});
+		}
+
+		await this._starboard.addStarboard(
 			interaction.guildId!,
-			sourceChannel.id,
+			emojiData.emoji,
+			sourceChannel?.id ?? null,
 			destinationChannel.id,
 		);
 
 		return interaction.reply({
-			content: `Stars that are used in <#${sourceChannel.id}> will now end up  in <#${destinationChannel.id}>`,
+			content: `A starboard has been added;
+Destination: <#${destinationChannel.id}>
+Emoji:  ${emojiData.unicode ? emojiData.emoji : emojiData.clientEmoji}${
+				sourceChannel
+					? `
+Source: <#${sourceChannel.id}>`
+					: ''
+			}`,
 			ephemeral: true,
 		});
 	}
 
 	@Subcommand({
 		name: 'remove',
-		description: 'Remove a starboard specific configuration',
+		description: 'Remove a starboard configuration',
 	})
 	public async remove(
 		@Context() [interaction]: SlashCommandContext,
@@ -139,7 +171,7 @@ export class StarboardCommands {
 			`Removing starboard configuration for ${interaction.guildId} - ${id}`,
 		);
 
-		const configuration = await this._starboard.removeSpecificChannelByID(
+		const configuration = await this._starboard.removeStarboardByID(
 			interaction.guildId!,
 			id!,
 		);
@@ -156,15 +188,14 @@ export class StarboardCommands {
 	) {
 		page = page ?? 1;
 
-		const { configurations, total } =
-			await this._starboard.getSpecificChannels(
-				interaction.guildId!,
-				page,
-			);
+		const { configurations, total } = await this._starboard.getStarboards(
+			interaction.guildId!,
+			page,
+		);
 
 		if (!total) {
 			const data = {
-				content: `No specific channels have been configured yet`,
+				content: `No starboards have been configured yet`,
 				embeds: [],
 				components: [],
 			};
@@ -181,7 +212,7 @@ export class StarboardCommands {
 
 		if (!configurations?.length) {
 			const data = {
-				content: `No specific channels have been found for page ${page}`,
+				content: `No starboards have been found for page ${page}`,
 				embeds: [],
 				components: [],
 			};
@@ -199,33 +230,34 @@ export class StarboardCommands {
 		const maxPage = Math.ceil(total / 10);
 
 		let embed = new EmbedBuilder()
-			.setTitle(
-				`Starboard specific channels for ${interaction.guild!.name}`,
-			)
+			.setTitle(`Starboards for ${interaction.guild!.name}`)
 			.setColor(EMBED_COLOR)
 			.addFields([
 				{
 					name: 'ID',
-					value: configurations
-						.map((c) => c.id ?? 'Default')
-						.join('\n'),
+					value: configurations.map((c) => c.id).join('\n'),
 					inline: true,
 				},
 				{
-					name: 'Source',
+					name: 'Emoji | Source',
 					value: configurations
-						.map((c) =>
-							c.sourceChannelId
-								? `<#${c.sourceChannelId}>`
-								: 'Anywhere',
-						)
+						.map((c) => {
+							const { emoji, unicode, clientEmoji } =
+								resolveEmoji(c.sourceEmoji, interaction.client);
+
+							return `${unicode ? emoji : clientEmoji} | ${
+								c.sourceChannelId
+									? `<#${c.sourceChannelId}>`
+									: 'Anywhere'
+							}`;
+						})
 						.join('\n'),
 					inline: true,
 				},
 				{
 					name: 'Destination',
 					value: configurations
-						.map((c) => `<#${c.channelId}>`)
+						.map((c) => `<#${c.targetChannelId}>`)
 						.join('\n'),
 					inline: true,
 				},

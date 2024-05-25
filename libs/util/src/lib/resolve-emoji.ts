@@ -1,15 +1,14 @@
 import { Client, GuildEmoji } from 'discord.js';
 import { emojiIsUnicode } from './emoji-is-unicode';
 
-export const resolveEmoji = (
-	emoji: string,
-	_client: Client,
-): {
+export interface ResolvedEmoji {
 	found: boolean;
 	unicode: boolean;
 	emoji?: GuildEmoji | string;
 	clientEmoji?: GuildEmoji | null;
-} => {
+}
+
+export const resolveEmoji = (emoji: string, _client: Client): ResolvedEmoji => {
 	if (!emoji?.length) {
 		return {
 			found: false,

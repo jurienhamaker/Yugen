@@ -1,14 +1,12 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Settings } from '@prisma/hoshi';
-import { EMBED_COLOR } from '../../../util/constants';
 import { PrismaService } from '@yugen/prisma/hoshi';
 import {
 	CommandInteraction,
 	EmbedBuilder,
-	GuildEmoji,
 	MessageComponentInteraction,
 } from 'discord.js';
-import { resolveEmoji } from '@yugen/util';
+import { EMBED_COLOR } from '../../../util/constants';
 
 @Injectable()
 export class SettingsService {
@@ -25,7 +23,7 @@ export class SettingsService {
 
 		if (!settings) {
 			return this._prisma.settings.create({
-				data: { guildId, emoji: '⭐' },
+				data: { guildId },
 			});
 		}
 
@@ -43,7 +41,7 @@ export class SettingsService {
 	async set(
 		guildId: string,
 		property: keyof Settings,
-		value: string | number | boolean | GuildEmoji | string[],
+		value: string | number | boolean | string[],
 	) {
 		let settings = await this.getSettings(guildId);
 
@@ -69,14 +67,7 @@ export class SettingsService {
 			return;
 		}
 
-		const { channelId, treshold, emoji, self, ignoredChannelIds } =
-			settings;
-
-		const {
-			emoji: parsedEmoji,
-			unicode,
-			clientEmoji,
-		} = resolveEmoji(emoji, interaction.client);
+		const { treshold, self, ignoredChannelIds } = settings;
 
 		const embed = new EmbedBuilder()
 			.setColor(EMBED_COLOR)
@@ -86,18 +77,8 @@ export class SettingsService {
 			)
 			.addFields(
 				{
-					name: 'Default channel',
-					value: channelId?.length ? `<#${channelId}>` : '-',
-					inline: true,
-				},
-				{
 					name: 'Treshold',
 					value: treshold.toString(),
-					inline: true,
-				},
-				{
-					name: 'Emoji',
-					value: `${unicode ? parsedEmoji : clientEmoji}`,
 					inline: true,
 				},
 				{

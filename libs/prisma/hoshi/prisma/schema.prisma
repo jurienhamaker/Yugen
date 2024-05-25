@@ -15,9 +15,7 @@ model Settings {
   id                Int         @id @default(autoincrement())
   guildId           String      @unique
 
-  channelId                        String?
   treshold                         Int         @default(3)
-  emoji                            String      @default("⭐")
   self                             Boolean     @default(false)
   ignoredChannelIds                String[]    @default([])
 
@@ -26,11 +24,14 @@ model Settings {
   updatedAt         DateTime    @updatedAt
 }
 
-model SpecificChannels {
+model Starboards {
   id                                        Int         @id @default(autoincrement())
   guildId                                   String
-  sourceChannelId                           String
-  channelId                                 String
+
+  sourceEmoji                               String      @default("⭐")
+  sourceChannelId                           String?
+
+  targetChannelId                           String
 
   // timestamps
   createdAt                                 DateTime    @default(now())

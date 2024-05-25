@@ -5,11 +5,6 @@ export const SETTINGS_CHOICES = [
 		value: 'enabled',
 	},
 	{
-		name: 'Default channel',
-		description: 'The default channel of the starboard.',
-		value: 'channelId',
-	},
-	{
 		name: 'Self starring',
 		description:
 			'Whether the author of the message can star their own messages.',

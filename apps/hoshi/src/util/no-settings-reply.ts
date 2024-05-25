@@ -1,11 +1,11 @@
-import { EMBED_COLOR } from './constants';
 import { getEmbedFooter } from '@yugen/util';
 import { Client, CommandInteraction, EmbedBuilder } from 'discord.js';
+import { EMBED_COLOR } from './constants';
 
 export const noSettingsDescription = `Someone with \`Manage Server\` permissions must do the following:
 
-- Create a new channel for the default starboard
-- Use the \`/settings channel\` command to configure the default channel
+- Create a new channel for to serve as a starboard
+- Use the \`/starboard add\` command to configure your first starboard
 
 That's it! Hoshi will start keeping a starboard!
 

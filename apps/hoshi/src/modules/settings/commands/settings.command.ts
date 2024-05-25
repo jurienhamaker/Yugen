@@ -5,8 +5,7 @@ import {
 	GuildAdminGuard,
 	GuildModeratorGuard,
 } from '@yugen/shared';
-import { resolveEmoji } from '@yugen/util';
-import { ChannelType, TextChannel } from 'discord.js';
+import { TextChannel } from 'discord.js';
 import {
 	BooleanOption,
 	ChannelOption,
@@ -40,15 +39,6 @@ class IgnoreOptions {
 	channel: TextChannel | undefined;
 }
 
-class SetEmojiOptions {
-	@StringOption({
-		name: 'emoji',
-		description: 'The emoji to react with',
-		required: true,
-	})
-	emojiString: string;
-}
-
 class SetTresholdOptions {
 	@NumberOption({
 		name: 'treshold',
@@ -66,15 +56,6 @@ class SetSelfOptions {
 		required: true,
 	})
 	self: boolean;
-}
-
-class SetChannelOptions {
-	@ChannelOption({
-		name: 'channel',
-		description: 'The default channel for the starboard.',
-		required: true,
-	})
-	channel: TextChannel | undefined;
 }
 
 @UseFilters(ForbiddenExceptionFilter)
@@ -112,10 +93,6 @@ export class SettingsCommands {
 
 		let value = null;
 
-		if (setting === 'emoji') {
-			value = '⭐';
-		}
-
 		if (setting === 'treshold') {
 			value = 3;
 		}
@@ -136,37 +113,6 @@ export class SettingsCommands {
 			content: `${name} has been reset to it's default value of \`${
 				value ? value : '-'
 			}\``,
-			ephemeral: true,
-		});
-	}
-
-	@UseGuards(GuildAdminGuard)
-	@Subcommand({
-		name: 'emoji',
-		description: 'Show starboard settings',
-	})
-	public async setEmoji(
-		@Context() [interaction]: SlashCommandContext,
-		@Options() { emojiString }: SetEmojiOptions,
-	) {
-		const resolved = resolveEmoji(emojiString, interaction.client);
-		const { found, unicode } = resolved;
-
-		if (!found) {
-			return interaction.reply({
-				content: `You can only use emojis from guilds that the bot is in.`,
-				ephemeral: true,
-			});
-		}
-
-		const { emoji, clientEmoji } = resolved;
-
-		await this._settings.set(interaction.guildId!, 'emoji', emoji);
-
-		return interaction.reply({
-			content: `Starboard reaction emoji has been set to ${
-				unicode ? emoji : clientEmoji
-			}.`,
 			ephemeral: true,
 		});
 	}
@@ -212,30 +158,6 @@ export class SettingsCommands {
 			content: `Message authors are now **${
 				self ? 'allowed' : 'disallowed'
 			}** to star their own message.`,
-			ephemeral: true,
-		});
-	}
-
-	@UseGuards(GuildAdminGuard)
-	@Subcommand({
-		name: 'channel',
-		description: 'Set the default starboard channel',
-	})
-	public async setChannel(
-		@Context() [interaction]: SlashCommandContext,
-		@Options() { channel }: SetChannelOptions,
-	) {
-		if (!channel || channel.type !== ChannelType.GuildText) {
-			return interaction.reply({
-				content: 'Selected channel must be a text channel.',
-				ephemeral: true,
-			});
-		}
-
-		await this._settings.set(interaction.guildId, 'channelId', channel.id);
-
-		return interaction.reply({
-			content: `I will run in <#${channel.id}> from now on.`,
 			ephemeral: true,
 		});
 	}

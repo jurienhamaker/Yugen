@@ -1,16 +1,17 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { Log } from '@prisma/hoshi';
+import { PrismaService } from '@yugen/prisma/hoshi';
+import { getUsername, resolveEmoji } from '@yugen/util';
 import {
 	ChannelType,
 	Client,
 	EmbedBuilder,
+	GuildEmoji,
 	Message,
 	MessageReaction,
 } from 'discord.js';
-import { SettingsService } from '../../settings';
-import { PrismaService } from '@yugen/prisma/hoshi';
-import { Log } from '@prisma/hoshi';
-import { getUsername, resolveEmoji } from '@yugen/util';
 import { EMBED_COLOR } from '../../../util/constants';
+import { SettingsService } from '../../settings';
 
 @Injectable()
 export class StarboardService {
@@ -26,13 +27,7 @@ export class StarboardService {
 		const settings = await this._settings.getSettings(
 			reaction.message.guildId,
 		);
-		const { emoji, treshold, self, ignoredChannelIds } = settings;
-
-		let { channelId } = settings;
-
-		if (!channelId) {
-			return;
-		}
+		const { treshold, self, ignoredChannelIds } = settings;
 
 		if (ignoredChannelIds.includes(reaction.message.channelId)) {
 			return;
@@ -42,15 +37,35 @@ export class StarboardService {
 			`Running starboard check for "${reaction.message.guildId}"`,
 		);
 
-		const reactionEmoji = reaction.emoji.id ?? reaction.emoji.name;
-		if (reactionEmoji !== emoji) {
-			return;
-		}
-
 		const isStarboard = await this.getLogByMessageId(reaction.message.id);
 		if (isStarboard) {
 			return;
 		}
+
+		const reactionEmoji = reaction.emoji.id ?? reaction.emoji.name;
+		const configurations = await this._prisma.starboards.findMany({
+			where: {
+				guildId: reaction.message.guildId,
+				sourceEmoji: reactionEmoji,
+				OR: [
+					{
+						sourceChannelId: reaction.message.channelId,
+					},
+					{
+						sourceChannelId: null,
+					},
+				],
+			},
+		});
+
+		if (!configurations.length) {
+			return;
+		}
+
+		const configuration =
+			configurations.find(
+				(c) => c.sourceChannelId === reaction.message.channelId,
+			) ?? configurations[0];
 
 		const users = await reaction.users.fetch();
 		const filteredUsers = users.filter(
@@ -80,25 +95,17 @@ export class StarboardService {
 				filteredUsers.size,
 				embed,
 				reaction.message as Message,
-				emoji,
+				configuration.sourceEmoji,
 				log,
 			);
-		}
-
-		const configuration = await this.getSpecificChannelBySourceId(
-			reaction.message.guildId,
-			reaction.message.channel.id,
-		);
-		if (configuration) {
-			channelId = configuration.channelId;
 		}
 
 		return this._createStarboard(
 			filteredUsers.size,
 			embed,
 			reaction.message as Message,
-			channelId,
-			emoji,
+			configuration.targetChannelId,
+			configuration.sourceEmoji,
 		);
 	}
 
@@ -118,8 +125,8 @@ export class StarboardService {
 		});
 	}
 
-	getSpecificChannelBySourceId(guildId: string, sourceChannelId: string) {
-		return this._prisma.specificChannels.findFirst({
+	getStarboardBySourceId(guildId: string, sourceChannelId: string | null) {
+		return this._prisma.starboards.findFirst({
 			where: {
 				guildId,
 				sourceChannelId,
@@ -127,54 +134,58 @@ export class StarboardService {
 		});
 	}
 
-	async getSpecificChannels(guildId: string, page = 1) {
-		const { channelId } = await this._settings.getSettings(guildId);
-
-		const where = {
-			guildId,
-		};
-
-		const configurations = await this._prisma.specificChannels.findMany({
-			where,
-			skip: page === 1 ? 0 : 9 + (page - 2) * 10,
-			take: page === 1 ? 9 : 10,
-		});
-		const total = await this._prisma.specificChannels.count({
-			where,
-		});
-
-		return {
-			configurations:
-				page === 1
-					? [
-							{
-								id: null,
-								sourceChannelId: null,
-								channelId,
-							},
-							...configurations,
-						]
-					: configurations,
-			total,
-		};
-	}
-
-	addSpecificChannel(
+	getStarboardBySourceIdAndEmoji(
 		guildId: string,
-		sourceChannelId: string,
-		channelId: string,
+		sourceEmoji: string | GuildEmoji,
+		sourceChannelId: string | null,
 	) {
-		return this._prisma.specificChannels.create({
-			data: {
+		return this._prisma.starboards.findFirst({
+			where: {
 				guildId,
 				sourceChannelId,
-				channelId,
+				sourceEmoji: sourceEmoji.toString(),
 			},
 		});
 	}
 
-	async removeSpecificChannelByID(guildId: string, id: number) {
-		const configuration = await this._prisma.specificChannels.findFirst({
+	async getStarboards(guildId: string, page = 1) {
+		const where = {
+			guildId,
+		};
+
+		const configurations = await this._prisma.starboards.findMany({
+			where,
+			skip: (page - 1) * 10,
+			take: 10,
+		});
+		const total = await this._prisma.starboards.count({
+			where,
+		});
+
+		return {
+			configurations,
+			total,
+		};
+	}
+
+	addStarboard(
+		guildId: string,
+		sourceEmoji: string | GuildEmoji,
+		sourceChannelId: string | null,
+		targetChannelId: string,
+	) {
+		return this._prisma.starboards.create({
+			data: {
+				guildId,
+				sourceEmoji: sourceEmoji.toString(),
+				sourceChannelId,
+				targetChannelId,
+			},
+		});
+	}
+
+	async removeStarboardByID(guildId: string, id: number) {
+		const configuration = await this._prisma.starboards.findFirst({
 			where: {
 				guildId,
 				id,
@@ -185,7 +196,7 @@ export class StarboardService {
 			return null;
 		}
 
-		await this._prisma.specificChannels.delete({
+		await this._prisma.starboards.delete({
 			where: {
 				id: configuration.id,
 			},
