@@ -16,7 +16,7 @@ model Settings {
   guildId           String      @unique
 
   channelId         String?
-  cooldown          Int         @default(1)
+  cooldown          Int         @default(0)
   math              Boolean     @default(true)
   shameRoleId       String?
 
