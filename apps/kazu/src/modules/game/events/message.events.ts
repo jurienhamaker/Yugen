@@ -112,7 +112,6 @@ Last number was **${didChange}**!`,
 		const cleaned = message.cleanContent
 			.replace(/[^0-9()+\-*/^. ]/g, '')
 			.replace(/\^/g, '**');
-		console.log(cleaned);
 
 		let parsed: number;
 		try {
