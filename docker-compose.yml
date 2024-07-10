@@ -49,6 +49,22 @@ services:
             - ./:/opt/app
         depends_on:
             - db
+    kazu:
+        build:
+            context: .
+            target: base
+        tty: true
+        command: yarn kazu:docker:start
+        env_file:
+            - ./.env
+            - ./kazu.env
+        ports:
+            - '$EXPOSED_KAZU_API_PORT:3000'
+            - '$EXPOSED_KAZU_DEBUGGING_PORT:9229'
+        volumes:
+            - ./:/opt/app
+        depends_on:
+            - db
     db:
         image: postgres:12.2-alpine
         volumes:

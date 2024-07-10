@@ -12,6 +12,7 @@ export * from './lib/get-timestamp';
 export * from './lib/get-username';
 export * from './lib/injection-tokens';
 export * from './lib/interaction-replies';
+export * from './lib/number-emojis';
 export * from './lib/resolve-emoji';
 export * from './lib/types';
 export * from './lib/util';

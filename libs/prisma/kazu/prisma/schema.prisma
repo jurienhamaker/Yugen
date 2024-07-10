@@ -1,0 +1,92 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../../../../node_modules/@prisma/kazu"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Settings {
+  id                Int         @id @default(autoincrement())
+  guildId           String      @unique
+
+  channelId         String?
+  cooldown          Int         @default(1)
+  math              Boolean     @default(true)
+  shameRoleId       String?
+
+  lastShameUserId   String?
+
+  games             Game[]
+
+  highscore         Int         @default(0)
+  highscoreDate     DateTime?
+
+  saves             Float       @default(0)
+  maxSaves          Float       @default(2)
+  savesUsed         Float       @default(0)
+
+  // timestamps
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+}
+
+model Game {
+  id                Int         @id @default(autoincrement())
+  guildId           String
+  lastMessageId     String?
+
+  settings          Settings    @relation(fields: [guildId], references: [guildId], onDelete: Cascade, onUpdate: Cascade)
+
+  history           History[]
+
+  status            GameStatus  @default(IN_PROGRESS)
+  type              GameType    @default(NORMAL)
+
+  // timestamps
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+}
+
+model History {
+  id                Int         @id @default(autoincrement())
+  userId            String
+
+  game              Game        @relation(fields: [gameId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  gameId            Int
+
+  number            Int
+
+  // timestamps
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+}
+
+model Player {
+  id                Int         @id @default(autoincrement())
+  userId            String
+  guildId           String
+  inGuild           Boolean     @default(true)
+
+  saves             Float       @default(0)
+  points            Int         @default(0)
+
+  // timestamps
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+}
+
+enum GameStatus {
+  IN_PROGRESS
+  FAILED
+  COMPLETED
+}
+
+enum GameType {
+  NORMAL
+}

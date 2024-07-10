@@ -1,11 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { Game, GameStatus, GameType, Settings } from '@prisma/kusari';
-import { PrismaService } from '@yugen/prisma/kusari';
-import { getTimestamp, numberEmojis } from '@yugen/util';
+import { Game, GameStatus, GameType, Settings } from '@prisma/kazu';
+import { PrismaService } from '@yugen/prisma/kazu';
+import { getTimestamp } from '@yugen/util';
 import { addMinutes, subMinutes } from 'date-fns';
 import { ChannelType, Client, Message } from 'discord.js';
 import { SettingsService } from '../../settings';
-import { GameDictionaryService } from './dictionary.service';
 import { GamePointsService } from './points.service';
 
 @Injectable()
@@ -14,7 +13,6 @@ export class GameService {
 
 	constructor(
 		private _prisma: PrismaService,
-		private _dictionary: GameDictionaryService,
 		private _points: GamePointsService,
 		private _settings: SettingsService,
 		private _client: Client,
@@ -24,6 +22,11 @@ export class GameService {
 		guildId: string,
 		type: GameType = GameType.NORMAL,
 		recreate = false,
+		shamedData?: {
+			message: Message;
+			lastShameUserId: string;
+			roleId: string;
+		},
 	) {
 		this._logger.log(`Trying to start a game for ${guildId}`);
 
@@ -42,10 +45,8 @@ export class GameService {
 			(currentGame && recreate) ||
 			(currentGame && currentGame.type !== type)
 		) {
-			await this.endGame(currentGame.id, GameStatus.FAILED);
+			await this.endGame(currentGame.id, GameStatus.FAILED, shamedData);
 		}
-
-		const letter = this._getRandomLetter();
 
 		await this._prisma.game.create({
 			data: {
@@ -53,7 +54,7 @@ export class GameService {
 				type,
 				history: {
 					create: {
-						word: letter,
+						number: 0,
 						userId: this._client.user.id,
 					},
 				},
@@ -62,15 +63,15 @@ export class GameService {
 
 		if (channel.type === ChannelType.GuildText) {
 			channel.send(`**A new game has started!**
-The first letter is: **${letter.toUpperCase()}**`);
+Start the count from **1**`);
 		}
 
 		return true;
 	}
 
-	async addWord(
+	async addNumber(
 		guildId: string,
-		word: string,
+		num: number,
 		message: Message,
 		settings: Settings,
 	) {
@@ -80,34 +81,22 @@ The first letter is: **${letter.toUpperCase()}**`);
 			return;
 		}
 
-		if (word.length < 3) {
-			return this._doReply(
-				message,
-				`A word must be atleast 3 characters long, try again!`,
-				'❌',
-			);
-		}
-
-		const exists = await this._dictionary.checkDictionary(word);
-		const lastWord = await this.getLastWord(game);
-		const lastLetter = lastWord.word[lastWord.word.length - 1];
+		const lastNumber = await this.getLastNumber(game);
 
 		if (
-			lastWord.userId === message.author.id &&
+			lastNumber.userId === message.author.id &&
 			process.env['NODE_ENV'] === 'production'
 		) {
 			return this._doReply(
 				message,
-				`Sorry, but you can't add a word twice in a row! Please wait for another player to add a word.`,
+				`Sorry, but you can't add a number twice in a row! Please wait for another player to add a number.`,
 				'🕒',
 			);
 		}
 
-		const isLastLetter = word[0] === lastLetter;
-		if (!exists || !isLastLetter) {
-			const failReason = !exists
-				? `Sorry, I couldn't find "**${word}**" in the [English dictionary](https://en.wiktionary.org/wiki/${word}), try again!`
-				: `The word ${word} does not start with the letter **${lastLetter}**`;
+		const isNextNumber = num === lastNumber.number + 1;
+		if (!isNextNumber) {
+			const failReason = `${num} is not the next number!`;
 
 			const saveAvailable = await this._getSaves(
 				settings,
@@ -161,19 +150,14 @@ Used **1 server** save, There are **${saves}/${maxSaves}** server saves left.`);
 						: ''
 				}
 
-**Want to save the game?** Make sure to **/vote** for Kusari and earn yourself saves to save the game!`,
+**Want to save the game?** Make sure to **/vote** for Kazu and earn yourself saves to save the game!`,
 			);
 
-			return this.start(guildId, game.type, true);
-		}
-
-		const usedInPastHundred = await this._checkUsed(game, word);
-		if (usedInPastHundred) {
-			return this._doReply(
+			return this.start(guildId, game.type, true, {
 				message,
-				`The word ${word} has already been used in the past 100 words, try another word!`,
-				'❌',
-			);
+				lastShameUserId: settings.lastShameUserId,
+				roleId: settings.shameRoleId,
+			});
 		}
 
 		const cooldown = await this._checkCooldown(
@@ -191,10 +175,10 @@ Used **1 server** save, There are **${saves}/${maxSaves}** server saves left.`);
 			);
 		}
 
-		await this._points.addPointAndWord(guildId, message.author.id);
+		await this._points.addPointAndNumber(guildId, message.author.id);
 		await this._prisma.history.create({
 			data: {
-				word,
+				number: num,
 				userId: message.author.id,
 				gameId: game.id,
 			},
@@ -207,8 +191,16 @@ Used **1 server** save, There are **${saves}/${maxSaves}** server saves left.`);
 		this._setNumber(message, count);
 	}
 
-	async endGame(gameId: number, status: GameStatus = GameStatus.COMPLETED) {
-		return this._prisma.game.update({
+	async endGame(
+		gameId: number,
+		status: GameStatus = GameStatus.COMPLETED,
+		shamedData?: {
+			message: Message;
+			lastShameUserId: string;
+			roleId: string;
+		},
+	) {
+		await this._prisma.game.update({
 			where: {
 				id: gameId,
 			},
@@ -216,6 +208,29 @@ Used **1 server** save, There are **${saves}/${maxSaves}** server saves left.`);
 				status,
 			},
 		});
+
+		if (shamedData) {
+			const { message, lastShameUserId, roleId } = shamedData;
+			await this._settings.set(
+				message.guild.id,
+				'lastShameUserId',
+				message.author.id,
+			);
+
+			const lastShamedMember = lastShameUserId
+				? await message.guild.members
+						.fetch(lastShameUserId)
+						.catch(() => null)
+				: null;
+			if (lastShamedMember && roleId) {
+				await lastShamedMember.roles.remove(roleId).catch(() => null);
+			}
+
+			const member = await message.guild.members.fetch(message.author.id);
+			if (member && roleId) {
+				await member.roles.add(roleId).catch(() => null);
+			}
+		}
 	}
 
 	getCurrentGame(guildId: string): Promise<Game> {
@@ -230,7 +245,7 @@ Used **1 server** save, There are **${saves}/${maxSaves}** server saves left.`);
 		});
 	}
 
-	async getLastWord(game: Game) {
+	async getLastNumber(game: Game) {
 		if (!game || game.status !== GameStatus.IN_PROGRESS) {
 			return;
 		}
@@ -281,20 +296,12 @@ Used **1 server** save, There are **${saves}/${maxSaves}** server saves left.`);
 	}
 
 	private async _setNumber(message: Message, count: number) {
-		const stringCount = `${count}`;
+		if (count === 69) {
+			await message.react('1260697303224815696').catch(() => null);
+		}
 
-		const usedEmojis = [];
-		for (const number of stringCount) {
-			const available = numberEmojis[parseInt(number)];
-			for (const emoji of available) {
-				if (usedEmojis.includes(emoji)) {
-					continue;
-				}
-
-				usedEmojis.push(emoji);
-				await message.react(emoji).catch(() => null);
-				break;
-			}
+		if (count === 420) {
+			await message.react('🍃').catch(() => null);
 		}
 	}
 
@@ -327,21 +334,6 @@ Used **1 server** save, There are **${saves}/${maxSaves}** server saves left.`);
 		return addMinutes(lastGuessWithinCooldown.createdAt, cooldown);
 	}
 
-	private async _checkUsed(game: Game, word: string) {
-		const history = await this._prisma.history.findMany({
-			where: {
-				gameId: game.id,
-			},
-			take: 100,
-			orderBy: {
-				createdAt: 'desc',
-			},
-		});
-
-		const index = history.findIndex((t) => t.word === word);
-		return index >= 0;
-	}
-
 	private async _doReply(message: Message, reply: string, reaction?: string) {
 		if (reaction) {
 			message.react(reaction).catch(() => null);
@@ -352,47 +344,5 @@ Used **1 server** save, There are **${saves}/${maxSaves}** server saves left.`);
 			setTimeout(() => response.delete().catch(() => null), 5000);
 		}
 		return;
-	}
-
-	private _getRandomLetter() {
-		const letters = [
-			'a',
-			'b',
-			'c',
-			'd',
-			'e',
-			'f',
-			'g',
-			'h',
-			'i',
-			'j',
-			'k',
-			'l',
-			'm',
-			'n',
-			'o',
-			'p',
-			'q',
-			'r',
-			's',
-			't',
-			'u',
-			'v',
-			'w',
-			'y',
-			'z',
-		];
-		const weights = [
-			382, 963, 1276, 1351, 1411, 1493, 1544, 1603, 1637, 1647, 1657,
-			1730, 1801, 1828, 1858, 1970, 1975, 2077, 2286, 2387, 2408, 2443,
-			2493, 2503, 2513,
-		];
-
-		const maxCumulativeWeight = weights[weights.length - 1];
-		const randomNumber = maxCumulativeWeight * Math.random();
-
-		const index = weights.findIndex((v) => v >= randomNumber);
-
-		return letters[index];
 	}
 }
