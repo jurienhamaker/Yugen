@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { PrismaModule } from '@yugen/prisma/kusari';
+import { PrismaModule } from '@yugen/prisma/kazu';
 import { SettingsService } from './services';
 
 @Module({
