@@ -109,6 +109,10 @@ Last number was **${didChange}**!`,
 			return num;
 		}
 
+		if (/[^0-9()+\-*/^. ]/g.test(message.cleanContent)) {
+			return;
+		}
+
 		const cleaned = message.cleanContent
 			.replace(/[^0-9()+\-*/^. ]/g, '')
 			.replace(/\^/g, '**');
