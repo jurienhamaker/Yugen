@@ -83,20 +83,12 @@ Start the count from **1**`);
 
 		const lastNumber = await this.getLastNumber(game);
 
-		if (
-			lastNumber.userId === message.author.id &&
-			process.env['NODE_ENV'] === 'production'
-		) {
-			return this._doReply(
-				message,
-				`Sorry, but you can't add a number twice in a row! Please wait for another player to add a number.`,
-				'🕒',
-			);
-		}
-
 		const isNextNumber = num === lastNumber.number + 1;
-		if (!isNextNumber) {
-			const failReason = `${num} is not the next number!`;
+		const isSameUser = lastNumber.userId === message.author.id;
+		if (!isNextNumber || isSameUser) {
+			const failReason = isSameUser
+				? `<@${message.author.id}> counted twice in a row!`
+				: `${num} is not the next number!`;
 
 			const saveAvailable = await this._getSaves(
 				settings,
