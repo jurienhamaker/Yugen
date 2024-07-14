@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { EMBED_COLOR } from '../util/constants';
 import { getEmbedFooter } from '@yugen/util';
 import { Client, EmbedBuilder } from 'discord.js';
 import { Context, SlashCommand, SlashCommandContext } from 'necord';
+import { EMBED_COLOR } from '../util/constants';
 
 @Injectable()
 export class TutorialCommands {
@@ -20,6 +20,7 @@ export class TutorialCommands {
 				`**How to Play:**
 - The first word can be any word
 - Each word afterwards has to start with the last letter of the previous word
+- A single person can not send in a word twice in a row!
 - That's it! Enjoy!
 
 **Saves:**

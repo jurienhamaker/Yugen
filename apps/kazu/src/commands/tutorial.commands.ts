@@ -20,6 +20,7 @@ export class TutorialCommands {
 				`**How to Play:**
 - The first count must be 1.
 - Each count afterwards has to be one number higher than the previous count. It can also be an equation when math is enabled.
+- A single person can not count twice in a row!
 - That's it! Enjoy!
 
 **Saves:**
