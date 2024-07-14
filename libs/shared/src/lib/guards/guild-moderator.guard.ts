@@ -43,6 +43,13 @@ export class GuildModeratorGuard implements CanActivate {
 			return true;
 		}
 
+		const hasManageGuildPermission = member.permissions.has(
+			PermissionsBitField.Flags.ManageGuild,
+		);
+		if (hasManageGuildPermission) {
+			return true;
+		}
+
 		const hasPermission = member.permissions.has(
 			PermissionsBitField.Flags.BanMembers,
 		);
