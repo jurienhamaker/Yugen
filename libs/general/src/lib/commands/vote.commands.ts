@@ -22,7 +22,7 @@ export class GeneralVoteCommands {
 		name: 'vote',
 		description: 'Vote for the bot!',
 	})
-	public async invite(@Context() [interaction]: SlashCommandContext) {
+	public async vote(@Context() [interaction]: SlashCommandContext) {
 		const footer = await getEmbedFooter(this._client, null, false);
 		const voteReward = this._voteReward();
 		const embed = new EmbedBuilder()
