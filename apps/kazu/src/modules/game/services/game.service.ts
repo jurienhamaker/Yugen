@@ -21,6 +21,7 @@ export class GameService {
 	async start(
 		guildId: string,
 		type: GameType = GameType.NORMAL,
+		startingNumber: number = 1,
 		recreate = false,
 		shamedData?: {
 			message: Message;
@@ -48,13 +49,14 @@ export class GameService {
 			await this.endGame(currentGame.id, GameStatus.FAILED, shamedData);
 		}
 
+		const number = startingNumber - 1;
 		await this._prisma.game.create({
 			data: {
 				guildId,
 				type,
 				history: {
 					create: {
-						number: 0,
+						number: number >= 0 ? number : 0,
 						userId: this._client.user.id,
 					},
 				},
@@ -63,7 +65,7 @@ export class GameService {
 
 		if (channel.type === ChannelType.GuildText) {
 			channel.send(`**A new game has started!**
-Start the count from **1**`);
+Start the count from **${startingNumber}**`);
 		}
 
 		return true;
@@ -145,7 +147,7 @@ Used **1 server** save, There are **${saves}/${maxSaves}** server saves left.`);
 **Want to save the game?** Make sure to **/vote** for Kazu and earn yourself saves to save the game!`,
 			);
 
-			return this.start(guildId, game.type, true, {
+			return this.start(guildId, game.type, 1, true, {
 				message,
 				lastShameUserId: settings.lastShameUserId,
 				roleId: settings.shameRoleId,

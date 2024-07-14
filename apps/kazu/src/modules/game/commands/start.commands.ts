@@ -4,6 +4,7 @@ import { ForbiddenExceptionFilter, GuildModeratorGuard } from '@yugen/shared';
 import { Client, CommandInteraction } from 'discord.js';
 import {
 	Context,
+	NumberOption,
 	Options,
 	SlashCommandContext,
 	StringOption,
@@ -28,6 +29,22 @@ class GameStartOptions {
 		choices: GameStartOptionsChoices,
 	})
 	type: GameType;
+
+	@NumberOption({
+		name: 'starting-number',
+		description: 'The number to start the game at',
+		required: false,
+	})
+	startingNumber: number;
+}
+
+class GameResetOptions {
+	@NumberOption({
+		name: 'starting-number',
+		description: 'The number to start the game at',
+		required: false,
+	})
+	startingNumber: number;
 }
 
 @UseGuards(GuildModeratorGuard)
@@ -47,25 +64,38 @@ export class GameStartCommands {
 	})
 	public async start(
 		@Context() [interaction]: SlashCommandContext,
-		@Options() { type }: GameStartOptions,
+		@Options() { type, startingNumber }: GameStartOptions,
 	) {
-		return this._startGame(interaction, type ?? GameType.NORMAL);
+		return this._startGame(
+			interaction,
+			type ?? GameType.NORMAL,
+			startingNumber ?? 1,
+		);
 	}
 
 	@Subcommand({
 		name: 'reset',
 		description: 'Reset the current game and any points earned.',
 	})
-	public async reset(@Context() [interaction]: SlashCommandContext) {
+	public async reset(
+		@Context() [interaction]: SlashCommandContext,
+		@Options() { startingNumber }: GameResetOptions,
+	) {
 		const currentGame = await this._game.getCurrentGame(
 			interaction.guildId,
 		);
-		return this._startGame(interaction, currentGame.type, true);
+		return this._startGame(
+			interaction,
+			currentGame.type,
+			startingNumber ?? 1,
+			true,
+		);
 	}
 
 	private async _startGame(
 		interaction: CommandInteraction,
 		type: GameType = GameType.NORMAL,
+		startingNumber: number = 0,
 		recreate: boolean = false,
 	) {
 		const settings = await this._settings.getSettings(interaction.guildId);
@@ -77,6 +107,7 @@ export class GameStartCommands {
 		const started = await this._game.start(
 			interaction.guildId,
 			type,
+			startingNumber,
 			recreate,
 		);
 
