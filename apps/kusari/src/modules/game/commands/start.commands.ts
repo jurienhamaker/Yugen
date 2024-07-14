@@ -1,6 +1,5 @@
 import { Injectable, UseFilters, UseGuards } from '@nestjs/common';
 import { GameType } from '@prisma/kusari';
-import { noSettingsReply } from '../../../util/no-settings-reply';
 import { ForbiddenExceptionFilter, GuildModeratorGuard } from '@yugen/shared';
 import { Client, CommandInteraction } from 'discord.js';
 import {
@@ -10,9 +9,10 @@ import {
 	StringOption,
 	Subcommand,
 } from 'necord';
+import { noSettingsReply } from '../../../util/no-settings-reply';
+import { SettingsService } from '../../settings';
 import { GameCommandDecorator } from '../game.decorator';
 import { GameService } from '../services/game.service';
-import { SettingsService } from '../../settings';
 
 const GameStartOptionsChoices = [
 	{
@@ -28,6 +28,22 @@ class GameStartOptions {
 		choices: GameStartOptionsChoices,
 	})
 	type: GameType;
+
+	@StringOption({
+		name: 'starting-word',
+		required: false,
+		description: 'The word the game starts with.',
+	})
+	startingWord: string;
+}
+
+class GameResetOptions {
+	@StringOption({
+		name: 'starting-word',
+		required: false,
+		description: 'The word the game starts with.',
+	})
+	startingWord: string;
 }
 
 @UseGuards(GuildModeratorGuard)
@@ -47,26 +63,40 @@ export class GameStartCommands {
 	})
 	public async start(
 		@Context() [interaction]: SlashCommandContext,
-		@Options() { type }: GameStartOptions,
+		@Options() { type, startingWord }: GameStartOptions,
 	) {
-		return this._startGame(interaction, type ?? GameType.NORMAL);
+		return this._startGame(
+			interaction,
+			type ?? GameType.NORMAL,
+			false,
+			startingWord,
+		);
 	}
 
 	@Subcommand({
 		name: 'reset',
 		description: 'Reset the current game and any points earned.',
 	})
-	public async reset(@Context() [interaction]: SlashCommandContext) {
+	public async reset(
+		@Context() [interaction]: SlashCommandContext,
+		@Options() { startingWord }: GameResetOptions,
+	) {
 		const currentGame = await this._game.getCurrentGame(
 			interaction.guildId,
 		);
-		return this._startGame(interaction, currentGame.type, true);
+		return this._startGame(
+			interaction,
+			currentGame.type,
+			true,
+			startingWord,
+		);
 	}
 
 	private async _startGame(
 		interaction: CommandInteraction,
 		type: GameType = GameType.NORMAL,
 		recreate: boolean = false,
+		startingWord: string | undefined,
 	) {
 		const settings = await this._settings.getSettings(interaction.guildId);
 
@@ -74,10 +104,16 @@ export class GameStartCommands {
 			return noSettingsReply(interaction, this._client);
 		}
 
+		let letter: string;
+		if (startingWord) {
+			letter = startingWord[startingWord.length - 1];
+		}
+
 		const started = await this._game.start(
 			interaction.guildId,
 			type,
 			recreate,
+			letter,
 		);
 
 		return interaction.reply({

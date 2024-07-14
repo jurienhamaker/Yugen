@@ -24,6 +24,7 @@ export class GameService {
 		guildId: string,
 		type: GameType = GameType.NORMAL,
 		recreate = false,
+		letter?: string,
 	) {
 		this._logger.log(`Trying to start a game for ${guildId}`);
 
@@ -45,7 +46,9 @@ export class GameService {
 			await this.endGame(currentGame.id, GameStatus.FAILED);
 		}
 
-		const letter = this._getRandomLetter();
+		if (!letter) {
+			letter = this._getRandomLetter();
+		}
 
 		await this._prisma.game.create({
 			data: {
