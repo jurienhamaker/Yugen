@@ -1,6 +1,6 @@
 import { Injectable, UseFilters, UseGuards } from '@nestjs/common';
 import { Settings } from '@prisma/koto';
-import { ForbiddenExceptionFilter, GuildAdminGuard } from '@yugen/shared';
+import { ForbiddenExceptionFilter, ManageServerGuard } from '@yugen/shared';
 import { formatMinutes } from '@yugen/util';
 import { ChannelType, Role, TextChannel } from 'discord.js';
 import {
@@ -121,7 +121,7 @@ class SettingsResetOptions {
 	setting: keyof Settings;
 }
 
-@UseGuards(GuildAdminGuard)
+@UseGuards(ManageServerGuard)
 @UseFilters(ForbiddenExceptionFilter)
 @SettingsCommandDecorator()
 @Injectable()

@@ -2,7 +2,7 @@ import { Injectable, Logger, UseFilters, UseGuards } from '@nestjs/common';
 import { Settings } from '@prisma/hoshi';
 import {
 	ForbiddenExceptionFilter,
-	GuildAdminGuard,
+	ManageServerGuard,
 	GuildModeratorGuard,
 } from '@yugen/shared';
 import { TextChannel } from 'discord.js';
@@ -75,7 +75,7 @@ export class SettingsCommands {
 		return this._settings.showSettings(interaction);
 	}
 
-	@UseGuards(GuildAdminGuard)
+	@UseGuards(ManageServerGuard)
 	@Subcommand({
 		name: 'reset',
 		description: "Reset a hoshi setting to it's default value.",
@@ -117,7 +117,7 @@ export class SettingsCommands {
 		});
 	}
 
-	@UseGuards(GuildAdminGuard)
+	@UseGuards(ManageServerGuard)
 	@Subcommand({
 		name: 'treshold',
 		description: 'Set starboard threshold',
@@ -143,7 +143,7 @@ export class SettingsCommands {
 		});
 	}
 
-	@UseGuards(GuildAdminGuard)
+	@UseGuards(ManageServerGuard)
 	@Subcommand({
 		name: 'author-starring',
 		description: 'Set whether message author starring counts',

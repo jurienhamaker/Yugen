@@ -1,6 +1,6 @@
 import { Injectable, UseFilters, UseGuards } from '@nestjs/common';
 import { Settings } from '@prisma/kazu';
-import { ForbiddenExceptionFilter, GuildAdminGuard } from '@yugen/shared';
+import { ForbiddenExceptionFilter, ManageServerGuard } from '@yugen/shared';
 import { ChannelType, Role, TextChannel } from 'discord.js';
 import {
 	BooleanOption,
@@ -82,7 +82,7 @@ class SettingsSetShameRoleOptions {
 	role: Role;
 }
 
-@UseGuards(GuildAdminGuard)
+@UseGuards(ManageServerGuard)
 @UseFilters(ForbiddenExceptionFilter)
 @SettingsCommandDecorator()
 @Injectable()

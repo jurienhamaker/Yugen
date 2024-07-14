@@ -1,5 +1,5 @@
 import { Injectable, UseFilters, UseGuards } from '@nestjs/common';
-import { ForbiddenExceptionFilter, GuildAdminGuard } from '@yugen/shared';
+import { ForbiddenExceptionFilter, ManageServerGuard } from '@yugen/shared';
 import { getEmbedFooter } from '@yugen/util';
 import {
 	ActionRowBuilder,
@@ -66,7 +66,7 @@ export class GameLeaderboardCommands {
 		return this._listLeaderboard(interaction, page);
 	}
 
-	@UseGuards(GuildAdminGuard)
+	@UseGuards(ManageServerGuard)
 	@UseFilters(ForbiddenExceptionFilter)
 	@SlashCommand({
 		name: 'reset-leaderboard',
@@ -101,7 +101,7 @@ export class GameLeaderboardCommands {
 		});
 	}
 
-	@UseGuards(GuildAdminGuard)
+	@UseGuards(ManageServerGuard)
 	@UseFilters(ForbiddenExceptionFilter)
 	@Button('RESET_LEADERBOARD/:type')
 	public async resetButton(

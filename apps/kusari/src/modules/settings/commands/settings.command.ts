@@ -1,6 +1,6 @@
 import { Injectable, UseFilters, UseGuards } from '@nestjs/common';
 import { Settings } from '@prisma/kusari';
-import { ForbiddenExceptionFilter, GuildAdminGuard } from '@yugen/shared';
+import { ForbiddenExceptionFilter, ManageServerGuard } from '@yugen/shared';
 import { ChannelType, TextChannel } from 'discord.js';
 import {
 	ChannelOption,
@@ -54,7 +54,7 @@ class SettingsSetCooldownOptions {
 	minutes: number | undefined;
 }
 
-@UseGuards(GuildAdminGuard)
+@UseGuards(ManageServerGuard)
 @UseFilters(ForbiddenExceptionFilter)
 @SettingsCommandDecorator()
 @Injectable()

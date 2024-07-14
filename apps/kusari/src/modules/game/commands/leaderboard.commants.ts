@@ -20,7 +20,7 @@ import {
 	SlashCommandContext,
 } from 'necord';
 import { GamePointsService } from '../services/points.service';
-import { ForbiddenExceptionFilter, GuildAdminGuard } from '@yugen/shared';
+import { ForbiddenExceptionFilter, ManageServerGuard } from '@yugen/shared';
 
 class GameLeaderboardOptions {
 	// @StringOption({
@@ -66,7 +66,7 @@ export class GameLeaderboardCommands {
 		return this._listLeaderboard(interaction, 'points', page);
 	}
 
-	@UseGuards(GuildAdminGuard)
+	@UseGuards(ManageServerGuard)
 	@UseFilters(ForbiddenExceptionFilter)
 	@SlashCommand({
 		name: 'reset-leaderboard',
@@ -100,7 +100,7 @@ export class GameLeaderboardCommands {
 		})
 	}
 
-	@UseGuards(GuildAdminGuard)
+	@UseGuards(ManageServerGuard)
 	@UseFilters(ForbiddenExceptionFilter)
 	@Button('RESET_LEADERBOARD/:type')
 	public async resetButton(
