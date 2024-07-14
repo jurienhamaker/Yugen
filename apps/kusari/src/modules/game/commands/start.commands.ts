@@ -109,6 +109,14 @@ export class GameStartCommands {
 			letter = startingWord[startingWord.length - 1];
 		}
 
+		if (/[^a-zA-Z]/.test(letter)) {
+			// letter is a non alphabetical character
+			return interaction.reply({
+				content: 'The word must end with an alphabetical character.',
+				ephemeral: true,
+			});
+		}
+
 		const started = await this._game.start(
 			interaction.guildId,
 			type,
