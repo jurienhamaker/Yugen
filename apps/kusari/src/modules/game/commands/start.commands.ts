@@ -105,7 +105,7 @@ export class GameStartCommands {
 		}
 
 		let letter: string;
-		if (startingWord) {
+		if (startingWord?.length) {
 			letter = startingWord[startingWord.length - 1];
 		}
 
