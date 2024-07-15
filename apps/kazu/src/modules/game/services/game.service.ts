@@ -317,12 +317,44 @@ Used **1 server** save, There are **${saves}/${maxSaves}** server saves left.`);
 	}
 
 	private async _setNumber(message: Message, count: number) {
+		if (count === 4) {
+			await message.react('🍀').catch(() => null);
+		}
+
 		if (count === 69) {
 			await message.react('1260697303224815696').catch(() => null);
 		}
 
+		if (count === 100) {
+			await message.react('💯').catch(() => null);
+		}
+
+		if (count === 360) {
+			await message.react('⚪').catch(() => null);
+		}
+
 		if (count === 420) {
 			await message.react('🍃').catch(() => null);
+		}
+
+		if (count === 666) {
+			await message.react('🤘').catch(() => null);
+		}
+
+		if (count === 777) {
+			await message.react('🎰').catch(() => null);
+		}
+
+		if (count === 1000) {
+			await message.react('1262411624019525684').catch(() => null);
+		}
+
+		if (count === 10000) {
+			await message.react('1262411765996851200').catch(() => null);
+		}
+
+		if (count === 100000) {
+			await message.react('1262411649407647904').catch(() => null);
 		}
 	}
 
