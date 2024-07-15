@@ -36,13 +36,15 @@ model Game {
   id                Int         @id @default(autoincrement())
   guildId           String
   lastMessageId     String?
-  
+
   settings          Settings    @relation(fields: [guildId], references: [guildId], onDelete: Cascade, onUpdate: Cascade)
 
   history           History[]
 
   status            GameStatus  @default(IN_PROGRESS)
   type              GameType    @default(NORMAL)
+
+  isHighscored      Boolean     @default(false)
 
   // timestamps
   createdAt         DateTime    @default(now())

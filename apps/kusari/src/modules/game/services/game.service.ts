@@ -153,12 +153,16 @@ Used **1 of your own** saves, You have **${saves}/2** saves left.`);
 Used **1 server** save, There are **${saves}/${maxSaves}** server saves left.`);
 			}
 
-			const highscore = await this._checkStreak(settings, count);
+			const { isHighscore } = await this._checkStreak(
+				settings,
+				game,
+				count,
+			);
 
 			await message.reply(
 				`${failReason}
 **The game has ended on a streak of ${count}!**${
-					highscore
+					isHighscore
 						? `
 **A new highscore has been set! 🎉**`
 						: ''
@@ -204,8 +208,16 @@ Used **1 server** save, There are **${saves}/${maxSaves}** server saves left.`);
 		});
 
 		const count = await this._getCount(game.id);
-		const highscore = await this._checkStreak(settings, count);
-		await message.react(highscore ? '☑️' : '✅').catch(() => null);
+		const { isHighscore, isGameHighscored } = await this._checkStreak(
+			settings,
+			game,
+			count,
+		);
+		if (isGameHighscored) {
+			await message.react('🎉').catch(() => null);
+		}
+
+		await message.react(isHighscore ? '☑️' : '✅').catch(() => null);
 
 		this._setNumber(message, count);
 	}
@@ -268,8 +280,9 @@ Used **1 server** save, There are **${saves}/${maxSaves}** server saves left.`);
 		});
 	}
 
-	private async _checkStreak(settings: Settings, count: number) {
+	private async _checkStreak(settings: Settings, game: Game, count: number) {
 		let isHighscore = false;
+		let isGameHighscored = false;
 		if (count > settings.highscore) {
 			isHighscore = true;
 			await this._settings.set(settings.guildId, 'highscore', count);
@@ -278,9 +291,21 @@ Used **1 server** save, There are **${saves}/${maxSaves}** server saves left.`);
 				'highscoreDate',
 				new Date(),
 			);
+
+			if (!game.isHighscored) {
+				isGameHighscored = true;
+				await this._prisma.game.update({
+					where: {
+						id: game.id,
+					},
+					data: {
+						isHighscored: true,
+					},
+				});
+			}
 		}
 
-		return isHighscore;
+		return { isHighscore, isGameHighscored };
 	}
 
 	private async _setNumber(message: Message, count: number) {
