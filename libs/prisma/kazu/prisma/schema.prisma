@@ -48,6 +48,8 @@ model Game {
   status            GameStatus  @default(IN_PROGRESS)
   type              GameType    @default(NORMAL)
 
+  isHighscored      Boolean     @default(false)
+
   // timestamps
   createdAt         DateTime    @default(now())
   updatedAt         DateTime    @updatedAt
