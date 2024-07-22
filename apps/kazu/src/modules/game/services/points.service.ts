@@ -127,7 +127,7 @@ export class GamePointsService {
 				id: user.id,
 			},
 			data: {
-				points: fixFloating(user.points + 1, -1),
+				points: fixFloating(user.points + 1),
 			},
 		});
 	}
