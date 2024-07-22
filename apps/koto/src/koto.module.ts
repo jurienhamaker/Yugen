@@ -25,7 +25,10 @@ import { AppEvents } from './events/app.events';
 
 		// libs
 		SharedModule.forRoot(intents),
-		GeneralModule.forRoot(EMBED_COLOR, () => `*Rewards Coming Soon*`),
+		GeneralModule.register({
+			embedColor: EMBED_COLOR,
+			voteReward: () => `*Rewards Coming Soon*`,
+		}),
 		HealthModule,
 		MetricsModule,
 		LogsModule,

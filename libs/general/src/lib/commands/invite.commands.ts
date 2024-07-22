@@ -5,16 +5,19 @@ import {
 	ButtonBuilder,
 	ButtonStyle,
 	Client,
-	ColorResolvable,
 	EmbedBuilder,
 } from 'discord.js';
 import { Context, SlashCommand, SlashCommandContext } from 'necord';
+import {
+	GeneralModuleOptions,
+	MODULE_OPTIONS_TOKEN,
+} from '../general.module-definition';
 
 @Injectable()
 export class GeneralInviteCommands {
 	constructor(
 		private _client: Client,
-		@Inject('EMBED_COLOR') private _embedColor: ColorResolvable,
+		@Inject(MODULE_OPTIONS_TOKEN) private _options: GeneralModuleOptions,
 	) {}
 
 	@SlashCommand({
@@ -29,7 +32,7 @@ export class GeneralInviteCommands {
 				`Do you want to share ${this._client.user?.displayName} with your friends in another server?
 Don't hesitate now and **invite ${this._client.user?.displayName}** wherever you want using the button bellow!`,
 			)
-			.setColor(this._embedColor)
+			.setColor(this._options.embedColor)
 			.setFooter(footer);
 
 		return interaction.reply({

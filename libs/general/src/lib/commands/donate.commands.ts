@@ -4,16 +4,19 @@ import {
 	ActionRowBuilder,
 	ButtonBuilder,
 	Client,
-	ColorResolvable,
 	EmbedBuilder,
 } from 'discord.js';
 import { Context, SlashCommand, SlashCommandContext } from 'necord';
+import {
+	GeneralModuleOptions,
+	MODULE_OPTIONS_TOKEN,
+} from '../general.module-definition';
 
 @Injectable()
 export class GeneralDonateCommands {
 	constructor(
 		private _client: Client,
-		@Inject('EMBED_COLOR') private _embedColor: ColorResolvable,
+		@Inject(MODULE_OPTIONS_TOKEN) private _options: GeneralModuleOptions,
 	) {}
 
 	@SlashCommand({
@@ -30,7 +33,7 @@ export class GeneralDonateCommands {
 
 Thanks for playing!`,
 			)
-			.setColor(this._embedColor)
+			.setColor(this._options.embedColor)
 			.setFooter(footer);
 
 		return interaction.reply({

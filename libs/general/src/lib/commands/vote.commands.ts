@@ -1,21 +1,23 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, Optional } from '@nestjs/common';
 import { getEmbedFooter } from '@yugen/util';
 import {
 	ActionRowBuilder,
 	ButtonBuilder,
 	ButtonStyle,
 	Client,
-	ColorResolvable,
 	EmbedBuilder,
 } from 'discord.js';
 import { Context, SlashCommand, SlashCommandContext } from 'necord';
+import {
+	GeneralModuleOptions,
+	MODULE_OPTIONS_TOKEN,
+} from '../general.module-definition';
 
 @Injectable()
 export class GeneralVoteCommands {
 	constructor(
 		private _client: Client,
-		@Inject('EMBED_COLOR') private _embedColor: ColorResolvable,
-		@Inject('VOTE_REWARD') private _voteReward: () => string,
+		@Inject(MODULE_OPTIONS_TOKEN) private _options: GeneralModuleOptions,
 	) {}
 
 	@SlashCommand({
@@ -24,7 +26,7 @@ export class GeneralVoteCommands {
 	})
 	public async vote(@Context() [interaction]: SlashCommandContext) {
 		const footer = await getEmbedFooter(this._client, null, false);
-		const voteReward = this._voteReward();
+		const voteReward = await this._options.voteReward(interaction.user.id);
 		const embed = new EmbedBuilder()
 			.setTitle(`Vote information`)
 			.setDescription(
@@ -39,7 +41,7 @@ ${voteReward}`
 						: ''
 				}`,
 			)
-			.setColor(this._embedColor)
+			.setColor(this._options.embedColor)
 			.setFooter(footer);
 
 		const buttons = [];
