@@ -5,30 +5,41 @@ import { Context, SlashCommand, SlashCommandContext } from 'necord';
 import { SettingsService } from '../../settings';
 import { GameService } from '../services/game.service';
 import { GamePointsService } from '../services/points.service';
+import { SavesService } from '../../../services/saves.service';
 
 @Injectable()
 export class GamePointsCommands {
 	constructor(
 		private _client: Client,
 		private _points: GamePointsService,
+		private _saves: SavesService,
 		private _game: GameService,
 		private _settings: SettingsService,
 	) {}
 
 	@SlashCommand({
-		name: 'points',
-		description: 'Get your current points!',
+		name: 'profile',
+		description: 'Get your kazu profile!',
 	})
-	public async points(@Context() [interaction]: SlashCommandContext) {
+	public async profile(@Context() [interaction]: SlashCommandContext) {
 		const user = await this._points.getPlayer(
 			interaction.guildId,
 			interaction.user.id,
 		);
+		const saves = await this._saves.getPlayer(interaction.user.id);
 
 		return interaction.reply({
 			content: `You currently have **${user.points}** points!
-And you have **${user.saves}/2** saves available!`,
+And you have **${saves.saves}/2** saves available!`,
 		});
+	}
+
+	@SlashCommand({
+		name: 'points',
+		description: 'Get your current points!',
+	})
+	public async points(@Context() ctx: SlashCommandContext) {
+		return this.profile(ctx);
 	}
 
 	@SlashCommand({
@@ -36,10 +47,7 @@ And you have **${user.saves}/2** saves available!`,
 		description: 'Donate a personal save to the server.',
 	})
 	public async donateSave(@Context() [interaction]: SlashCommandContext) {
-		const user = await this._points.getPlayer(
-			interaction.guildId,
-			interaction.user.id,
-		);
+		const user = await this._saves.getPlayer(interaction.user.id);
 
 		if (user.saves < 1) {
 			return interaction.reply({
@@ -48,11 +56,7 @@ And you have **${user.saves}/2** saves available!`,
 			});
 		}
 
-		await this._points.deductSave(
-			interaction.guildId,
-			interaction.user.id,
-			1,
-		);
+		await this._saves.deductSave(interaction.user.id, 1);
 		const { saves, maxSaves } = await this._settings.addSave(
 			interaction.guildId,
 			0.2,

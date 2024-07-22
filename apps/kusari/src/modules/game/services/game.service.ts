@@ -7,6 +7,7 @@ import { ChannelType, Client, Message } from 'discord.js';
 import { SettingsService } from '../../settings';
 import { GameDictionaryService } from './dictionary.service';
 import { GamePointsService } from './points.service';
+import { SavesService } from '../../../services/saves.service';
 
 @Injectable()
 export class GameService {
@@ -16,6 +17,7 @@ export class GameService {
 		private _prisma: PrismaService,
 		private _dictionary: GameDictionaryService,
 		private _points: GamePointsService,
+		private _saves: SavesService,
 		private _settings: SettingsService,
 		private _client: Client,
 	) {}
@@ -121,8 +123,7 @@ The first letter is: **${letter.toUpperCase()}**`);
 			message.react('❌').catch(() => null);
 
 			if (saveAvailable.player >= 1) {
-				const { saves } = await this._points.deductSave(
-					guildId,
+				const { saves } = await this._saves.deductSave(
 					message.author.id,
 					1,
 				);
@@ -261,7 +262,7 @@ Used **1 server** save, There are **${saves}/${maxSaves}** server saves left.`);
 	}
 
 	private async _getSaves(settings: Settings, userId: string) {
-		const player = await this._points.getPlayer(settings.guildId, userId);
+		const player = await this._saves.getPlayer(userId);
 
 		return {
 			guild: settings.saves,

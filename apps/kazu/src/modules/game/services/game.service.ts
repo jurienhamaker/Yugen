@@ -1,11 +1,12 @@
-import { Injectable, Logger } from '@nestjs/common';
 import { Game, GameStatus, GameType, Settings } from '@prisma/kazu';
+import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '@yugen/prisma/kazu';
 import { getTimestamp } from '@yugen/util';
 import { addMinutes, subMinutes } from 'date-fns';
 import { ChannelType, Client, Message } from 'discord.js';
 import { SettingsService } from '../../settings';
 import { GamePointsService } from './points.service';
+import { SavesService } from '../../../services/saves.service';
 
 @Injectable()
 export class GameService {
@@ -14,6 +15,7 @@ export class GameService {
 	constructor(
 		private _prisma: PrismaService,
 		private _points: GamePointsService,
+		private _saves: SavesService,
 		private _settings: SettingsService,
 		private _client: Client,
 	) {}
@@ -103,8 +105,7 @@ Start the count from **${startingNumber}**`);
 			message.react('❌').catch(() => null);
 
 			if (saveAvailable.player >= 1) {
-				const { saves } = await this._points.deductSave(
-					guildId,
+				const { saves } = await this._saves.deductSave(
 					message.author.id,
 					1,
 				);
@@ -269,7 +270,7 @@ Used **1 server** save, There are **${saves}/${maxSaves}** server saves left.`);
 	}
 
 	private async _getSaves(settings: Settings, userId: string) {
-		const player = await this._points.getPlayer(settings.guildId, userId);
+		const player = await this._saves.getPlayer(userId);
 
 		return {
 			guild: settings.saves,
