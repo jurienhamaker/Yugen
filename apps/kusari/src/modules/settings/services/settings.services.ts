@@ -8,6 +8,7 @@ import {
 	EmbedBuilder,
 	MessageComponentInteraction,
 } from 'discord.js';
+import { fixFloating } from '@yugen/util';
 
 @Injectable()
 export class SettingsService {
@@ -126,7 +127,7 @@ export class SettingsService {
 	async addSave(guildId: string, amount: number) {
 		const settings = await this.getSettings(guildId);
 
-		const newSaves = settings.saves + amount;
+		const newSaves = fixFloating(settings.saves + amount);
 		return this._prisma.settings.update({
 			where: {
 				id: settings.id,
@@ -141,7 +142,7 @@ export class SettingsService {
 	async deductSave(guildId: string, amount: number) {
 		const settings = await this.getSettings(guildId);
 
-		const newSaves = settings.saves - amount;
+		const newSaves = fixFloating(settings.saves - amount);
 		return this._prisma.settings.update({
 			where: {
 				id: settings.id,

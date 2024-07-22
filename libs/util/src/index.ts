@@ -4,6 +4,7 @@ export * from './lib/delay';
 export * from './lib/emoji-is-unicode';
 export * from './lib/errors';
 export * from './lib/filters';
+export * from './lib/fix-floating';
 export * from './lib/format-minutes';
 export * from './lib/get-bot-author';
 export * from './lib/get-embed-footer';

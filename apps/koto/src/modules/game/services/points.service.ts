@@ -1,13 +1,17 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Game, Guess, Prisma } from '@prisma/koto';
 import { PrismaService } from '@yugen/prisma/koto';
+import { fixFloating } from '@yugen/util';
 import { Client } from 'discord.js';
 
 @Injectable()
 export class GamePointsService {
 	private readonly _logger = new Logger(GamePointsService.name);
 
-	constructor(private _prisma: PrismaService, private _client: Client) {}
+	constructor(
+		private _prisma: PrismaService,
+		private _client: Client,
+	) {}
 
 	async getPlayer(
 		guildId: string,
@@ -58,16 +62,14 @@ export class GamePointsService {
 		});
 	}
 
-	resetLeaderboard(
-		guildId: string
-	) {
+	resetLeaderboard(guildId: string) {
 		return this._prisma.player.updateMany({
 			where: {
-				guildId
+				guildId,
 			},
 			data: {
-				points: 0
-			}
+				points: 0,
+			},
 		});
 	}
 
@@ -136,6 +138,7 @@ export class GamePointsService {
 			}
 
 			users[guess.userId] += guess.points;
+			users[guess.userId] = fixFloating(users[guess.userId]);
 		}
 
 		const promises = [];
@@ -166,9 +169,9 @@ export class GamePointsService {
 				id: user.id,
 			},
 			data: {
-				participated: user.participated + 1,
-				wins: user.wins + (isWinner ? 1 : 0),
-				points: user.points + points,
+				participated: fixFloating(user.participated + 1),
+				wins: fixFloating(user.wins + (isWinner ? 1 : 0)),
+				points: fixFloating(user.points + points),
 			},
 		});
 	}

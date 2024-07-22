@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
 import { Prisma } from '@prisma/kusari';
 import { PrismaService } from '@yugen/prisma/kusari';
+import { fixFloating } from '@yugen/util';
 import { isWeekend } from 'date-fns';
 import { Client } from 'discord.js';
 
@@ -72,16 +73,14 @@ export class GamePointsService {
 		});
 	}
 
-	resetLeaderboard(
-		guildId: string
-	) {
+	resetLeaderboard(guildId: string) {
 		return this._prisma.player.updateMany({
 			where: {
-				guildId
+				guildId,
 			},
 			data: {
-				points: 0
-			}
+				points: 0,
+			},
 		});
 	}
 
@@ -139,7 +138,7 @@ export class GamePointsService {
 				id: user.id,
 			},
 			data: {
-				points: user.points + 1,
+				points: fixFloating(user.points + 1),
 			},
 		});
 	}
@@ -157,7 +156,7 @@ export class GamePointsService {
 				continue;
 			}
 
-			const newSaves = player.saves + amount;
+			const newSaves = fixFloating(player.saves + amount);
 			const update = this._prisma.player.update({
 				where: {
 					id: player.id,
@@ -176,7 +175,7 @@ export class GamePointsService {
 	async deductSave(guildId: string, userId: string, amount: number) {
 		const player = await this.getPlayer(guildId, userId);
 
-		const newSave = player.saves - amount;
+		const newSave = fixFloating(player.saves - amount);
 		return this._prisma.player.update({
 			where: {
 				id: player.id,

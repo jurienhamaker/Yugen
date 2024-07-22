@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
 import { Prisma } from '@prisma/kazu';
+import { fixFloating } from '@yugen/util';
 import { PrismaService } from '@yugen/prisma/kazu';
 import { isWeekend } from 'date-fns';
 
@@ -126,7 +127,7 @@ export class GamePointsService {
 				id: user.id,
 			},
 			data: {
-				points: user.points + 1,
+				points: fixFloating(user.points + 1, -1),
 			},
 		});
 	}
@@ -144,7 +145,7 @@ export class GamePointsService {
 				continue;
 			}
 
-			const newSaves = player.saves + amount;
+			const newSaves = fixFloating(player.saves + amount);
 			const update = this._prisma.player.update({
 				where: {
 					id: player.id,
@@ -163,7 +164,7 @@ export class GamePointsService {
 	async deductSave(guildId: string, userId: string, amount: number) {
 		const player = await this.getPlayer(guildId, userId);
 
-		const newSave = player.saves - amount;
+		const newSave = fixFloating(player.saves - amount);
 		return this._prisma.player.update({
 			where: {
 				id: player.id,
