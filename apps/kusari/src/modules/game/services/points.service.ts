@@ -29,7 +29,7 @@ export class GamePointsService {
 		userId: string,
 		setInGuild: boolean = true,
 	) {
-		const user = await this._prisma.player.findFirst({
+		const user = await this._prisma.playerStats.findFirst({
 			where: {
 				guildId,
 				userId,
@@ -37,7 +37,7 @@ export class GamePointsService {
 		});
 
 		if (!user) {
-			return this._prisma.player.create({
+			return this._prisma.playerStats.create({
 				data: {
 					guildId,
 					userId,
@@ -47,7 +47,7 @@ export class GamePointsService {
 		}
 
 		if (setInGuild) {
-			await this._prisma.player.update({
+			await this._prisma.playerStats.update({
 				where: {
 					id: user.id,
 				},
@@ -63,7 +63,7 @@ export class GamePointsService {
 	async removePlayerFromGuild(guildId: string, userId: string) {
 		const user = await this.getPlayer(guildId, userId);
 
-		return this._prisma.player.update({
+		return this._prisma.playerStats.update({
 			where: {
 				id: user.id,
 			},
@@ -74,7 +74,7 @@ export class GamePointsService {
 	}
 
 	resetLeaderboard(guildId: string) {
-		return this._prisma.player.updateMany({
+		return this._prisma.playerStats.updateMany({
 			where: {
 				guildId,
 			},
@@ -90,7 +90,7 @@ export class GamePointsService {
 			inGuild: true,
 		};
 
-		let orderBy: Prisma.PlayerOrderByWithRelationInput = {
+		let orderBy: Prisma.PlayerStatsOrderByWithRelationInput = {
 			points: 'desc',
 		};
 
@@ -101,14 +101,14 @@ export class GamePointsService {
 			};
 		}
 
-		const playersPromise = this._prisma.player.findMany({
+		const playersPromise = this._prisma.playerStats.findMany({
 			where,
 			orderBy,
 			take: 10,
 			skip: (page - 1) * 10,
 		});
 
-		const totalPromise = this._prisma.player.count({
+		const totalPromise = this._prisma.playerStats.count({
 			where,
 		});
 
@@ -133,7 +133,7 @@ export class GamePointsService {
 	async addPointAndWord(guildId: string, userId: string) {
 		const user = await this.getPlayer(guildId, userId);
 
-		return this._prisma.player.update({
+		return this._prisma.playerStats.update({
 			where: {
 				id: user.id,
 			},
@@ -144,7 +144,7 @@ export class GamePointsService {
 	}
 
 	async addSave(userId: string, amount: number) {
-		const players = await this._prisma.player.findMany({
+		const players = await this._prisma.playerStats.findMany({
 			where: {
 				userId,
 			},
@@ -157,7 +157,7 @@ export class GamePointsService {
 			}
 
 			const newSaves = fixFloating(player.saves + amount);
-			const update = this._prisma.player.update({
+			const update = this._prisma.playerStats.update({
 				where: {
 					id: player.id,
 				},
@@ -176,7 +176,7 @@ export class GamePointsService {
 		const player = await this.getPlayer(guildId, userId);
 
 		const newSave = fixFloating(player.saves - amount);
-		return this._prisma.player.update({
+		return this._prisma.playerStats.update({
 			where: {
 				id: player.id,
 			},

@@ -65,7 +65,7 @@ model History {
   updatedAt         DateTime    @updatedAt
 }
 
-model Player {
+model PlayerStats {
   id                Int         @id @default(autoincrement())
   userId            String
   guildId           String
