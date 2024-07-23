@@ -19,12 +19,22 @@ export class SavesService {
 		this.addSave(userId, saves, true);
 	}
 
-	getPlayer(userId: string) {
-		return this._prisma.playerSaves.findFirst({
+	async getPlayer(userId: string) {
+		let player = await this._prisma.playerSaves.findFirst({
 			where: {
 				userId,
 			},
 		});
+
+		if (!player) {
+			player = await this._prisma.playerSaves.create({
+				data: {
+					userId,
+				},
+			});
+		}
+
+		return player;
 	}
 
 	async addSave(userId: string, amount: number, isVote: boolean = false) {
