@@ -29,6 +29,10 @@ const settingsResetOptionsChoices = [
 		value: 'channelId',
 	},
 	{
+		name: 'Bot updates channel',
+		value: 'botUpdatesChannelId',
+	},
+	{
 		name: 'Cooldown',
 		value: 'cooldown',
 	},
@@ -52,6 +56,15 @@ class SettingsSetCooldownOptions {
 		max_value: 60,
 	})
 	minutes: number | undefined;
+}
+
+class SettingsSetBotUpdatesChannelOptions {
+	@ChannelOption({
+		name: 'channel',
+		description: 'The channel to send updates to.',
+		required: true,
+	})
+	channel: TextChannel | undefined;
 }
 
 @UseGuards(ManageServerGuard)
@@ -88,6 +101,26 @@ export class SettingsCommands {
 
 		return interaction.reply({
 			content: `I will run in <#${channel.id}> from now on.`,
+			ephemeral: true,
+		});
+	}
+
+	@Subcommand({
+		description: 'Set channel for the bot updates',
+		name: 'bot-updates',
+	})
+	public async setBotUpdatesChannel(
+		@Context() [interaction]: SlashCommandContext,
+		@Options() { channel }: SettingsSetBotUpdatesChannelOptions,
+	) {
+		await this._settings.set(
+			interaction.guildId!,
+			'botUpdatesChannelId',
+			channel.id,
+		);
+
+		return interaction.reply({
+			content: `Kusari will send it's updates to <#${channel.id}>!`,
 			ephemeral: true,
 		});
 	}

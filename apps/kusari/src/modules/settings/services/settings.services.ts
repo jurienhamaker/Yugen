@@ -88,7 +88,7 @@ export class SettingsService {
 			return;
 		}
 
-		const { channelId, cooldown } = settings;
+		const { channelId, cooldown, botUpdatesChannelId } = settings;
 
 		const embed = new EmbedBuilder()
 			.setColor(EMBED_COLOR)
@@ -100,6 +100,13 @@ export class SettingsService {
 				{
 					name: 'Channel',
 					value: channelId ? `<#${channelId}>` : '-',
+					inline: true,
+				},
+				{
+					name: 'Bot updates channel',
+					value: botUpdatesChannelId
+						? `<#${botUpdatesChannelId}>`
+						: '-',
 					inline: true,
 				},
 				{

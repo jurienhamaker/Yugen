@@ -12,24 +12,25 @@ datasource db {
 }
 
 model Settings {
-  id                Int         @id @default(autoincrement())
-  guildId           String      @unique
+  id                                Int         @id @default(autoincrement())
+  guildId                           String      @unique
+  botUpdatesChannelId               String?
 
-  channelId         String?
-  cooldown          Int         @default(1)
+  channelId                         String?
+  cooldown                          Int         @default(1)
 
-  games             Game[]
+  games                             Game[]
 
-  highscore         Int         @default(0)
-  highscoreDate     DateTime?
+  highscore                         Int         @default(0)
+  highscoreDate                     DateTime?
 
-  saves             Float       @default(0)
-  maxSaves          Float       @default(2)
-  savesUsed         Float       @default(0)
+  saves                             Float       @default(0)
+  maxSaves                          Float       @default(2)
+  savesUsed                         Float       @default(0)
 
   // timestamps
-  createdAt         DateTime    @default(now())
-  updatedAt         DateTime    @updatedAt
+  createdAt                         DateTime    @default(now())
+  updatedAt                         DateTime    @updatedAt
 }
 
 model Game {
