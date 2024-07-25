@@ -103,7 +103,11 @@ Last count by: **${
 				}**
 ${
 	settings.shameRoleId?.length
-		? `Last shamed user: <@${settings.lastShameUserId}>
+		? `Last shamed user: ${
+				settings.lastShameUserId
+					? `<@${settings.lastShameUserId}>`
+					: '-'
+			}
 `
 		: ''
 }

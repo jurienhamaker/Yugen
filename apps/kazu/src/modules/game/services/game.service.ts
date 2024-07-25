@@ -193,6 +193,24 @@ Used **1 server** save, There are **${saves}/${maxSaves}** server saves left.`);
 		);
 		if (isGameHighscored) {
 			await message.react('🎉').catch(() => null);
+
+			if (settings.shameRoleId && settings.lastShameUserId) {
+				const lastShamedMember = await message.guild.members
+					.fetch(settings.lastShameUserId)
+					.catch(() => null);
+
+				if (lastShamedMember) {
+					await lastShamedMember.roles
+						.remove(settings.shameRoleId)
+						.catch(() => null);
+
+					await this._settings.set(
+						message.guild.id,
+						'lastShameUserId',
+						null,
+					);
+				}
+			}
 		}
 
 		await message.react(isHighscore ? '☑️' : '✅').catch(() => null);

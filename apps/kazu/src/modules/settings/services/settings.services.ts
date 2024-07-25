@@ -88,7 +88,14 @@ export class SettingsService {
 			return;
 		}
 
-		const { channelId, cooldown, math, shameRoleId } = settings;
+		const {
+			channelId,
+			cooldown,
+			math,
+			shameRoleId,
+			botUpdatesChannelId,
+			removeShameRoleAfterHighscore,
+		} = settings;
 
 		const embed = new EmbedBuilder()
 			.setColor(EMBED_COLOR)
@@ -100,6 +107,13 @@ export class SettingsService {
 				{
 					name: 'Channel',
 					value: channelId ? `<#${channelId}>` : '-',
+					inline: true,
+				},
+				{
+					name: 'Bot updates channel',
+					value: botUpdatesChannelId
+						? `<#${botUpdatesChannelId}>`
+						: '-',
 					inline: true,
 				},
 				{
@@ -115,6 +129,11 @@ export class SettingsService {
 				{
 					name: 'Shame role',
 					value: shameRoleId ? `<@&${shameRoleId}>` : '-',
+					inline: true,
+				},
+				{
+					name: 'Remove shame role on highschore',
+					value: removeShameRoleAfterHighscore ? 'Yes' : 'No',
 					inline: true,
 				},
 			);

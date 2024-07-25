@@ -31,6 +31,10 @@ const settingsResetOptionsChoices = [
 		value: 'channelId',
 	},
 	{
+		name: 'Bot updates channel',
+		value: 'botUpdatesChannelId',
+	},
+	{
 		name: 'Cooldown',
 		value: 'cooldown',
 	},
@@ -41,6 +45,10 @@ const settingsResetOptionsChoices = [
 	{
 		name: 'Shame role',
 		value: 'shameRoleId',
+	},
+	{
+		name: 'Remove shame role after highschore',
+		value: 'removeShameRoleAfterHighscore',
 	},
 ];
 class SettingsResetOptions {
@@ -82,6 +90,25 @@ class SettingsSetShameRoleOptions {
 	role: Role;
 }
 
+class SettingsSetRemoveShameRoleAfterHighscoreOptions {
+	@BooleanOption({
+		name: 'remove',
+		description:
+			'Wether Kazu will remove the shame role when a highscore is reached.',
+		required: true,
+	})
+	remove: boolean;
+}
+
+class SettingsSetBotUpdatesChannelOptions {
+	@ChannelOption({
+		name: 'channel',
+		description: 'The channel to send updates to.',
+		required: true,
+	})
+	channel: TextChannel | undefined;
+}
+
 @UseGuards(ManageServerGuard)
 @UseFilters(ForbiddenExceptionFilter)
 @SettingsCommandDecorator()
@@ -121,6 +148,26 @@ export class SettingsCommands {
 	}
 
 	@Subcommand({
+		description: 'Set channel for the bot updates',
+		name: 'bot-updates',
+	})
+	public async setBotUpdatesChannel(
+		@Context() [interaction]: SlashCommandContext,
+		@Options() { channel }: SettingsSetBotUpdatesChannelOptions,
+	) {
+		await this._settings.set(
+			interaction.guildId!,
+			'botUpdatesChannelId',
+			channel.id,
+		);
+
+		return interaction.reply({
+			content: `Kazu will send it's updates to <#${channel.id}>!`,
+			ephemeral: true,
+		});
+	}
+
+	@Subcommand({
 		name: 'reset',
 		description: "Reset a Kazu setting to it's default value.",
 	})
@@ -143,6 +190,10 @@ export class SettingsCommands {
 
 		if (setting === 'math') {
 			value = true;
+		}
+
+		if (setting === 'removeShameRoleAfterHighscore') {
+			value = false;
 		}
 
 		await this._settings.set(interaction.guildId, setting, value);
@@ -222,6 +273,29 @@ export class SettingsCommands {
 
 		return interaction.reply({
 			content: `I will apply <@&${role.id}> to the person that breaks the count chain.`,
+			ephemeral: true,
+		});
+	}
+
+	@Subcommand({
+		name: 'remove-shame-role',
+		description:
+			'Set wether Kazu will reset the shame role after a highscore is reached.',
+	})
+	public async setResetShameRoleAfterHighscore(
+		@Context() [interaction]: SlashCommandContext,
+		@Options() { remove }: SettingsSetRemoveShameRoleAfterHighscoreOptions,
+	) {
+		await this._settings.set(
+			interaction.guildId,
+			'removeShameRoleAfterHighscore',
+			remove,
+		);
+
+		return interaction.reply({
+			content: `I will **${
+				remove ? 'remove' : 'not remove'
+			}** the shame role after a highscore is reached.`,
 			ephemeral: true,
 		});
 	}
