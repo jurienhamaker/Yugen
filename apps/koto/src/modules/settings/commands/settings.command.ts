@@ -187,7 +187,7 @@ export class SettingsCommands {
 		);
 
 		return interaction.reply({
-			content: `Kusari will send it's updates to <#${channel.id}>!`,
+			content: `Koto will send it's updates to <#${channel.id}>!`,
 			ephemeral: true,
 		});
 	}
