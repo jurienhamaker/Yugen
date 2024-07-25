@@ -12,6 +12,7 @@ import { intents } from './util/intents';
 import { GuildEvents } from './events/guild.events';
 import { StarboardModule } from './modules/starboard';
 import { AppEvents } from './events/app.events';
+import { AdminModule } from './modules/admin/admin.module';
 
 @Module({
 	imports: [
@@ -30,6 +31,7 @@ import { AppEvents } from './events/app.events';
 		ExternalsModule,
 
 		// app
+		AdminModule,
 		StarboardModule,
 	],
 	providers: [

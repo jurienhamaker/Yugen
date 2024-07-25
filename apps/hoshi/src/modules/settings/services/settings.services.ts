@@ -67,7 +67,8 @@ export class SettingsService {
 			return;
 		}
 
-		const { treshold, self, ignoredChannelIds } = settings;
+		const { treshold, self, ignoredChannelIds, botUpdatesChannelId } =
+			settings;
 
 		const embed = new EmbedBuilder()
 			.setColor(EMBED_COLOR)
@@ -84,6 +85,13 @@ export class SettingsService {
 				{
 					name: 'Author starring',
 					value: self ? 'Allowed' : 'Disallowed',
+					inline: true,
+				},
+				{
+					name: 'Bot updates channel',
+					value: botUpdatesChannelId?.length
+						? `<#${botUpdatesChannelId}>`
+						: '-',
 					inline: true,
 				},
 				{

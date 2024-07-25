@@ -58,6 +58,15 @@ class SetSelfOptions {
 	self: boolean;
 }
 
+class SetBotUpdatesChannelOptions {
+	@ChannelOption({
+		name: 'channel',
+		description: 'The channel to send updates to.',
+		required: true,
+	})
+	channel: TextChannel | undefined;
+}
+
 @UseFilters(ForbiddenExceptionFilter)
 @SettingsCommandDecorator()
 @Injectable()
@@ -77,8 +86,8 @@ export class SettingsCommands {
 
 	@UseGuards(ManageServerGuard)
 	@Subcommand({
-		name: 'reset',
 		description: "Reset a hoshi setting to it's default value.",
+		name: 'reset',
 	})
 	public async reset(
 		@Context() [interaction]: SlashCommandContext,
@@ -119,8 +128,8 @@ export class SettingsCommands {
 
 	@UseGuards(ManageServerGuard)
 	@Subcommand({
-		name: 'treshold',
 		description: 'Set starboard threshold',
+		name: 'treshold',
 	})
 	public async setTreshold(
 		@Context() [interaction]: SlashCommandContext,
@@ -158,6 +167,27 @@ export class SettingsCommands {
 			content: `Message authors are now **${
 				self ? 'allowed' : 'disallowed'
 			}** to star their own message.`,
+			ephemeral: true,
+		});
+	}
+
+	@UseGuards(ManageServerGuard)
+	@Subcommand({
+		description: 'Set channel for the bot updates',
+		name: 'bot-updates',
+	})
+	public async setBotUpdatesChannel(
+		@Context() [interaction]: SlashCommandContext,
+		@Options() { channel }: SetBotUpdatesChannelOptions,
+	) {
+		await this._settings.set(
+			interaction.guildId!,
+			'botUpdatesChannelId',
+			channel.id,
+		);
+
+		return interaction.reply({
+			content: `Hoshi will send it's updates to <#${channel.id}>!`,
 			ephemeral: true,
 		});
 	}
