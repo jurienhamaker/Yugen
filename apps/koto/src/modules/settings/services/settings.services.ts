@@ -70,6 +70,7 @@ export class SettingsService {
 
 		const {
 			channelId,
+			botUpdatesChannelId,
 			pingRoleId,
 			pingOnlyNew,
 			cooldown,
@@ -94,15 +95,17 @@ export class SettingsService {
 					inline: true,
 				},
 				{
+					name: 'Bot updates channel',
+					value: botUpdatesChannelId
+						? `<#${botUpdatesChannelId}>`
+						: '-',
+					inline: true,
+				},
+				{
 					name: 'Members privilege',
 					value: membersCanStart
 						? `Allowed to start games`
 						: "Can't start games",
-					inline: true,
-				},
-				{
-					name: ' ',
-					value: ' ',
 					inline: true,
 				},
 				{
@@ -113,6 +116,11 @@ export class SettingsService {
 				{
 					name: 'Ping type',
 					value: pingOnlyNew ? 'New games' : 'Every change',
+					inline: true,
+				},
+				{
+					name: ' ',
+					value: ' ',
 					inline: true,
 				},
 				{

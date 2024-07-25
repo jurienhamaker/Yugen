@@ -11,12 +11,15 @@ import { AdminScrapeWordsCommands } from './commands/scrape-words.commands';
 import { AdminSendWelcomeCommands } from './commands/send-welcome.commands';
 import { AdminGuildsService } from './services/guilds.service';
 import { AdminScrapeService } from './services/scrape.service';
+import { AdminNotifyService } from './services/notify.service';
+import { AdminNotifyCommands } from './commands/notify.commands';
 
 @Module({
 	imports: [KotoSharedModule, WordsModule, GameModule, HttpModule],
 	providers: [
 		AdminScrapeService,
 		AdminGuildsService,
+		AdminNotifyService,
 
 		// commands
 		AdminEmojisCommands,
@@ -24,6 +27,7 @@ import { AdminScrapeService } from './services/scrape.service';
 		AdminSendWelcomeCommands,
 		AdminGetWordCommands,
 		AdminGuildsCommands,
+		AdminNotifyCommands,
 
 		...(process.env['NODE_ENV'] !== 'production'
 			? [AdminScrapeWordsCommands]
