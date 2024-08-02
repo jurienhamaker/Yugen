@@ -1,13 +1,13 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Game, GameStatus, GameType, Settings } from '@prisma/kusari';
 import { PrismaService } from '@yugen/prisma/kusari';
-import { getTimestamp, numberEmojis } from '@yugen/util';
+import { getTimestamp, isPalindrome, numberEmojis } from '@yugen/util';
 import { addMinutes, subMinutes } from 'date-fns';
 import { ChannelType, Client, Message } from 'discord.js';
+import { SavesService } from '../../../services/saves.service';
 import { SettingsService } from '../../settings';
 import { GameDictionaryService } from './dictionary.service';
 import { GamePointsService } from './points.service';
-import { SavesService } from '../../../services/saves.service';
 
 @Injectable()
 export class GameService {
@@ -221,6 +221,10 @@ Used **1 server** save, There are **${saves}/${maxSaves}** server saves left.`);
 		await message.react(isHighscore ? '☑️' : '✅').catch(() => null);
 
 		this._setNumber(message, count);
+
+		if (isPalindrome(word)) {
+			await message.react('🪞').catch(() => null);
+		}
 	}
 
 	async endGame(gameId: number, status: GameStatus = GameStatus.COMPLETED) {

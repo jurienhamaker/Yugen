@@ -2,8 +2,8 @@ import { Injectable, Logger, UseFilters, UseGuards } from '@nestjs/common';
 import { Settings } from '@prisma/hoshi';
 import {
 	ForbiddenExceptionFilter,
-	ManageServerGuard,
 	GuildModeratorGuard,
+	ManageServerGuard,
 } from '@yugen/shared';
 import { TextChannel } from 'discord.js';
 import {

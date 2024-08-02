@@ -1,12 +1,12 @@
-import { Game, GameStatus, GameType, Settings } from '@prisma/kazu';
 import { Injectable, Logger } from '@nestjs/common';
+import { Game, GameStatus, GameType, Settings } from '@prisma/kazu';
 import { PrismaService } from '@yugen/prisma/kazu';
-import { getTimestamp } from '@yugen/util';
+import { getTimestamp, isPalindrome } from '@yugen/util';
 import { addMinutes, subMinutes } from 'date-fns';
 import { ChannelType, Client, Message } from 'discord.js';
+import { SavesService } from '../../../services/saves.service';
 import { SettingsService } from '../../settings';
 import { GamePointsService } from './points.service';
-import { SavesService } from '../../../services/saves.service';
 
 @Injectable()
 export class GameService {
@@ -336,6 +336,10 @@ Used **1 server** save, There are **${saves}/${maxSaves}** server saves left.`);
 	}
 
 	private async _setNumber(message: Message, count: number) {
+		if (isPalindrome(count.toString()) && count > 10) {
+			await message.react('🪞').catch(() => null);
+		}
+
 		if (count === 4) {
 			await message.react('🍀').catch(() => null);
 		}
