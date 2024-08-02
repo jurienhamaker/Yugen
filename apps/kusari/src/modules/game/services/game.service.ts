@@ -220,7 +220,7 @@ Used **1 server** save, There are **${saves}/${maxSaves}** server saves left.`);
 
 		await message.react(isHighscore ? '☑️' : '✅').catch(() => null);
 
-		this._setNumber(message, count);
+		await this._setNumber(message, count);
 
 		if (isPalindrome(word)) {
 			await message.react('🪞').catch(() => null);
