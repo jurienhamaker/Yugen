@@ -17,7 +17,11 @@ export class HelpCommands {
 		const footer = await getEmbedFooter(this._client);
 		const embed = new EmbedBuilder()
 			.setTitle(`Kusari Setup`)
-			.setDescription(noSettingsDescription)
+			.setDescription(
+				`${noSettingsDescription}
+
+Want to know how to play the game? Use \`/tutorial\`!`,
+			)
 			.setColor(EMBED_COLOR)
 			.setFooter(footer);
 

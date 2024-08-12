@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { EMBED_COLOR } from '../util/constants';
-import { noSettingsDescription } from '../util/no-settings-reply';
 import { getEmbedFooter } from '@yugen/util';
 import { Client, EmbedBuilder } from 'discord.js';
 import { Context, SlashCommand, SlashCommandContext } from 'necord';
+import { EMBED_COLOR } from '../util/constants';
+import { noSettingsDescription } from '../util/no-settings-reply';
 
 @Injectable()
 export class HelpCommands {
@@ -17,7 +17,11 @@ export class HelpCommands {
 		const footer = await getEmbedFooter(this._client);
 		const embed = new EmbedBuilder()
 			.setTitle(`Koto Setup`)
-			.setDescription(noSettingsDescription)
+			.setDescription(
+				`${noSettingsDescription}
+
+Want to know how to play the game? Use \`/tutorial\`!`,
+			)
 			.setColor(EMBED_COLOR)
 			.setFooter(footer);
 
