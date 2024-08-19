@@ -29,7 +29,17 @@ export class StarboardService {
 		);
 		const { treshold, self, ignoredChannelIds } = settings;
 
-		if (ignoredChannelIds.includes(reaction.message.channelId)) {
+		let sourceChannelId = reaction.message.channelId;
+		const channelType = reaction.message.channel.type;
+		if (
+			channelType === ChannelType.PublicThread ||
+			channelType === ChannelType.PrivateThread
+		) {
+			// in case of a thread, we will use the parent channelId
+			sourceChannelId = reaction.message.channel.parentId;
+		}
+
+		if (ignoredChannelIds.includes(sourceChannelId)) {
 			return;
 		}
 
@@ -49,7 +59,7 @@ export class StarboardService {
 				sourceEmoji: reactionEmoji,
 				OR: [
 					{
-						sourceChannelId: reaction.message.channelId,
+						sourceChannelId,
 					},
 					{
 						sourceChannelId: null,
@@ -63,9 +73,8 @@ export class StarboardService {
 		}
 
 		const configuration =
-			configurations.find(
-				(c) => c.sourceChannelId === reaction.message.channelId,
-			) ?? configurations[0];
+			configurations.find((c) => c.sourceChannelId === sourceChannelId) ??
+			configurations[0];
 
 		const users = await reaction.users.fetch();
 		const filteredUsers = users.filter(
