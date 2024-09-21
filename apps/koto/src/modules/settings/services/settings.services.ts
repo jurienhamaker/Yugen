@@ -74,6 +74,7 @@ export class SettingsService {
 			pingRoleId,
 			pingOnlyNew,
 			cooldown,
+			informCooldownAfterGuess,
 			frequency,
 			timeLimit,
 			autoStart,
@@ -134,6 +135,11 @@ export class SettingsService {
 					inline: true,
 				},
 				{
+					name: 'Inform cooldown',
+					value: informCooldownAfterGuess ? 'Yes' : 'No',
+					inline: true,
+				},
+				{
 					name: 'Game frequency',
 					value: `Every ${
 						frequencyFormatted.hours
@@ -173,6 +179,11 @@ export class SettingsService {
 								}`
 							: ''
 					}`,
+					inline: true,
+				},
+				{
+					name: ' ',
+					value: ' ',
 					inline: true,
 				},
 			);

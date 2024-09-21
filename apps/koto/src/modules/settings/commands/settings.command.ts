@@ -63,6 +63,16 @@ class SettingsSetCooldownOptions {
 	minutes: number | undefined;
 }
 
+class SettingsSetInformCooldownAfterGuessOptions {
+	@BooleanOption({
+		name: 'value',
+		description:
+			'Whether to inform the user after a guess what their cooldown is.',
+		required: true,
+	})
+	informCooldownAfterGuess: boolean;
+}
+
 class SettingsSetAutoStartOptions {
 	@BooleanOption({
 		name: 'value',
@@ -414,8 +424,8 @@ export class SettingsCommands {
 		description: 'Set the cooldown between answers.',
 	})
 	public async setCooldown(
-		@Context() [interaction]: SlashCommandContext,
 		@Options() { minutes }: SettingsSetCooldownOptions,
+		@Context() [interaction]: SlashCommandContext,
 	) {
 		if (isNaN(minutes) || minutes === undefined || minutes === null) {
 			return interaction.reply({
@@ -438,6 +448,32 @@ export class SettingsCommands {
 			content: `Members will now be able to provide an answer every ${minutes} minute${
 				minutes === 1 ? '' : 's'
 			}.`,
+			ephemeral: true,
+		});
+	}
+
+	@Subcommand({
+		name: 'inform-cooldown',
+		description:
+			'Enable/Disable the message that informs a user of their cooldown after a guess.',
+	})
+	public async setInformCooldownAfterGuess(
+		@Options()
+		{
+			informCooldownAfterGuess,
+		}: SettingsSetInformCooldownAfterGuessOptions,
+		@Context() [interaction]: SlashCommandContext,
+	) {
+		await this._settings.set(
+			interaction.guildId,
+			'informCooldownAfterGuess',
+			informCooldownAfterGuess,
+		);
+
+		return interaction.reply({
+			content: informCooldownAfterGuess
+				? 'I will **automatically** inform a user of their cooldown after each guess.'
+				: 'I will **not** inform a user of their cooldown after each guess.',
 			ephemeral: true,
 		});
 	}

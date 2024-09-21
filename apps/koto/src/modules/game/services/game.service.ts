@@ -174,6 +174,25 @@ export class GameService {
 
 		await Promise.allSettled(promises);
 
+		if (
+			status !== GameStatus.COMPLETED &&
+			settings.informCooldownAfterGuess
+		) {
+			const cooldown = await this._checkCooldown(
+				message.author.id,
+				game.id,
+				settings.cooldown,
+			);
+
+			if (cooldown) {
+				message.reply(
+					`Thank you for your guess, you are now on a cooldown. You can guess again <t:${getTimestamp(
+						cooldown,
+					)}:R>`,
+				);
+			}
+		}
+
 		if (status !== GameStatus.IN_PROGRESS) {
 			// after the message has been send, we can delete the guesses so we don't keep any message content ever.
 			await this._prisma.guess.deleteMany({
