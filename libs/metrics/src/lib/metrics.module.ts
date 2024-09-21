@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { PrometheusModule } from '@willsoto/nestjs-prometheus';
+
 import { MetricsEvents } from './events/metrics.events';
 import { botMetrics } from './metrics/bot.metrics';
 import { channelMetrics } from './metrics/channel.metrics';

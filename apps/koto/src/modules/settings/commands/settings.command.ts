@@ -1,7 +1,5 @@
 import { Injectable, UseFilters, UseGuards } from '@nestjs/common';
 import { Settings } from '@prisma/koto';
-import { ForbiddenExceptionFilter, ManageServerGuard } from '@yugen/shared';
-import { formatMinutes } from '@yugen/util';
 import { ChannelType, Role, TextChannel } from 'discord.js';
 import {
 	BooleanOption,
@@ -14,8 +12,13 @@ import {
 	StringOption,
 	Subcommand,
 } from 'necord';
+
 import { SettingsService } from '../services';
 import { SettingsCommandDecorator } from '../settings.decorator';
+
+import { ForbiddenExceptionFilter, ManageServerGuard } from '@yugen/shared';
+
+import { formatMinutes } from '@yugen/util';
 
 class SettingsSetChannelOptions {
 	@ChannelOption({
@@ -165,7 +168,7 @@ export class SettingsCommands {
 	})
 	public async setChannel(
 		@Context() [interaction]: SlashCommandContext,
-		@Options() { channel }: SettingsSetChannelOptions,
+		@Options() { channel }: SettingsSetChannelOptions
 	) {
 		if (!channel || channel.type !== ChannelType.GuildText) {
 			return interaction.reply({
@@ -188,12 +191,12 @@ export class SettingsCommands {
 	})
 	public async setBotUpdatesChannel(
 		@Context() [interaction]: SlashCommandContext,
-		@Options() { channel }: SettingsSetBotUpdatesChannelOptions,
+		@Options() { channel }: SettingsSetBotUpdatesChannelOptions
 	) {
 		await this._settings.set(
-			interaction.guildId!,
+			interaction.guildId,
 			'botUpdatesChannelId',
-			channel.id,
+			channel.id
 		);
 
 		return interaction.reply({
@@ -208,7 +211,7 @@ export class SettingsCommands {
 	})
 	public async setRole(
 		@Context() [interaction]: SlashCommandContext,
-		@Options() { role, onlyNew }: SettingsSetRoleOptions,
+		@Options() { role, onlyNew }: SettingsSetRoleOptions
 	) {
 		if (!role) {
 			return interaction.reply({
@@ -234,7 +237,7 @@ export class SettingsCommands {
 	})
 	public async reset(
 		@Context() [interaction]: SlashCommandContext,
-		@Options() { setting }: SettingsResetOptions,
+		@Options() { setting }: SettingsResetOptions
 	) {
 		if (!setting) {
 			return interaction.reply({
@@ -264,12 +267,12 @@ export class SettingsCommands {
 		await this._settings.set(interaction.guildId, setting, value);
 
 		const name = settingsResetOptionsChoices.find(
-			(v) => v.value === setting,
+			v => v.value === setting
 		).name;
 
 		return interaction.reply({
 			content: `${name} has been reset to it's default value of \`${
-				value ? value : '-'
+				value ?? '-'
 			}\``,
 			ephemeral: true,
 		});
@@ -281,10 +284,10 @@ export class SettingsCommands {
 	})
 	public async setFrequency(
 		@Context() [interaction]: SlashCommandContext,
-		@Options() { minutes }: SettingsSetFrequencyOrTimeLimitOptions,
+		@Options() { minutes }: SettingsSetFrequencyOrTimeLimitOptions
 	) {
 		const settings = await this._settings.getSettings(interaction.guildId);
-		if (!minutes || isNaN(minutes)) {
+		if (!minutes || Number.isNaN(minutes)) {
 			return interaction.reply({
 				content: 'A valid number for minutes must be provided.',
 				ephemeral: true,
@@ -305,17 +308,15 @@ export class SettingsCommands {
 					timeLimitFormatted.hours
 						? `${timeLimitFormatted.hours} hour${
 								timeLimitFormatted.hours === 1 ? '' : 's'
-							}`
+						  }`
 						: ''
 				}${
-					timeLimitFormatted.hours && timeLimitFormatted.minutes
-						? ' & '
-						: ''
+					timeLimitFormatted.hours && timeLimitFormatted.minutes ? ' & ' : ''
 				}${
 					timeLimitFormatted.minutes
 						? `${timeLimitFormatted.minutes} minute${
 								timeLimitFormatted.minutes === 1 ? '' : 's'
-							}`
+						  }`
 						: ''
 				}.`,
 				ephemeral: true,
@@ -330,17 +331,13 @@ export class SettingsCommands {
 				frequencyFormatted.hours
 					? `${frequencyFormatted.hours} hour${
 							frequencyFormatted.hours === 1 ? '' : 's'
-						}`
+					  }`
 					: ''
-			}${
-				frequencyFormatted.hours && frequencyFormatted.minutes
-					? ' & '
-					: ''
-			}${
+			}${frequencyFormatted.hours && frequencyFormatted.minutes ? ' & ' : ''}${
 				frequencyFormatted.minutes
 					? `${frequencyFormatted.minutes} minute${
 							frequencyFormatted.minutes === 1 ? '' : 's'
-						}`
+					  }`
 					: ''
 			}.`,
 			ephemeral: true,
@@ -353,10 +350,10 @@ export class SettingsCommands {
 	})
 	public async setTimeLimit(
 		@Context() [interaction]: SlashCommandContext,
-		@Options() { minutes }: SettingsSetFrequencyOrTimeLimitOptions,
+		@Options() { minutes }: SettingsSetFrequencyOrTimeLimitOptions
 	) {
 		const settings = await this._settings.getSettings(interaction.guildId);
-		if (!minutes || isNaN(minutes)) {
+		if (!minutes || Number.isNaN(minutes)) {
 			return interaction.reply({
 				content: 'A valid number for minutes must be provided.',
 				ephemeral: true,
@@ -377,17 +374,15 @@ export class SettingsCommands {
 					frequencyFormatted.hours
 						? `${frequencyFormatted.hours} hour${
 								frequencyFormatted.hours === 1 ? '' : 's'
-							}`
+						  }`
 						: ''
 				}${
-					frequencyFormatted.hours && frequencyFormatted.minutes
-						? ' & '
-						: ''
+					frequencyFormatted.hours && frequencyFormatted.minutes ? ' & ' : ''
 				}${
 					frequencyFormatted.minutes
 						? `${frequencyFormatted.minutes} minute${
 								frequencyFormatted.minutes === 1 ? '' : 's'
-							}`
+						  }`
 						: ''
 				}.`,
 				ephemeral: true,
@@ -402,17 +397,13 @@ export class SettingsCommands {
 				timeLimitFormatted.hours
 					? `${timeLimitFormatted.hours} hour${
 							timeLimitFormatted.hours === 1 ? '' : 's'
-						}`
+					  }`
 					: ''
-			}${
-				timeLimitFormatted.hours && timeLimitFormatted.minutes
-					? ' & '
-					: ''
-			}${
+			}${timeLimitFormatted.hours && timeLimitFormatted.minutes ? ' & ' : ''}${
 				timeLimitFormatted.minutes
 					? `${timeLimitFormatted.minutes} minute${
 							timeLimitFormatted.minutes === 1 ? '' : 's'
-						}`
+					  }`
 					: ''
 			}.`,
 			ephemeral: true,
@@ -425,9 +416,9 @@ export class SettingsCommands {
 	})
 	public async setCooldown(
 		@Options() { minutes }: SettingsSetCooldownOptions,
-		@Context() [interaction]: SlashCommandContext,
+		@Context() [interaction]: SlashCommandContext
 	) {
-		if (isNaN(minutes) || minutes === undefined || minutes === null) {
+		if (Number.isNaN(minutes) || minutes === undefined || minutes === null) {
 			return interaction.reply({
 				content: 'A valid number for minutes must be provided.',
 				ephemeral: true,
@@ -436,8 +427,7 @@ export class SettingsCommands {
 
 		if (minutes < 0 || minutes > 60) {
 			return interaction.reply({
-				content:
-					'A minimum of 0 & a maximum of 60 minutes must be provided.',
+				content: 'A minimum of 0 & a maximum of 60 minutes must be provided.',
 				ephemeral: true,
 			});
 		}
@@ -459,15 +449,13 @@ export class SettingsCommands {
 	})
 	public async setInformCooldownAfterGuess(
 		@Options()
-		{
-			informCooldownAfterGuess,
-		}: SettingsSetInformCooldownAfterGuessOptions,
-		@Context() [interaction]: SlashCommandContext,
+		{ informCooldownAfterGuess }: SettingsSetInformCooldownAfterGuessOptions,
+		@Context() [interaction]: SlashCommandContext
 	) {
 		await this._settings.set(
 			interaction.guildId,
 			'informCooldownAfterGuess',
-			informCooldownAfterGuess,
+			informCooldownAfterGuess
 		);
 
 		return interaction.reply({
@@ -485,7 +473,7 @@ export class SettingsCommands {
 	})
 	public async setAutoStart(
 		@Context() [interaction]: SlashCommandContext,
-		@Options() { autoStart }: SettingsSetAutoStartOptions,
+		@Options() { autoStart }: SettingsSetAutoStartOptions
 	) {
 		await this._settings.set(interaction.guildId, 'autoStart', autoStart);
 
@@ -503,12 +491,12 @@ export class SettingsCommands {
 	})
 	public async setMemberCanStart(
 		@Context() [interaction]: SlashCommandContext,
-		@Options() { membersCanStart }: SettingsSetMembersPrivilegeOptions,
+		@Options() { membersCanStart }: SettingsSetMembersPrivilegeOptions
 	) {
 		await this._settings.set(
 			interaction.guildId,
 			'membersCanStart',
-			membersCanStart,
+			membersCanStart
 		);
 
 		return interaction.reply({

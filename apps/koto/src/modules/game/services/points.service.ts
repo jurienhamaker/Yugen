@@ -1,23 +1,15 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Game, Guess, Prisma } from '@prisma/koto';
-import { PrismaService } from '@yugen/prisma/koto';
+
 import { fixFloating } from '@yugen/util';
-import { Client } from 'discord.js';
+
+import { PrismaService } from '@yugen/prisma/koto';
 
 @Injectable()
 export class GamePointsService {
-	private readonly _logger = new Logger(GamePointsService.name);
+	constructor(private _prisma: PrismaService) {}
 
-	constructor(
-		private _prisma: PrismaService,
-		private _client: Client,
-	) {}
-
-	async getPlayer(
-		guildId: string,
-		userId: string,
-		setInGuild: boolean = true,
-	) {
+	async getPlayer(guildId: string, userId: string, setInGuild: boolean = true) {
 		const user = await this._prisma.playerStats.findFirst({
 			where: {
 				guildId,
@@ -76,7 +68,7 @@ export class GamePointsService {
 	async getLeaderboard(
 		guildId: string,
 		type: 'points' | 'wins' | 'participated' = 'points',
-		page = 1,
+		page = 1
 	) {
 		const where = {
 			guildId,
@@ -147,7 +139,7 @@ export class GamePointsService {
 				game.guildId,
 				userId,
 				users[userId],
-				userId === winnerId,
+				userId === winnerId
 			);
 
 			promises.push(promise);
@@ -160,7 +152,7 @@ export class GamePointsService {
 		guildId: string,
 		userId: string,
 		points: number,
-		isWinner: boolean = false,
+		isWinner: boolean = false
 	) {
 		const user = await this.getPlayer(guildId, userId);
 

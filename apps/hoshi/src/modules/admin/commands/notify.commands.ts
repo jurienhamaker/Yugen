@@ -1,6 +1,4 @@
 import { Injectable, UseFilters, UseGuards } from '@nestjs/common';
-import { AdminGuard, ForbiddenExceptionFilter } from '@yugen/shared';
-import { AdminCommandDecorator } from '../admin.decorator';
 import {
 	ActionRowBuilder,
 	ModalActionRowComponentBuilder,
@@ -16,7 +14,11 @@ import {
 	SlashCommandContext,
 	Subcommand,
 } from 'necord';
+
+import { AdminCommandDecorator } from '../admin.decorator';
 import { AdminNotifyService } from '../services/notify.service';
+
+import { AdminGuard, ForbiddenExceptionFilter } from '@yugen/shared';
 
 @UseGuards(AdminGuard)
 @UseFilters(ForbiddenExceptionFilter)
@@ -34,14 +36,12 @@ export class AdminNotifyCommands {
 			.setTitle('Send notification to all guilds')
 			.setCustomId(`ADMIN_NOTIFY_SEND`)
 			.setComponents([
-				new ActionRowBuilder<ModalActionRowComponentBuilder>().addComponents(
-					[
-						new TextInputBuilder()
-							.setCustomId('message')
-							.setLabel('Message to send')
-							.setStyle(TextInputStyle.Paragraph),
-					],
-				),
+				new ActionRowBuilder<ModalActionRowComponentBuilder>().addComponents([
+					new TextInputBuilder()
+						.setCustomId('message')
+						.setLabel('Message to send')
+						.setStyle(TextInputStyle.Paragraph),
+				]),
 			]);
 
 		return interaction.showModal(modal);
@@ -57,7 +57,7 @@ export class AdminNotifyCommands {
 
 		return interaction.editReply({
 			content: `Message sent to ${Math.round(
-				successByBotChannelId + successByStarboard,
+				successByBotChannelId + successByStarboard
 			)} of ${total} guilds. ${successByBotChannelId} were by \`botUpdatesChannelId\` settings.`,
 		});
 	}

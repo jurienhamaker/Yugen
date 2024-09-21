@@ -1,6 +1,5 @@
 import { Injectable, UseFilters, UseGuards } from '@nestjs/common';
 import { Settings } from '@prisma/kazu';
-import { ForbiddenExceptionFilter, ManageServerGuard } from '@yugen/shared';
 import { ChannelType, Role, TextChannel } from 'discord.js';
 import {
 	BooleanOption,
@@ -13,8 +12,11 @@ import {
 	StringOption,
 	Subcommand,
 } from 'necord';
+
 import { SettingsService } from '../services';
 import { SettingsCommandDecorator } from '../settings.decorator';
+
+import { ForbiddenExceptionFilter, ManageServerGuard } from '@yugen/shared';
 
 class SettingsSetChannelOptions {
 	@ChannelOption({
@@ -130,7 +132,7 @@ export class SettingsCommands {
 	})
 	public async setChannel(
 		@Context() [interaction]: SlashCommandContext,
-		@Options() { channel }: SettingsSetChannelOptions,
+		@Options() { channel }: SettingsSetChannelOptions
 	) {
 		if (!channel || channel.type !== ChannelType.GuildText) {
 			return interaction.reply({
@@ -153,12 +155,12 @@ export class SettingsCommands {
 	})
 	public async setBotUpdatesChannel(
 		@Context() [interaction]: SlashCommandContext,
-		@Options() { channel }: SettingsSetBotUpdatesChannelOptions,
+		@Options() { channel }: SettingsSetBotUpdatesChannelOptions
 	) {
 		await this._settings.set(
-			interaction.guildId!,
+			interaction.guildId,
 			'botUpdatesChannelId',
-			channel.id,
+			channel.id
 		);
 
 		return interaction.reply({
@@ -173,7 +175,7 @@ export class SettingsCommands {
 	})
 	public async reset(
 		@Context() [interaction]: SlashCommandContext,
-		@Options() { setting }: SettingsResetOptions,
+		@Options() { setting }: SettingsResetOptions
 	) {
 		if (!setting) {
 			return interaction.reply({
@@ -199,12 +201,12 @@ export class SettingsCommands {
 		await this._settings.set(interaction.guildId, setting, value);
 
 		const name = settingsResetOptionsChoices.find(
-			(v) => v.value === setting,
+			v => v.value === setting
 		).name;
 
 		return interaction.reply({
 			content: `${name} has been reset to it's default value of \`${
-				value ? value : '-'
+				value ?? '-'
 			}\``,
 			ephemeral: true,
 		});
@@ -216,9 +218,9 @@ export class SettingsCommands {
 	})
 	public async setCooldown(
 		@Context() [interaction]: SlashCommandContext,
-		@Options() { minutes }: SettingsSetCooldownOptions,
+		@Options() { minutes }: SettingsSetCooldownOptions
 	) {
-		if (isNaN(minutes) || minutes === undefined || minutes === null) {
+		if (Number.isNaN(minutes) || minutes === undefined || minutes === null) {
 			return interaction.reply({
 				content: 'A valid number for minutes must be provided.',
 				ephemeral: true,
@@ -227,8 +229,7 @@ export class SettingsCommands {
 
 		if (minutes < 0 || minutes > 60) {
 			return interaction.reply({
-				content:
-					'A minimum of 0 & a maximum of 60 minutes must be provided.',
+				content: 'A minimum of 0 & a maximum of 60 minutes must be provided.',
 				ephemeral: true,
 			});
 		}
@@ -249,7 +250,7 @@ export class SettingsCommands {
 	})
 	public async setMath(
 		@Context() [interaction]: SlashCommandContext,
-		@Options() { enabled }: SettingsSetMathOptions,
+		@Options() { enabled }: SettingsSetMathOptions
 	) {
 		await this._settings.set(interaction.guildId, 'math', enabled);
 
@@ -267,7 +268,7 @@ export class SettingsCommands {
 	})
 	public async setShameRole(
 		@Context() [interaction]: SlashCommandContext,
-		@Options() { role }: SettingsSetShameRoleOptions,
+		@Options() { role }: SettingsSetShameRoleOptions
 	) {
 		await this._settings.set(interaction.guildId, 'shameRoleId', role.id);
 
@@ -284,12 +285,12 @@ export class SettingsCommands {
 	})
 	public async setResetShameRoleAfterHighscore(
 		@Context() [interaction]: SlashCommandContext,
-		@Options() { remove }: SettingsSetRemoveShameRoleAfterHighscoreOptions,
+		@Options() { remove }: SettingsSetRemoveShameRoleAfterHighscoreOptions
 	) {
 		await this._settings.set(
 			interaction.guildId,
 			'removeShameRoleAfterHighscore',
-			remove,
+			remove
 		);
 
 		return interaction.reply({

@@ -14,8 +14,8 @@ export class GuildModeratorGuard implements CanActivate {
 	constructor(protected _client: Client) {}
 
 	async canActivate(context: ExecutionContext): Promise<boolean> {
-		const ctx = NecordExecutionContext.create(context);
-		const [interaction] = ctx.getContext<'interactionCreate'>();
+		const context_ = NecordExecutionContext.create(context);
+		const [interaction] = context_.getContext<'interactionCreate'>();
 
 		if (!interaction) {
 			return true;
@@ -28,30 +28,30 @@ export class GuildModeratorGuard implements CanActivate {
 			return false;
 		}
 
-		const admins = process.env['OWNER_IDS']!.split(',');
+		const admins = process.env['OWNER_IDS'].split(',');
 		if (admins.includes(interaction?.user?.id)) {
 			return true;
 		}
 
-		const guild = await this._client.guilds.fetch(interaction.guildId!);
+		const guild = await this._client.guilds.fetch(interaction.guildId);
 		const member = await guild.members.fetch(interaction.user.id);
 
 		const hasAdminPermissions = member.permissions.has(
-			PermissionsBitField.Flags.Administrator,
+			PermissionsBitField.Flags.Administrator
 		);
 		if (hasAdminPermissions) {
 			return true;
 		}
 
 		const hasManageGuildPermission = member.permissions.has(
-			PermissionsBitField.Flags.ManageGuild,
+			PermissionsBitField.Flags.ManageGuild
 		);
 		if (hasManageGuildPermission) {
 			return true;
 		}
 
 		const hasPermission = member.permissions.has(
-			PermissionsBitField.Flags.BanMembers,
+			PermissionsBitField.Flags.BanMembers
 		);
 		if (hasPermission) {
 			return true;

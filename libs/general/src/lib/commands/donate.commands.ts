@@ -1,5 +1,4 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { getEmbedFooter, kofiButton } from '@yugen/util';
 import {
 	ActionRowBuilder,
 	ButtonBuilder,
@@ -7,16 +6,19 @@ import {
 	EmbedBuilder,
 } from 'discord.js';
 import { Context, SlashCommand, SlashCommandContext } from 'necord';
+
 import {
 	GeneralModuleOptions,
 	MODULE_OPTIONS_TOKEN,
 } from '../general.module-definition';
 
+import { getEmbedFooter, kofiButton } from '@yugen/util';
+
 @Injectable()
 export class GeneralDonateCommands {
 	constructor(
 		private _client: Client,
-		@Inject(MODULE_OPTIONS_TOKEN) private _options: GeneralModuleOptions,
+		@Inject(MODULE_OPTIONS_TOKEN) private _options: GeneralModuleOptions
 	) {}
 
 	@SlashCommand({
@@ -31,7 +33,7 @@ export class GeneralDonateCommands {
 				`Thanks you for checking out the donate link, clicking on the button below will lead you to my ko-fi.
 **All money raised will go towards costs of running ${this._client.user?.displayName}!**
 
-Thanks for playing!`,
+Thanks for playing!`
 			)
 			.setColor(this._options.embedColor)
 			.setFooter(footer);

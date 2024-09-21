@@ -1,8 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { getEmbedFooter } from '@yugen/util';
 import { Client, EmbedBuilder } from 'discord.js';
 import { Context, SlashCommand, SlashCommandContext } from 'necord';
+
 import { EMBED_COLOR } from '../util/constants';
+
+import { getEmbedFooter } from '@yugen/util';
 
 @Injectable()
 export class TutorialCommands {
@@ -32,7 +34,7 @@ Donating a save will turn 1 personal save into 0.2 server saves.
 - Channel, specify a dedicated channel
 - Cooldown, specify a cooldown before users can add a word again
 - Math, Wether Kazu will try to parse equations
-- Shame role, a role to apply to someone that breaks the chain`,
+- Shame role, a role to apply to someone that breaks the chain`
 			)
 			.setColor(EMBED_COLOR)
 			.setFooter(footer);

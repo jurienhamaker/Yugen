@@ -1,6 +1,4 @@
 import { Injectable, UseFilters, UseGuards } from '@nestjs/common';
-import { GameService } from '../../game/services/game.service';
-import { AdminGuard, ForbiddenExceptionFilter } from '@yugen/shared';
 import { Client } from 'discord.js';
 import {
 	Context,
@@ -9,7 +7,11 @@ import {
 	StringOption,
 	Subcommand,
 } from 'necord';
+
+import { GameService } from '../../game/services/game.service';
 import { AdminCommandDecorator } from '../admin.decorator';
+
+import { AdminGuard, ForbiddenExceptionFilter } from '@yugen/shared';
 
 class AdminGetWordOptions {
 	@StringOption({
@@ -25,10 +27,7 @@ class AdminGetWordOptions {
 @AdminCommandDecorator()
 @Injectable()
 export class AdminGetWordCommands {
-	constructor(
-		private _client: Client,
-		private _game: GameService,
-	) {}
+	constructor(private _client: Client, private _game: GameService) {}
 
 	@Subcommand({
 		name: 'get-word',
@@ -36,11 +35,9 @@ export class AdminGetWordCommands {
 	})
 	public async welcome(
 		@Context() [interaction]: SlashCommandContext,
-		@Options() { guildId }: AdminGetWordOptions,
+		@Options() { guildId }: AdminGetWordOptions
 	) {
-		const guild = await this._client.guilds
-			.fetch(guildId)
-			.catch(() => null);
+		const guild = await this._client.guilds.fetch(guildId).catch(() => null);
 		if (!guild) {
 			return interaction.reply({
 				content: `Koto could not access specified guild with id \`${guildId}\`.`,

@@ -1,26 +1,22 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Events, Message, PartialMessage } from 'discord.js';
 import { Context, ContextOf, On } from 'necord';
+
 import { SettingsService } from '../../settings/services/settings.services';
 import { GameService } from '../services/game.service';
 
 @Injectable()
 export class GameMessageEvents {
-	private readonly _logger = new Logger(GameMessageEvents.name);
-
-	constructor(
-		private _settings: SettingsService,
-		private _game: GameService,
-	) {}
+	constructor(private _settings: SettingsService, private _game: GameService) {}
 
 	@On(Events.MessageCreate)
 	public async onMessageCreate(
-		@Context() [message]: ContextOf<Events.MessageCreate>,
+		@Context() [message]: ContextOf<Events.MessageCreate>
 	) {
 		const settings = await this._settings.getSettings(message.guildId);
-		const num = this._getNumber(message, settings.math);
+		const number_ = this._getNumber(message, settings.math);
 
-		if (!num) {
+		if (!number_) {
 			return;
 		}
 
@@ -28,12 +24,12 @@ export class GameMessageEvents {
 			return;
 		}
 
-		return this._game.addNumber(message.guildId, num, message, settings);
+		return this._game.addNumber(message.guildId, number_, message, settings);
 	}
 
 	@On(Events.MessageDelete)
 	public async onMessageDelete(
-		@Context() [message]: ContextOf<Events.MessageDelete>,
+		@Context() [message]: ContextOf<Events.MessageDelete>
 	) {
 		const didChange = await this._didChange(message);
 
@@ -43,13 +39,13 @@ export class GameMessageEvents {
 
 		message.channel.send(
 			`<@${message.author.id}> just deleted their number 😒
-Last number was **${didChange}**!`,
+Last number was **${didChange}**!`
 		);
 	}
 
 	@On(Events.MessageUpdate)
 	public async onMessageUpdate(
-		@Context() [message]: ContextOf<Events.MessageDelete>,
+		@Context() [message]: ContextOf<Events.MessageDelete>
 	) {
 		const didChange = await this._didChange(message);
 
@@ -59,7 +55,7 @@ Last number was **${didChange}**!`,
 
 		message.channel.send(
 			`<@${message.author.id}> just edited their guess 😒
-Last number was **${didChange}**!`,
+Last number was **${didChange}**!`
 		);
 	}
 
@@ -69,8 +65,8 @@ Last number was **${didChange}**!`,
 			return;
 		}
 
-		const num = this._getNumber(message, settings.math);
-		if (!num) {
+		const number_ = this._getNumber(message, settings.math);
+		if (!number_) {
 			return;
 		}
 
@@ -84,7 +80,7 @@ Last number was **${didChange}**!`,
 			return;
 		}
 
-		if (num !== lastNumber.number) {
+		if (number_ !== lastNumber.number) {
 			return;
 		}
 
@@ -93,38 +89,38 @@ Last number was **${didChange}**!`,
 
 	private _getNumber(
 		message: Message<boolean> | PartialMessage,
-		useMath: boolean = true,
+		useMath: boolean = true
 	) {
 		if (message.author.bot) {
 			return;
 		}
 
 		if (!useMath) {
-			const num = parseInt(message.cleanContent, 10);
+			const number_ = Number.parseInt(message.cleanContent, 10);
 
-			if (isNaN(num)) {
+			if (Number.isNaN(number_)) {
 				return;
 			}
 
-			return num;
+			return number_;
 		}
 
-		if (/[^0-9()+\-*/^. ]/g.test(message.cleanContent)) {
+		if (/[^\d ()*+./^-]/g.test(message.cleanContent)) {
 			return;
 		}
 
 		const cleaned = message.cleanContent
-			.replace(/[^0-9()+\-*/^. ]/g, '')
-			.replace(/\^/g, '**');
+			.replaceAll(/[^\d ()*+./^-]/g, '')
+			.replaceAll('^', '**');
 
 		let parsed: number;
 		try {
-			parsed = Function(`'use strict'; return (${cleaned})`)();
+			parsed = new Function(`'use strict'; return (${cleaned})`)();
 		} catch {
 			return;
 		}
 
-		if (isNaN(parsed)) {
+		if (Number.isNaN(parsed)) {
 			return;
 		}
 

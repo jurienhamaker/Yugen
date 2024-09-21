@@ -9,10 +9,7 @@ import { lastValueFrom } from 'rxjs';
 export class BotsGGService {
 	private readonly _logger = new Logger(BotsGGService.name);
 
-	constructor(
-		private _client: Client,
-		private _http: HttpService,
-	) {}
+	constructor(private _client: Client, private _http: HttpService) {}
 
 	@Once(Events.ClientReady)
 	@Cron('0 */30 * * * *')
@@ -32,13 +29,10 @@ export class BotsGGService {
 						headers: {
 							Authorization: process.env['BOTS_GG_TOKEN'],
 						},
-					},
-				),
-			).catch((err) =>
-				this._logger.error(
-					`Error sending information to Bots.GG`,
-					err.stack,
-				),
+					}
+				)
+			).catch(error =>
+				this._logger.error(`Error sending information to Bots.GG`, error.stack)
 			);
 
 			this._logger.log(`Updated Bots.GG stats`);

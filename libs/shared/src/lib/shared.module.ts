@@ -14,12 +14,11 @@ export class SharedModule {
 			imports: [
 				NecordModule.forRoot({
 					development:
-						process.env['NODE_ENV']! !== 'production'
-							? [process.env['DEVELOPMENT_SERVER_ID']!]
-							: false,
-					skipRegistration:
-						process.env['REGISTER_COMMANDS'] === 'false',
-					token: process.env['DISCORD_TOKEN']!,
+						process.env['NODE_ENV'] === 'production'
+							? false
+							: [process.env['DEVELOPMENT_SERVER_ID']],
+					skipRegistration: process.env['REGISTER_COMMANDS'] === 'false',
+					token: process.env['DISCORD_TOKEN'],
 					intents,
 				}),
 				SentryModule.forRoot({

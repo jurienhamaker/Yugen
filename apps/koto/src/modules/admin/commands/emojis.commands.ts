@@ -1,8 +1,10 @@
 import { Injectable, UseFilters, UseGuards } from '@nestjs/common';
-import { AdminGuard, ForbiddenExceptionFilter } from '@yugen/shared';
 import { Client } from 'discord.js';
 import { Context, SlashCommandContext, Subcommand } from 'necord';
+
 import { AdminCommandDecorator } from '../admin.decorator';
+
+import { AdminGuard, ForbiddenExceptionFilter } from '@yugen/shared';
 
 @UseGuards(AdminGuard)
 @UseFilters(ForbiddenExceptionFilter)
@@ -17,18 +19,18 @@ export class AdminEmojisCommands {
 	})
 	public async getEmojis(@Context() [interaction]: SlashCommandContext) {
 		const guilds = await this._client.guilds.fetch();
-		const letterGuilds = [
-			...guilds
-				.filter(
-					(g) =>
-						g.name.startsWith('Koto Letters') &&
-						g.name.endsWith('Rounded'),
-				)
-				.values(),
-		].map((g) => g.id);
+		const letterGuilds = new Set(
+			[
+				...guilds
+					.filter(
+						g => g.name.startsWith('Koto Letters') && g.name.endsWith('Rounded')
+					)
+					.values(),
+			].map(g => g.id)
+		);
 
-		const emojis = this._client.emojis.cache.filter(
-			(e) => letterGuilds.indexOf(e.guild.id) !== -1,
+		const emojis = this._client.emojis.cache.filter(e =>
+			letterGuilds.has(e.guild.id)
 		);
 
 		const data = {};
@@ -36,8 +38,7 @@ export class AdminEmojisCommands {
 		for (const emoji of emojis.values()) {
 			const parsedName = emoji.name.replace('letter', '');
 			let letter = parsedName[0].toLowerCase();
-			let type = parsedName
-				.split('')
+			let type = [...parsedName]
 				.splice(1, parsedName.length - 1)
 				.join('')
 				.toUpperCase();

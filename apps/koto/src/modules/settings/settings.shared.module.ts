@@ -1,5 +1,7 @@
 import { Module } from '@nestjs/common';
+
 import { PrismaModule } from '@yugen/prisma/koto';
+
 import { SettingsService } from './services';
 
 @Module({

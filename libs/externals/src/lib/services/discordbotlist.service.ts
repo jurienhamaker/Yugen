@@ -12,7 +12,7 @@ export class DiscordBotListService {
 	constructor(
 		private _client: Client,
 		private _http: HttpService,
-		private _commands: CommandsService,
+		private _commands: CommandsService
 	) {}
 
 	@Once(Events.ClientReady)
@@ -38,13 +38,13 @@ export class DiscordBotListService {
 						headers: {
 							Authorization: process.env['DISCORDBOTLIST_TOKEN'],
 						},
-					},
-				),
-			).catch((err) =>
+					}
+				)
+			).catch(error =>
 				this._logger.error(
 					`Error sending information to DiscordBotList`,
-					err.stack,
-				),
+					error.stack
+				)
 			);
 
 			this._logger.log(`Updated DiscordBotList stats`);
@@ -82,18 +82,16 @@ export class DiscordBotListService {
 						headers: {
 							Authorization: process.env['DISCORDBOTLIST_TOKEN'],
 						},
-					},
-				),
-			).catch((err) =>
+					}
+				)
+			).catch(error =>
 				this._logger.error(
 					`Error sending commands to DiscordBotList`,
-					err.stack,
-				),
+					error.stack
+				)
 			);
 
-			this._logger.log(
-				`Updated DiscordBotList with ${data.length} commands`,
-			);
+			this._logger.log(`Updated DiscordBotList with ${data.length} commands`);
 		}
 	}
 }

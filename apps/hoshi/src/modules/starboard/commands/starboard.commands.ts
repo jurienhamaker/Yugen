@@ -1,6 +1,4 @@
 import { Logger, UseFilters, UseGuards } from '@nestjs/common';
-import { ForbiddenExceptionFilter, GuildModeratorGuard } from '@yugen/shared';
-import { DiscordComponentsArrayDTO, resolveEmoji } from '@yugen/util';
 import {
 	ActionRowBuilder,
 	ButtonBuilder,
@@ -22,9 +20,14 @@ import {
 	StringOption,
 	Subcommand,
 } from 'necord';
+
 import { EMBED_COLOR } from '../../../util/constants';
 import { StarboardService } from '../services/starboard.service';
 import { StarboardCommandDecorator } from '../starboard.decorator';
+
+import { ForbiddenExceptionFilter, GuildModeratorGuard } from '@yugen/shared';
+
+import { DiscordComponentsArrayDTO, resolveEmoji } from '@yugen/util';
 
 class ListOptions {
 	@NumberOption({
@@ -81,7 +84,7 @@ export class StarboardCommands {
 	})
 	public async show(
 		@Context() [interaction]: SlashCommandContext,
-		@Options() { page }: ListOptions,
+		@Options() { page }: ListOptions
 	) {
 		return this._listStarboards(interaction, page);
 	}
@@ -90,9 +93,9 @@ export class StarboardCommands {
 	public onShowButton(
 		@Context()
 		[interaction]: ButtonContext,
-		@ComponentParam('page') page: string,
+		@ComponentParam('page') page: string
 	) {
-		const pageInt = parseInt(page, 10);
+		const pageInt = Number.parseInt(page, 10);
 		return this._listStarboards(interaction, pageInt);
 	}
 
@@ -103,20 +106,18 @@ export class StarboardCommands {
 	public async add(
 		@Context() [interaction]: SlashCommandContext,
 		@Options()
-		{ emojiString, sourceChannel, destinationChannel }: AddOptions,
+		{ emojiString, sourceChannel, destinationChannel }: AddOptions
 	) {
 		this._logger.verbose(
-			`Adding starboard configuration for ${
-				interaction.guildId
-			} - source: ${sourceChannel?.id ?? 'none'} emoji: ${
-				emojiString ?? '⭐'
-			} destination: ${destinationChannel.id}`,
+			`Adding starboard configuration for ${interaction.guildId} - source: ${
+				sourceChannel?.id ?? 'none'
+			} emoji: ${emojiString ?? '⭐'} destination: ${destinationChannel.id}`
 		);
 
 		emojiString = emojiString ?? '⭐';
 
 		const emojiData = resolveEmoji(emojiString, interaction.client);
-		const { found } = emojiData;
+		const { found, emoji, clientEmoji, unicode } = emojiData;
 
 		if (!found) {
 			return interaction.reply({
@@ -125,12 +126,11 @@ export class StarboardCommands {
 			});
 		}
 
-		const configuration =
-			await this._starboard.getStarboardBySourceIdAndEmoji(
-				interaction.guildId,
-				emojiData.emoji,
-				sourceChannel?.id ?? null,
-			);
+		const configuration = await this._starboard.getStarboardBySourceIdAndEmoji(
+			interaction.guildId,
+			emoji,
+			sourceChannel?.id ?? null
+		);
 
 		if (configuration) {
 			return interaction.reply({
@@ -140,16 +140,16 @@ export class StarboardCommands {
 		}
 
 		await this._starboard.addStarboard(
-			interaction.guildId!,
-			emojiData.emoji,
+			interaction.guildId,
+			emoji,
 			sourceChannel?.id ?? null,
-			destinationChannel.id,
+			destinationChannel.id
 		);
 
 		return interaction.reply({
 			content: `A starboard has been added;
 Destination: <#${destinationChannel.id}>
-Emoji:  ${emojiData.unicode ? emojiData.emoji : emojiData.clientEmoji}${
+Emoji:  ${unicode ? emoji : clientEmoji}${
 				sourceChannel
 					? `
 Source: <#${sourceChannel.id}>`
@@ -165,15 +165,15 @@ Source: <#${sourceChannel.id}>`
 	})
 	public async remove(
 		@Context() [interaction]: SlashCommandContext,
-		@Options() { id }: RemoveOptions,
+		@Options() { id }: RemoveOptions
 	) {
 		this._logger.verbose(
-			`Removing starboard configuration for ${interaction.guildId} - ${id}`,
+			`Removing starboard configuration for ${interaction.guildId} - ${id}`
 		);
 
 		const configuration = await this._starboard.removeStarboardByID(
-			interaction.guildId!,
-			id!,
+			interaction.guildId,
+			id
 		);
 
 		return interaction.reply({
@@ -184,13 +184,13 @@ Source: <#${sourceChannel.id}>`
 
 	private async _listStarboards(
 		interaction: CommandInteraction | ButtonInteraction,
-		page = 1,
+		page = 1
 	) {
 		page = page ?? 1;
 
 		const { configurations, total } = await this._starboard.getStarboards(
-			interaction.guildId!,
-			page,
+			interaction.guildId,
+			page
 		);
 
 		if (!total) {
@@ -230,25 +230,25 @@ Source: <#${sourceChannel.id}>`
 		const maxPage = Math.ceil(total / 10);
 
 		let embed = new EmbedBuilder()
-			.setTitle(`Starboards for ${interaction.guild!.name}`)
+			.setTitle(`Starboards for ${interaction.guild.name}`)
 			.setColor(EMBED_COLOR)
 			.addFields([
 				{
 					name: 'ID',
-					value: configurations.map((c) => c.id).join('\n'),
+					value: configurations.map(c => c.id).join('\n'),
 					inline: true,
 				},
 				{
 					name: 'Emoji | Source',
 					value: configurations
-						.map((c) => {
-							const { emoji, unicode, clientEmoji } =
-								resolveEmoji(c.sourceEmoji, interaction.client);
+						.map(c => {
+							const { emoji, unicode, clientEmoji } = resolveEmoji(
+								c.sourceEmoji,
+								interaction.client
+							);
 
 							return `${unicode ? emoji : clientEmoji} | ${
-								c.sourceChannelId
-									? `<#${c.sourceChannelId}>`
-									: 'Anywhere'
+								c.sourceChannelId ? `<#${c.sourceChannelId}>` : 'Anywhere'
 							}`;
 						})
 						.join('\n'),
@@ -256,9 +256,7 @@ Source: <#${sourceChannel.id}>`
 				},
 				{
 					name: 'Destination',
-					value: configurations
-						.map((c) => `<#${c.targetChannelId}>`)
-						.join('\n'),
+					value: configurations.map(c => `<#${c.targetChannelId}>`).join('\n'),
 					inline: true,
 				},
 			]);
@@ -277,7 +275,7 @@ Source: <#${sourceChannel.id}>`
 				new ButtonBuilder()
 					.setCustomId(`STARBOARD_LIST/${page - 1}`)
 					.setLabel('◀️')
-					.setStyle(ButtonStyle.Primary),
+					.setStyle(ButtonStyle.Primary)
 			);
 		}
 
@@ -286,13 +284,13 @@ Source: <#${sourceChannel.id}>`
 				new ButtonBuilder()
 					.setCustomId(`STARBOARD_LIST/${page + 1}`)
 					.setLabel('▶️')
-					.setStyle(ButtonStyle.Primary),
+					.setStyle(ButtonStyle.Primary)
 			);
 		}
 
-		if (buttons.length) {
+		if (buttons.length > 0) {
 			components.push(
-				new ActionRowBuilder<ButtonBuilder>().addComponents(buttons),
+				new ActionRowBuilder<ButtonBuilder>().addComponents(buttons)
 			);
 		}
 

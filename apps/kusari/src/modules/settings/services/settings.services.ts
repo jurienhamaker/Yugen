@@ -1,23 +1,21 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Settings } from '@prisma/kusari';
-import { EMBED_COLOR } from '../../../util/constants';
-import { PrismaService } from '@yugen/prisma/kusari';
 import {
 	Client,
 	CommandInteraction,
 	EmbedBuilder,
 	MessageComponentInteraction,
 } from 'discord.js';
+
+import { EMBED_COLOR } from '../../../util/constants';
+
 import { fixFloating } from '@yugen/util';
+
+import { PrismaService } from '@yugen/prisma/kusari';
 
 @Injectable()
 export class SettingsService {
-	private readonly _logger = new Logger(SettingsService.name);
-
-	constructor(
-		private _prisma: PrismaService,
-		private _client: Client,
-	) {}
+	constructor(private _prisma: PrismaService, private _client: Client) {}
 
 	async getSettings(guildId: string) {
 		const settings = await this._prisma.settings.findUnique({
@@ -46,7 +44,7 @@ export class SettingsService {
 	async set(
 		guildId: string,
 		property: keyof Settings,
-		value: string | number | Date,
+		value: string | number | Date
 	) {
 		let settings = await this.getSettings(guildId);
 
@@ -80,9 +78,9 @@ export class SettingsService {
 	}
 
 	async showSettings(
-		interaction: MessageComponentInteraction | CommandInteraction,
+		interaction: MessageComponentInteraction | CommandInteraction
 	) {
-		const settings = await this.getSettings(interaction.guildId!);
+		const settings = await this.getSettings(interaction.guildId);
 
 		if (!settings) {
 			return;
@@ -93,9 +91,7 @@ export class SettingsService {
 		const embed = new EmbedBuilder()
 			.setColor(EMBED_COLOR)
 			.setTitle('Kusari settings')
-			.setDescription(
-				`These are the settings currently configured for Kusari`,
-			)
+			.setDescription(`These are the settings currently configured for Kusari`)
 			.addFields(
 				{
 					name: 'Channel',
@@ -104,16 +100,14 @@ export class SettingsService {
 				},
 				{
 					name: 'Bot updates channel',
-					value: botUpdatesChannelId
-						? `<#${botUpdatesChannelId}>`
-						: '-',
+					value: botUpdatesChannelId ? `<#${botUpdatesChannelId}>` : '-',
 					inline: true,
 				},
 				{
 					name: 'Answer cooldown',
 					value: `${cooldown} minute${cooldown === 1 ? '' : 's'}`,
 					inline: true,
-				},
+				}
 			);
 
 		const data = {
@@ -134,14 +128,14 @@ export class SettingsService {
 	async addSave(guildId: string, amount: number) {
 		const settings = await this.getSettings(guildId);
 
-		const newSaves = fixFloating(settings.saves + amount);
+		const updatedSaves = fixFloating(settings.saves + amount);
 		return this._prisma.settings.update({
 			where: {
 				id: settings.id,
 			},
 			data: {
 				saves:
-					newSaves > settings.maxSaves ? settings.maxSaves : newSaves,
+					updatedSaves > settings.maxSaves ? settings.maxSaves : updatedSaves,
 			},
 		});
 	}
@@ -149,13 +143,13 @@ export class SettingsService {
 	async deductSave(guildId: string, amount: number) {
 		const settings = await this.getSettings(guildId);
 
-		const newSaves = fixFloating(settings.saves - amount);
+		const updatedSaves = fixFloating(settings.saves - amount);
 		return this._prisma.settings.update({
 			where: {
 				id: settings.id,
 			},
 			data: {
-				saves: newSaves < 0 ? 0 : newSaves,
+				saves: updatedSaves < 0 ? 0 : updatedSaves,
 			},
 		});
 	}

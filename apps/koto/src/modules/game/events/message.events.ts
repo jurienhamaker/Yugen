@@ -1,25 +1,24 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
+import { Events, Message } from 'discord.js';
+import { Context, ContextOf, On } from 'necord';
+
 import { SettingsService } from '../../settings/services/settings.services';
 import { WordsService } from '../../words/services/words.service';
-import { Events } from 'discord.js';
-import { Context, ContextOf, On } from 'necord';
 import { GameService } from '../services/game.service';
 
 @Injectable()
 export class GameMessageEvents {
-	private readonly _logger = new Logger(GameMessageEvents.name);
-
 	constructor(
 		private _settings: SettingsService,
 		private _words: WordsService,
-		private _game: GameService,
+		private _game: GameService
 	) {}
 
 	@On(Events.MessageCreate)
 	public async onMessageCreate(
-		@Context() [message]: ContextOf<Events.MessageCreate>,
-	) {
-		const words = message.content.split(/\b/).filter((v) => v !== ' ');
+		@Context() [message]: ContextOf<Events.MessageCreate>
+	): Promise<boolean | Message<boolean> | void> {
+		const words = message.content.split(/\b/).filter(v => v !== ' ');
 
 		if (words[0] && words[0] === '!') {
 			words.shift();

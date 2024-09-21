@@ -1,8 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
-import { PrismaService } from '@yugen/prisma/kusari';
-import { fixFloating } from '@yugen/util';
 import { isWeekend } from 'date-fns';
+
+import { fixFloating } from '@yugen/util';
+
+import { PrismaService } from '@yugen/prisma/kusari';
 
 @Injectable()
 export class SavesService {
@@ -11,10 +13,10 @@ export class SavesService {
 	constructor(private _prisma: PrismaService) {}
 
 	@OnEvent('webhook.vote.received')
-	onVote({ userId }: { userId }) {
+	onVote({ userId }: { userId: string }) {
 		const saves = isWeekend(new Date()) ? 0.5 : 0.25;
 		this._logger.log(
-			`Received webhook vote, adding ${saves} saves to ${userId}`,
+			`Received webhook vote, adding ${saves} saves to ${userId}`
 		);
 		this.addSave(userId, saves, true);
 	}
@@ -44,13 +46,13 @@ export class SavesService {
 			return;
 		}
 
-		const newSaves = fixFloating(player.saves + amount);
+		const updatedSaves = fixFloating(player.saves + amount);
 		return this._prisma.playerSaves.update({
 			where: {
 				id: player.id,
 			},
 			data: {
-				saves: newSaves > 2 ? 2 : newSaves,
+				saves: updatedSaves > 2 ? 2 : updatedSaves,
 				lastVoteTime: isVote ? new Date() : player.lastVoteTime,
 			},
 		});
@@ -59,13 +61,13 @@ export class SavesService {
 	async deductSave(userId: string, amount: number) {
 		const player = await this.getPlayer(userId);
 
-		const newSave = fixFloating(player.saves - amount);
+		const updatedSaves = fixFloating(player.saves - amount);
 		return this._prisma.playerSaves.update({
 			where: {
 				id: player.id,
 			},
 			data: {
-				saves: newSave < 0 ? 0 : newSave,
+				saves: updatedSaves < 0 ? 0 : updatedSaves,
 			},
 		});
 	}

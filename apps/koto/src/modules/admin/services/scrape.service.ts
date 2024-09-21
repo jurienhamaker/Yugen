@@ -1,10 +1,12 @@
+import { writeFileSync } from 'node:fs';
+
 import { HttpService } from '@nestjs/axios';
 import { Injectable, Logger } from '@nestjs/common';
-import { delay } from '@yugen/util';
 import { AxiosResponse } from 'axios';
 import { Channel, ChannelType } from 'discord.js';
-import { writeFileSync } from 'fs';
 import { firstValueFrom } from 'rxjs';
+
+import { delay } from '@yugen/util';
 
 @Injectable()
 export class AdminScrapeService {
@@ -36,7 +38,7 @@ export class AdminScrapeService {
 				headers: {
 					Accept: 'application/json',
 				},
-			}),
+			})
 		).catch(() => {
 			if (this._retries === 5) {
 				return this._run(channel);
@@ -63,7 +65,7 @@ export class AdminScrapeService {
 
 		writeFileSync(
 			'/opt/app/src/modules/words/assets/scraped.json',
-			JSON.stringify(this._words, null, 2),
+			JSON.stringify(this._words, null, 2)
 		);
 		this._words = [];
 		this._logger.log(`Finished scraping!`);
@@ -81,9 +83,9 @@ export class AdminScrapeService {
 
 		const words = data.data._groups[0]._items;
 
-		this._words = this._words.concat(words);
+		this._words = [...this._words, ...words];
 		this._logger.log(
-			`Got ${words.length} from offset ${this._offset}. Total: ${data.data._meta.total}`,
+			`Got ${words.length} from offset ${this._offset}. Total: ${data.data._meta.total}`
 		);
 
 		return words.length;

@@ -1,6 +1,7 @@
 import { ArgumentsHost, Catch, ExceptionFilter, Logger } from '@nestjs/common';
 import { EmbedBuilder } from 'discord.js';
 import { SlashCommandContext } from 'necord';
+
 import { ModuleNotEnabledException } from '../errors';
 import { interactionReply } from '../interaction-replies';
 

@@ -1,19 +1,15 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/kusari';
-import { PrismaService } from '@yugen/prisma/kusari';
+
 import { fixFloating } from '@yugen/util';
+
+import { PrismaService } from '@yugen/prisma/kusari';
 
 @Injectable()
 export class GamePointsService {
-	private readonly _logger = new Logger(GamePointsService.name);
-
 	constructor(private _prisma: PrismaService) {}
 
-	async getPlayer(
-		guildId: string,
-		userId: string,
-		setInGuild: boolean = true,
-	) {
+	async getPlayer(guildId: string, userId: string, setInGuild: boolean = true) {
 		const user = await this._prisma.playerStats.findFirst({
 			where: {
 				guildId,

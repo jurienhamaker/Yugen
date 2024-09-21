@@ -1,11 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import { getEmbedFooter, getTimestamp } from '@yugen/util';
 import { Client, EmbedBuilder } from 'discord.js';
 import { Context, SlashCommand, SlashCommandContext } from 'necord';
+
+import { SavesService } from '../../../services/saves.service';
 import { SettingsService } from '../../settings';
 import { GameService } from '../services/game.service';
 import { GamePointsService } from '../services/points.service';
-import { SavesService } from '../../../services/saves.service';
+
+import { getEmbedFooter, getTimestamp } from '@yugen/util';
 
 @Injectable()
 export class GamePointsCommands {
@@ -14,7 +16,7 @@ export class GamePointsCommands {
 		private _points: GamePointsService,
 		private _saves: SavesService,
 		private _game: GameService,
-		private _settings: SettingsService,
+		private _settings: SettingsService
 	) {}
 
 	@SlashCommand({
@@ -24,7 +26,7 @@ export class GamePointsCommands {
 	public async profile(@Context() [interaction]: SlashCommandContext) {
 		const user = await this._points.getPlayer(
 			interaction.guildId,
-			interaction.user.id,
+			interaction.user.id
 		);
 		const saves = await this._saves.getPlayer(interaction.user.id);
 
@@ -38,8 +40,8 @@ And you have **${saves.saves}/2** saves available!`,
 		name: 'points',
 		description: 'Get your current points!',
 	})
-	public async points(@Context() ctx: SlashCommandContext) {
-		return this.profile(ctx);
+	public async points(@Context() context: SlashCommandContext) {
+		return this.profile(context);
 	}
 
 	@SlashCommand({
@@ -59,7 +61,7 @@ And you have **${saves.saves}/2** saves available!`,
 		await this._saves.deductSave(interaction.user.id, 1);
 		const { saves, maxSaves } = await this._settings.addSave(
 			interaction.guildId,
-			0.2,
+			0.2
 		);
 
 		return interaction.reply({
@@ -75,9 +77,7 @@ The server now has **${saves}/${maxSaves}** saves!`,
 	})
 	public async server(@Context() [interaction]: SlashCommandContext) {
 		const settings = await this._settings.getSettings(interaction.guildId);
-		const currentGame = await this._game.getCurrentGame(
-			interaction.guildId,
-		);
+		const currentGame = await this._game.getCurrentGame(interaction.guildId);
 		const lastNumber = currentGame
 			? await this._game.getLastNumber(currentGame)
 			: null;
@@ -104,16 +104,14 @@ Last count by: **${
 ${
 	settings.shameRoleId?.length
 		? `Last shamed user: ${
-				settings.lastShameUserId
-					? `<@${settings.lastShameUserId}>`
-					: '-'
-			}
+				settings.lastShameUserId ? `<@${settings.lastShameUserId}>` : '-'
+		  }
 `
 		: ''
 }
 Guild saves: **${settings.saves}/${settings.maxSaves}**
 Saves used: **${settings.savesUsed}**
-				`,
+				`
 			)
 			.setFooter(footer);
 

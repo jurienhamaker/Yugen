@@ -1,21 +1,17 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Events, Message, PartialMessage } from 'discord.js';
 import { Context, ContextOf, On } from 'necord';
+
 import { SettingsService } from '../../settings/services/settings.services';
 import { GameService } from '../services/game.service';
 
 @Injectable()
 export class GameMessageEvents {
-	private readonly _logger = new Logger(GameMessageEvents.name);
-
-	constructor(
-		private _settings: SettingsService,
-		private _game: GameService,
-	) {}
+	constructor(private _settings: SettingsService, private _game: GameService) {}
 
 	@On(Events.MessageCreate)
 	public async onMessageCreate(
-		@Context() [message]: ContextOf<Events.MessageCreate>,
+		@Context() [message]: ContextOf<Events.MessageCreate>
 	) {
 		const word = this._getWord(message);
 
@@ -33,7 +29,7 @@ export class GameMessageEvents {
 
 	@On(Events.MessageDelete)
 	public async onMessageDelete(
-		@Context() [message]: ContextOf<Events.MessageDelete>,
+		@Context() [message]: ContextOf<Events.MessageDelete>
 	) {
 		const didChange = await this._didChange(message);
 
@@ -44,13 +40,13 @@ export class GameMessageEvents {
 		message.channel.send(
 			`<@${message.author.id}> just deleted their guess 😒
 Last word was **${didChange}**!
-The next letter is **${didChange[didChange.length - 1]}**`,
+The next letter is **${didChange.at(-1)}**`
 		);
 	}
 
 	@On(Events.MessageUpdate)
 	public async onMessageUpdate(
-		@Context() [message]: ContextOf<Events.MessageDelete>,
+		@Context() [message]: ContextOf<Events.MessageDelete>
 	) {
 		const didChange = await this._didChange(message);
 
@@ -61,7 +57,7 @@ The next letter is **${didChange[didChange.length - 1]}**`,
 		message.channel.send(
 			`<@${message.author.id}> just edited their guess 😒
 Last word was **${didChange}**!
-The next letter is **${didChange[didChange.length - 1]}**`,
+The next letter is **${didChange.at(-1)}**`
 		);
 	}
 
@@ -98,7 +94,7 @@ The next letter is **${didChange[didChange.length - 1]}**`,
 			return;
 		}
 
-		const words = message.content.split(/\b/).filter((v) => v !== ' ');
+		const words = message.content.split(/\b/).filter(v => v !== ' ');
 
 		if (words[0] && words[0] === '!') {
 			words.shift();

@@ -1,5 +1,4 @@
-import { Inject, Injectable, Optional } from '@nestjs/common';
-import { getEmbedFooter } from '@yugen/util';
+import { Inject, Injectable } from '@nestjs/common';
 import {
 	ActionRowBuilder,
 	ButtonBuilder,
@@ -8,16 +7,19 @@ import {
 	EmbedBuilder,
 } from 'discord.js';
 import { Context, SlashCommand, SlashCommandContext } from 'necord';
+
 import {
 	GeneralModuleOptions,
 	MODULE_OPTIONS_TOKEN,
 } from '../general.module-definition';
 
+import { getEmbedFooter } from '@yugen/util';
+
 @Injectable()
 export class GeneralVoteCommands {
 	constructor(
 		private _client: Client,
-		@Inject(MODULE_OPTIONS_TOKEN) private _options: GeneralModuleOptions,
+		@Inject(MODULE_OPTIONS_TOKEN) private _options: GeneralModuleOptions
 	) {}
 
 	@SlashCommand({
@@ -30,16 +32,18 @@ export class GeneralVoteCommands {
 		const embed = new EmbedBuilder()
 			.setTitle(`Vote information`)
 			.setDescription(
-				`Like what ${this._client.user
-					?.displayName} is doing and want to support it's growth?
-Please use any of the links below to vote for ${this._client.user
-					?.displayName}!${
+				`Like what ${
+					this._client.user?.displayName
+				} is doing and want to support it's growth?
+Please use any of the links below to vote for ${
+					this._client.user?.displayName
+				}!${
 					voteReward?.length
 						? `
 
 ${voteReward}`
 						: ''
-				}`,
+				}`
 			)
 			.setColor(this._options.embedColor)
 			.setFooter(footer);
@@ -51,7 +55,7 @@ ${voteReward}`
 				new ButtonBuilder()
 					.setURL(process.env['TOP_GG_VOTE_LINK'])
 					.setLabel('Vote on Top.GG')
-					.setStyle(ButtonStyle.Link),
+					.setStyle(ButtonStyle.Link)
 			);
 		}
 
@@ -60,7 +64,7 @@ ${voteReward}`
 				new ButtonBuilder()
 					.setURL(process.env['DISCORDBOTLIST_VOTE_LINK'])
 					.setLabel('Vote on Discord Bot List')
-					.setStyle(ButtonStyle.Link),
+					.setStyle(ButtonStyle.Link)
 			);
 		}
 
@@ -69,7 +73,7 @@ ${voteReward}`
 				new ButtonBuilder()
 					.setURL(process.env['BOTS_GG_VOTE_LINK'])
 					.setLabel('Vote on Bots.GG')
-					.setStyle(ButtonStyle.Link),
+					.setStyle(ButtonStyle.Link)
 			);
 		}
 

@@ -1,6 +1,8 @@
-import { EMBED_COLOR } from './constants';
-import { getEmbedFooter } from '@yugen/util';
 import { Client, CommandInteraction, EmbedBuilder } from 'discord.js';
+
+import { getEmbedFooter } from '@yugen/util';
+
+import { EMBED_COLOR } from './constants';
 
 export const noSettingsDescription = `Someone with \`Manage Server\` permissions must do the following:
     
@@ -12,13 +14,13 @@ That's it! Have fun playing!`;
 
 export const noSettingsReply = async (
 	interaction: CommandInteraction,
-	_client: Client,
+	_client: Client
 ) => {
 	const footer = await getEmbedFooter(_client);
 	const embed = new EmbedBuilder()
 		.setTitle('Koto Setup')
 		.setDescription(
-			`Koto has not yet been set up in this server! ${noSettingsDescription}`,
+			`Koto has not yet been set up in this server! ${noSettingsDescription}`
 		)
 		.setColor(EMBED_COLOR)
 		.setFooter(footer);

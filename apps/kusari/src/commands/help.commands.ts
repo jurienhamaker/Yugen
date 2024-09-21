@@ -1,9 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { getEmbedFooter } from '@yugen/util';
 import { Client, EmbedBuilder } from 'discord.js';
 import { Context, SlashCommand, SlashCommandContext } from 'necord';
+
 import { EMBED_COLOR } from '../util/constants';
 import { noSettingsDescription } from '../util/no-settings-reply';
+
+import { getEmbedFooter } from '@yugen/util';
 
 @Injectable()
 export class HelpCommands {
@@ -20,7 +22,7 @@ export class HelpCommands {
 			.setDescription(
 				`${noSettingsDescription}
 
-Want to know how to play the game? Use \`/tutorial\`!`,
+Want to know how to play the game? Use \`/tutorial\`!`
 			)
 			.setColor(EMBED_COLOR)
 			.setFooter(footer);

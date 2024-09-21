@@ -1,5 +1,4 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { getEmbedFooter } from '@yugen/util';
 import {
 	ActionRowBuilder,
 	ButtonBuilder,
@@ -8,16 +7,19 @@ import {
 	EmbedBuilder,
 } from 'discord.js';
 import { Context, SlashCommand, SlashCommandContext } from 'necord';
+
 import {
 	GeneralModuleOptions,
 	MODULE_OPTIONS_TOKEN,
 } from '../general.module-definition';
 
+import { getEmbedFooter } from '@yugen/util';
+
 @Injectable()
 export class GeneralInviteCommands {
 	constructor(
 		private _client: Client,
-		@Inject(MODULE_OPTIONS_TOKEN) private _options: GeneralModuleOptions,
+		@Inject(MODULE_OPTIONS_TOKEN) private _options: GeneralModuleOptions
 	) {}
 
 	@SlashCommand({
@@ -30,7 +32,7 @@ export class GeneralInviteCommands {
 			.setTitle(`Invite ${this._client.user?.displayName}`)
 			.setDescription(
 				`Do you want to share ${this._client.user?.displayName} with your friends in another server?
-Don't hesitate now and **invite ${this._client.user?.displayName}** wherever you want using the button bellow!`,
+Don't hesitate now and **invite ${this._client.user?.displayName}** wherever you want using the button bellow!`
 			)
 			.setColor(this._options.embedColor)
 			.setFooter(footer);
@@ -42,9 +44,9 @@ Don't hesitate now and **invite ${this._client.user?.displayName}** wherever you
 					new ButtonBuilder()
 						.setURL(process.env['INVITE_LINK'])
 						.setLabel(
-							`Invite ${this._client.user?.displayName} to your Server 🎉`,
+							`Invite ${this._client.user?.displayName} to your Server 🎉`
 						)
-						.setStyle(ButtonStyle.Link),
+						.setStyle(ButtonStyle.Link)
 				),
 			],
 		});

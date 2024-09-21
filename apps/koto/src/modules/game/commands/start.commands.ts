@@ -1,12 +1,14 @@
 import { Injectable, UseFilters, UseGuards } from '@nestjs/common';
-import { noSettingsReply } from '../../../util/no-settings-reply';
-import { ForbiddenExceptionFilter } from '@yugen/shared';
 import { Client, CommandInteraction } from 'discord.js';
 import { Context, SlashCommandContext, Subcommand } from 'necord';
+
+import { noSettingsReply } from '../../../util/no-settings-reply';
+import { SettingsService } from '../../settings';
 import { GameStartGuard } from '../filters/game-start.guard';
 import { GameCommandDecorator } from '../game.decorator';
 import { GameService } from '../services/game.service';
-import { SettingsService } from '../../settings';
+
+import { ForbiddenExceptionFilter } from '@yugen/shared';
 
 @UseGuards(GameStartGuard)
 @UseFilters(ForbiddenExceptionFilter)
@@ -16,7 +18,7 @@ export class GameStartCommands {
 	constructor(
 		private _game: GameService,
 		private _settings: SettingsService,
-		private _client: Client,
+		private _client: Client
 	) {}
 
 	@Subcommand({
@@ -37,7 +39,7 @@ export class GameStartCommands {
 
 	private async _startGame(
 		interaction: CommandInteraction,
-		recreate: boolean = false,
+		recreate: boolean = false
 	) {
 		const settings = await this._settings.getSettings(interaction.guildId);
 
@@ -45,11 +47,7 @@ export class GameStartCommands {
 			return noSettingsReply(interaction, this._client);
 		}
 
-		const started = await this._game.start(
-			interaction.guildId,
-			true,
-			recreate,
-		);
+		const started = await this._game.start(interaction.guildId, true, recreate);
 
 		return interaction.reply({
 			content:

@@ -1,17 +1,17 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Settings } from '@prisma/hoshi';
-import { PrismaService } from '@yugen/prisma/hoshi';
 import {
 	CommandInteraction,
 	EmbedBuilder,
 	MessageComponentInteraction,
 } from 'discord.js';
+
 import { EMBED_COLOR } from '../../../util/constants';
+
+import { PrismaService } from '@yugen/prisma/hoshi';
 
 @Injectable()
 export class SettingsService {
-	private readonly _logger = new Logger(SettingsService.name);
-
 	constructor(private _prisma: PrismaService) {}
 
 	async getSettings(guildId: string) {
@@ -41,7 +41,7 @@ export class SettingsService {
 	async set(
 		guildId: string,
 		property: keyof Settings,
-		value: string | number | boolean | string[],
+		value: string | number | boolean | string[]
 	) {
 		let settings = await this.getSettings(guildId);
 
@@ -59,23 +59,20 @@ export class SettingsService {
 	}
 
 	async showSettings(
-		interaction: MessageComponentInteraction | CommandInteraction,
+		interaction: MessageComponentInteraction | CommandInteraction
 	) {
-		const settings = await this.getSettings(interaction.guildId!);
+		const settings = await this.getSettings(interaction.guildId);
 
 		if (!settings) {
 			return;
 		}
 
-		const { treshold, self, ignoredChannelIds, botUpdatesChannelId } =
-			settings;
+		const { treshold, self, ignoredChannelIds, botUpdatesChannelId } = settings;
 
 		const embed = new EmbedBuilder()
 			.setColor(EMBED_COLOR)
 			.setTitle('Hoshi settings')
-			.setDescription(
-				`These are the settings currently configured for Hoshi`,
-			)
+			.setDescription(`These are the settings currently configured for Hoshi`)
 			.addFields(
 				{
 					name: 'Treshold',
@@ -97,10 +94,10 @@ export class SettingsService {
 				{
 					name: 'Ignored Channels',
 					value: ignoredChannelIds?.length
-						? ignoredChannelIds.map((id) => `<#${id}>`).join('\n')
+						? ignoredChannelIds.map((id: string) => `<#${id}>`).join('\n')
 						: '-',
 					inline: false,
-				},
+				}
 			);
 
 		const data = {
@@ -121,7 +118,7 @@ export class SettingsService {
 	async ignoreChannel(
 		guildId: string,
 		channelId: string,
-		value: boolean = true,
+		value: boolean = true
 	) {
 		const settings = await this.getSettings(guildId);
 
@@ -132,16 +129,12 @@ export class SettingsService {
 		const { ignoredChannelIds } = settings;
 		const index = ignoredChannelIds.indexOf(channelId);
 
-		if (!value) {
-			if (index >= 0) {
-				ignoredChannelIds.splice(index, 1);
-			}
+		if (!value && index >= 0) {
+			ignoredChannelIds.splice(index, 1);
 		}
 
-		if (value) {
-			if (index === -1) {
-				ignoredChannelIds.push(channelId);
-			}
+		if (value && index === -1) {
+			ignoredChannelIds.push(channelId);
 		}
 
 		return this.set(guildId, 'ignoredChannelIds', ignoredChannelIds);

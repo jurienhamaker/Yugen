@@ -1,6 +1,4 @@
 import { Injectable, UseFilters, UseGuards } from '@nestjs/common';
-import { sendWelcomeMessage } from '../../../util/send-welcome-message';
-import { AdminGuard, ForbiddenExceptionFilter } from '@yugen/shared';
 import { ChannelType, Client, PermissionsBitField } from 'discord.js';
 import {
 	Context,
@@ -9,7 +7,11 @@ import {
 	StringOption,
 	Subcommand,
 } from 'necord';
+
+import { sendWelcomeMessage } from '../../../util/send-welcome-message';
 import { AdminCommandDecorator } from '../admin.decorator';
+
+import { AdminGuard, ForbiddenExceptionFilter } from '@yugen/shared';
 
 class AdminSendWelcomeOptions {
 	@StringOption({
@@ -36,16 +38,13 @@ export class AdminSendWelcomeCommands {
 
 	@Subcommand({
 		name: 'send-welcome',
-		description:
-			'Send welcome message to specified channel within a guild.',
+		description: 'Send welcome message to specified channel within a guild.',
 	})
 	public async welcome(
 		@Context() [interaction]: SlashCommandContext,
-		@Options() { guildId, channelId }: AdminSendWelcomeOptions,
+		@Options() { guildId, channelId }: AdminSendWelcomeOptions
 	) {
-		const guild = await this._client.guilds
-			.fetch(guildId)
-			.catch(() => null);
+		const guild = await this._client.guilds.fetch(guildId).catch(() => null);
 		if (!guild) {
 			return interaction.reply({
 				content: `Koto could not access specified guild with id \`${guildId}\`.`,

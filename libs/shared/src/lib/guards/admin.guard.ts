@@ -1,21 +1,11 @@
-import {
-	CanActivate,
-	ExecutionContext,
-	Injectable,
-	Logger,
-} from '@nestjs/common';
-import { Reflector } from '@nestjs/core';
+import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { NecordExecutionContext } from 'necord';
 
 @Injectable()
 export class AdminGuard implements CanActivate {
-	private readonly _logger = new Logger(AdminGuard.name);
-
-	constructor(private readonly reflector: Reflector) {}
-
 	canActivate(context: ExecutionContext): boolean {
-		const ctx = NecordExecutionContext.create(context);
-		const [interaction] = ctx.getContext<'interactionCreate'>();
+		const context_ = NecordExecutionContext.create(context);
+		const [interaction] = context_.getContext<'interactionCreate'>();
 
 		if (!interaction) {
 			return true;
@@ -28,7 +18,7 @@ export class AdminGuard implements CanActivate {
 			return false;
 		}
 
-		const admins = process.env['OWNER_IDS']!.split(',');
+		const admins = process.env['OWNER_IDS'].split(',');
 		if (!admins.includes(interaction.user.id)) {
 			return false;
 		}

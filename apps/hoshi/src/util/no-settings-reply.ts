@@ -1,5 +1,7 @@
-import { getEmbedFooter } from '@yugen/util';
 import { Client, CommandInteraction, EmbedBuilder } from 'discord.js';
+
+import { getEmbedFooter } from '@yugen/util';
+
 import { EMBED_COLOR } from './constants';
 
 export const noSettingsDescription = `Someone with \`Manage Server\` permissions must do the following:
@@ -17,13 +19,13 @@ To add another starboard, use \`/starboard add\`.
 
 export const noSettingsReply = async (
 	interaction: CommandInteraction,
-	_client: Client,
+	_client: Client
 ) => {
 	const footer = await getEmbedFooter(_client);
 	const embed = new EmbedBuilder()
 		.setTitle('Hoshi Setup')
 		.setDescription(
-			`Hoshi has not yet been set up in this server! ${noSettingsDescription}`,
+			`Hoshi has not yet been set up in this server! ${noSettingsDescription}`
 		)
 		.setColor(EMBED_COLOR)
 		.setFooter(footer);

@@ -12,7 +12,7 @@ export class PrismaHealthService extends HealthIndicator {
 		@Inject('PRISMA_SERVICE')
 		private readonly prismaService: PrismaClient,
 		@Inject('PRISMA_DB_NAME')
-		private readonly dbName: string,
+		private readonly databaseName: string
 	) {
 		super();
 	}
@@ -21,10 +21,10 @@ export class PrismaHealthService extends HealthIndicator {
 		try {
 			await this.prismaService.$queryRaw`SELECT 1`;
 			return this.getStatus('database', true, {
-				name: this.dbName,
+				name: this.databaseName,
 			});
-		} catch (e) {
-			throw new HealthCheckError('Prisma Health check failed', e);
+		} catch (error) {
+			throw new HealthCheckError('Prisma Health check failed', error);
 		}
 	}
 }

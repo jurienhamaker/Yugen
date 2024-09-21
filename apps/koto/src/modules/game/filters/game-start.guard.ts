@@ -4,25 +4,27 @@ import {
 	Injectable,
 	Logger,
 } from '@nestjs/common';
-import { GuildModeratorGuard } from '@yugen/shared';
 import { Client } from 'discord.js';
 import { NecordExecutionContext } from 'necord';
+
 import { SettingsService } from '../../settings';
+
+import { GuildModeratorGuard } from '@yugen/shared';
 
 @Injectable()
 export class GameStartGuard extends GuildModeratorGuard implements CanActivate {
-	protected readonly _logger = new Logger(GameStartGuard.name);
+	protected override readonly _logger = new Logger(GameStartGuard.name);
 
 	constructor(
-		protected _client: Client,
-		private _settings: SettingsService,
+		protected override _client: Client,
+		private _settings: SettingsService
 	) {
 		super(_client);
 	}
 
-	async canActivate(context: ExecutionContext): Promise<boolean> {
-		const ctx = NecordExecutionContext.create(context);
-		const [interaction] = ctx.getContext<'interactionCreate'>();
+	override async canActivate(context: ExecutionContext): Promise<boolean> {
+		const context_ = NecordExecutionContext.create(context);
+		const [interaction] = context_.getContext<'interactionCreate'>();
 
 		if (!interaction) {
 			return true;

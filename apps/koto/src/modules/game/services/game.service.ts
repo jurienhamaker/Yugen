@@ -1,9 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Game, GameStatus, Guess, Settings } from '@prisma/koto';
-import { PrismaService } from '@yugen/prisma/koto';
-import { delay, getTimestamp } from '@yugen/util';
 import { addMinutes, roundToNearestMinutes, subMinutes } from 'date-fns';
 import { Message } from 'discord.js';
+
 import { SettingsService } from '../../settings';
 import { WordsService } from '../../words/services/words.service';
 import {
@@ -12,6 +11,11 @@ import {
 	GameMeta,
 	GameWithMetaAndGuesses,
 } from '../types/meta';
+
+import { delay, getTimestamp } from '@yugen/util';
+
+import { PrismaService } from '@yugen/prisma/koto';
+
 import { GameMessageService } from './message.service';
 import { GamePointsService } from './points.service';
 
@@ -24,15 +28,15 @@ export class GameService {
 		private _settings: SettingsService,
 		private _words: WordsService,
 		private _message: GameMessageService,
-		private _points: GamePointsService,
+		private _points: GamePointsService
 	) {}
 
 	async start(
 		guildId: string,
 		schedule = false,
 		recreate = false,
-		word = null,
-	) {
+		word = undefined
+	): Promise<boolean | void> {
 		this._logger.log(`Trying to start a game for ${guildId}`);
 
 		const currentGame = await this.getCurrentGame(guildId);
@@ -59,7 +63,7 @@ export class GameService {
 			take: 50,
 		});
 
-		const ignoredWords = pastFiftyGames.map((g: Game) => g.word);
+		const ignoredWords = pastFiftyGames.map(g => g.word);
 		word = word ?? this._words.getRandom(ignoredWords);
 
 		if (!word) {
@@ -73,7 +77,7 @@ export class GameService {
 				word,
 				scheduleStarted: schedule,
 				endingAt: roundToNearestMinutes(
-					addMinutes(new Date(), settings.timeLimit),
+					addMinutes(new Date(), settings.timeLimit)
 				),
 				meta: this._createBaseState(word) as never,
 			},
@@ -90,7 +94,7 @@ export class GameService {
 		guildId: string,
 		word: string,
 		message: Message,
-		settings: Settings,
+		settings: Settings
 	) {
 		let game = await this.getCurrentGame(guildId);
 		await this._points.getPlayer(guildId, message.author.id);
@@ -100,13 +104,10 @@ export class GameService {
 		}
 
 		const alreadyGuessedIndex = game.guesses.findIndex(
-			(g: Guess) => g.word === word,
+			(g: Guess) => g.word === word
 		);
 
-		if (
-			alreadyGuessedIndex >= 0 &&
-			process.env['NODE_ENV'] === 'production'
-		) {
+		if (alreadyGuessedIndex >= 0 && process.env['NODE_ENV'] === 'production') {
 			await message.react('❌');
 			return;
 		}
@@ -114,14 +115,14 @@ export class GameService {
 		const cooldown = await this._checkCooldown(
 			message.author.id,
 			game.id,
-			settings.cooldown,
+			settings.cooldown
 		);
 		if (cooldown) {
 			message.react('🕒');
 			message.reply(
 				`You're on a cooldown, you can guess again <t:${getTimestamp(
-					cooldown,
-				)}:R>`,
+					cooldown
+				)}:R>`
 			);
 			return;
 		}
@@ -129,7 +130,7 @@ export class GameService {
 		const { meta, guessed, points, gameMeta } = this._checkWord(
 			game.word,
 			word,
-			game.meta as never,
+			game.meta as never
 		);
 
 		await this._prisma.guess.create({
@@ -168,29 +169,24 @@ export class GameService {
 			promises.push(this._points.applyPoints(game, message.author.id));
 		}
 
-		if (
-			status !== GameStatus.COMPLETED &&
-			settings.informCooldownAfterGuess
-		) {
+		if (status !== GameStatus.COMPLETED && settings.informCooldownAfterGuess) {
 			const cooldown = await this._checkCooldown(
 				message.author.id,
 				game.id,
-				settings.cooldown,
+				settings.cooldown
 			);
 
 			if (cooldown) {
 				const cooldownReply = message.reply(
 					`Thank you for your guess, you are now on a cooldown. You can guess again <t:${getTimestamp(
-						cooldown,
-					)}:R>`,
+						cooldown
+					)}:R>`
 				);
 				promises.push(cooldownReply);
 			}
 		}
 
-		promises.push(
-			this._message.create(game as GameWithMetaAndGuesses, false),
-		);
+		promises.push(this._message.create(game as GameWithMetaAndGuesses, false));
 
 		await Promise.allSettled(promises);
 
@@ -251,15 +247,14 @@ export class GameService {
 	}
 
 	private _checkWord(word: string, guess: string, state: GameMeta) {
-		const meta: GameGuessMeta[] = new Array(guess.length);
+		const meta: GameGuessMeta[] = Array.from({ length: guess.length });
 		const unmatched = {}; // unmatched word letters
 		const letterCount = {};
 
 		// color matched guess letters as correct-spot,
 		// and count unmatched word letters
-		for (let i = 0; i < word.length; i++) {
-			const letter = word[i];
-			if (letter === guess[i]) {
+		for (const [index, letter] of [...word].entries()) {
+			if (letter === guess[index]) {
 				letterCount[letter] = (letterCount[letter] || 0) + 1;
 
 				let points = 0;
@@ -277,7 +272,7 @@ export class GameService {
 					state.discovery.almost[letter] += 1;
 				}
 
-				meta[i] = {
+				meta[index] = {
 					type: GAME_TYPE.CORRECT,
 					points,
 					letter: letter,
@@ -290,7 +285,7 @@ export class GameService {
 					state.keyboard[letter] = GAME_TYPE.CORRECT;
 				}
 
-				state.word[i].type = GAME_TYPE.CORRECT;
+				state.word[index].type = GAME_TYPE.CORRECT;
 				continue;
 			}
 
@@ -300,9 +295,9 @@ export class GameService {
 		// color unmatched guess letters right-to-left,
 		// allocating remaining word letters as wrong-spot,
 		// otherwise, as not-any-spot
-		for (let i = 0; i < word.length; i++) {
-			const letter = guess[i];
-			if (letter !== word[i]) {
+		for (const [index, element] of [...word].entries()) {
+			const letter = guess[index];
+			if (letter !== element) {
 				if (unmatched[letter]) {
 					letterCount[letter] = (letterCount[letter] || 0) + 1;
 
@@ -313,7 +308,7 @@ export class GameService {
 						state.discovery.almost[letter] += 1;
 					}
 
-					meta[i] = {
+					meta[index] = {
 						type: GAME_TYPE.ALMOST,
 						points,
 						letter: letter,
@@ -330,7 +325,7 @@ export class GameService {
 					continue;
 				}
 
-				meta[i] = {
+				meta[index] = {
 					type: GAME_TYPE.WRONG,
 					points: 0,
 					letter: letter,
@@ -346,18 +341,15 @@ export class GameService {
 			meta,
 			gameMeta: state,
 			guessed: word === guess,
-			points: Object.keys(meta).reduce(
-				(pts, key) => pts + meta[key].points,
-				0,
-			),
+			points: Object.keys(meta).reduce((pts, key) => pts + meta[key].points, 0),
 		};
 	}
 
 	private async _checkCooldown(
 		userId: string,
 		gameId: number,
-		cooldown: number,
-	): Promise<Date | undefined> {
+		cooldown: number
+	): Promise<Date | undefined | void> {
 		if (process.env['NODE_ENV'] !== 'production') {
 			return;
 		}
@@ -383,6 +375,16 @@ export class GameService {
 	}
 
 	private _createBaseState(word: string): GameMeta {
+		const data = {
+			almost: {},
+			correct: {},
+		};
+
+		for (const letter of word) {
+			data.almost[letter] = 0;
+			data.correct[letter] = 0;
+		}
+
 		return {
 			keyboard: {},
 			word: [...word].map((letter, index) => ({
@@ -390,18 +392,7 @@ export class GameService {
 				index,
 				type: GAME_TYPE.WRONG,
 			})),
-			discovery: [...word].reduce(
-				(data, letter) => {
-					data.almost[letter] = 0;
-					data.correct[letter] = 0;
-
-					return data;
-				},
-				{
-					almost: {},
-					correct: {},
-				},
-			),
+			discovery: data,
 		};
 	}
 }

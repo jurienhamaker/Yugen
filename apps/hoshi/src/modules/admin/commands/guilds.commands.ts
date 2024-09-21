@@ -1,6 +1,4 @@
 import { Injectable, UseFilters, UseGuards } from '@nestjs/common';
-import { AdminGuard, ForbiddenExceptionFilter } from '@yugen/shared';
-import { getEmbedFooter } from '@yugen/util';
 import {
 	ActionRowBuilder,
 	ButtonBuilder,
@@ -20,8 +18,13 @@ import {
 	SlashCommandContext,
 	Subcommand,
 } from 'necord';
+
 import { AdminCommandDecorator } from '../admin.decorator';
 import { AdminGuildsService } from '../services/guilds.service';
+
+import { AdminGuard, ForbiddenExceptionFilter } from '@yugen/shared';
+
+import { getEmbedFooter } from '@yugen/util';
 
 class AdminGuildsListOptions {
 	@NumberOption({
@@ -37,10 +40,7 @@ class AdminGuildsListOptions {
 @AdminCommandDecorator()
 @Injectable()
 export class AdminGuildsCommands {
-	constructor(
-		private _guilds: AdminGuildsService,
-		private _client: Client,
-	) {}
+	constructor(private _guilds: AdminGuildsService, private _client: Client) {}
 
 	@Subcommand({
 		name: 'guilds',
@@ -48,7 +48,7 @@ export class AdminGuildsCommands {
 	})
 	public async list(
 		@Context() [interaction]: SlashCommandContext,
-		@Options() { page }: AdminGuildsListOptions,
+		@Options() { page }: AdminGuildsListOptions
 	) {
 		return this._listLeaderboard(interaction, page);
 	}
@@ -57,15 +57,15 @@ export class AdminGuildsCommands {
 	public leaderboardButton(
 		@Context()
 		[interaction]: ButtonContext,
-		@ComponentParam('page') page: string,
+		@ComponentParam('page') page: string
 	) {
-		const pageInt = parseInt(page, 10);
+		const pageInt = Number.parseInt(page, 10);
 		return this._listLeaderboard(interaction, pageInt);
 	}
 
 	private async _listLeaderboard(
 		interaction: CommandInteraction | ButtonInteraction,
-		page: number = 1,
+		page: number = 1
 	) {
 		page = page ?? 1;
 
@@ -109,7 +109,7 @@ export class AdminGuildsCommands {
 
 		const footer = await getEmbedFooter(
 			this._client,
-			maxPage > 1 ? `Page ${page}/${maxPage}` : null,
+			maxPage > 1 ? `Page ${page}/${maxPage}` : null
 		);
 
 		const buttons = [];
@@ -120,16 +120,16 @@ export class AdminGuildsCommands {
 		const embed = new EmbedBuilder()
 			.setTitle(title)
 			.setDescription(
-				guilds.length
+				guilds.length > 0
 					? guilds
 							.map(
 								(guild, index) =>
-									`${(page - 1) * 10 + (index + 1)}. ${
-										guild.name
-									}: **${guild.memberCount}**`,
+									`${(page - 1) * 10 + (index + 1)}. ${guild.name}: **${
+										guild.memberCount
+									}**`
 							)
 							.join('\n')
-					: '',
+					: ''
 			)
 			.setFooter(footer);
 
@@ -138,7 +138,7 @@ export class AdminGuildsCommands {
 				new ButtonBuilder()
 					.setCustomId(`ADMIN_GUILDS_LIST/${page - 1}`)
 					.setLabel('◀️')
-					.setStyle(ButtonStyle.Primary),
+					.setStyle(ButtonStyle.Primary)
 			);
 		}
 
@@ -147,13 +147,13 @@ export class AdminGuildsCommands {
 				new ButtonBuilder()
 					.setCustomId(`ADMIN_GUILDS_LIST/${page + 1}`)
 					.setLabel('▶️')
-					.setStyle(ButtonStyle.Primary),
+					.setStyle(ButtonStyle.Primary)
 			);
 		}
 
-		if (buttons.length) {
+		if (buttons.length > 0) {
 			components.push(
-				new ActionRowBuilder<ButtonBuilder>().addComponents(buttons),
+				new ActionRowBuilder<ButtonBuilder>().addComponents(buttons)
 			);
 		}
 

@@ -1,11 +1,15 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { GameStatus } from '@prisma/koto';
-import { PrismaService } from '@yugen/prisma/koto';
-import { delay } from '@yugen/util';
 import { addMinutes, addSeconds, isAfter } from 'date-fns';
 import { Client } from 'discord.js';
+
 import { SettingsService } from '../../settings';
+
+import { delay } from '@yugen/util';
+
+import { PrismaService } from '@yugen/prisma/koto';
+
 import { GameService } from './game.service';
 
 @Injectable()
@@ -16,7 +20,7 @@ export class GameScheduleService {
 		private _prisma: PrismaService,
 		private _client: Client,
 		private _game: GameService,
-		private _settings: SettingsService,
+		private _settings: SettingsService
 	) {}
 
 	@Cron(`0 * * * * *`)
@@ -47,7 +51,7 @@ export class GameScheduleService {
 		}
 		const endGames = await Promise.allSettled(endPromises);
 		const startedAfterEndgames = endGames.filter(
-			(r) => r.status === 'fulfilled' && !!r.value,
+			r => r.status === 'fulfilled' && !!r.value
 		);
 
 		const guildsWithChannelId = await this._prisma.settings.findMany({
@@ -62,9 +66,7 @@ export class GameScheduleService {
 		stats.checkedGuilds = guildsWithChannelId.length;
 		const promises = [];
 		for (const { guildId } of guildsWithChannelId) {
-			const guild = await this._client.guilds
-				.fetch(guildId)
-				.catch(() => null);
+			const guild = await this._client.guilds.fetch(guildId).catch(() => null);
 			if (guild) {
 				promises.push(this._checkGuild(guildId));
 			}
@@ -72,12 +74,12 @@ export class GameScheduleService {
 
 		const guildChecks = await Promise.allSettled(promises);
 		const startedGames = guildChecks.filter(
-			(r) => r.status === 'fulfilled' && !!r.value,
+			r => r.status === 'fulfilled' && !!r.value
 		);
 
 		stats.startedGames = startedGames.length + startedAfterEndgames.length;
 		this._logger.log(
-			`Ended ${stats.outOfTimeGames} games. Checked ${stats.checkedGuilds} guilds. Started ${stats.startedGames} games.`,
+			`Ended ${stats.outOfTimeGames} games. Checked ${stats.checkedGuilds} guilds. Started ${stats.startedGames} games.`
 		);
 	}
 
@@ -124,7 +126,7 @@ export class GameScheduleService {
 			!lastGame ||
 			isAfter(
 				addMinutes(lastGame.createdAt, settings.frequency),
-				addSeconds(new Date(), 30),
+				addSeconds(new Date(), 30)
 			)
 		) {
 			return false;

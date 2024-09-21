@@ -1,15 +1,11 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { ChannelType, Client } from 'discord.js';
+
 import { PrismaService } from '@yugen/prisma/hoshi';
 
 @Injectable()
 export class AdminNotifyService {
-	private readonly _logger = new Logger(AdminNotifyService.name);
-
-	constructor(
-		private _client: Client,
-		private _prisma: PrismaService,
-	) {}
+	constructor(private _client: Client, private _prisma: PrismaService) {}
 
 	async sendNotification(content: string) {
 		const settings = await this._prisma.settings.findMany();
@@ -42,9 +38,7 @@ export class AdminNotifyService {
 				channelId = starboard.targetChannelId;
 			}
 
-			const channel = await guild.channels
-				.fetch(channelId)
-				.catch(() => null);
+			const channel = await guild.channels.fetch(channelId).catch(() => null);
 			if (!channel) {
 				continue;
 			}

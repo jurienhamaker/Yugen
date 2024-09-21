@@ -1,6 +1,5 @@
 import { Injectable, UseFilters, UseGuards } from '@nestjs/common';
 import { GameType } from '@prisma/kusari';
-import { ForbiddenExceptionFilter, GuildModeratorGuard } from '@yugen/shared';
 import { Client, CommandInteraction } from 'discord.js';
 import {
 	Context,
@@ -9,10 +8,13 @@ import {
 	StringOption,
 	Subcommand,
 } from 'necord';
+
 import { noSettingsReply } from '../../../util/no-settings-reply';
 import { SettingsService } from '../../settings';
 import { GameCommandDecorator } from '../game.decorator';
 import { GameService } from '../services/game.service';
+
+import { ForbiddenExceptionFilter, GuildModeratorGuard } from '@yugen/shared';
 
 const GameStartOptionsChoices = [
 	{
@@ -54,7 +56,7 @@ export class GameStartCommands {
 	constructor(
 		private _game: GameService,
 		private _settings: SettingsService,
-		private _client: Client,
+		private _client: Client
 	) {}
 
 	@Subcommand({
@@ -63,13 +65,13 @@ export class GameStartCommands {
 	})
 	public async start(
 		@Context() [interaction]: SlashCommandContext,
-		@Options() { type, startingWord }: GameStartOptions,
+		@Options() { type, startingWord }: GameStartOptions
 	) {
 		return this._startGame(
 			interaction,
 			type ?? GameType.NORMAL,
 			false,
-			startingWord,
+			startingWord
 		);
 	}
 
@@ -79,24 +81,17 @@ export class GameStartCommands {
 	})
 	public async reset(
 		@Context() [interaction]: SlashCommandContext,
-		@Options() { startingWord }: GameResetOptions,
+		@Options() { startingWord }: GameResetOptions
 	) {
-		const currentGame = await this._game.getCurrentGame(
-			interaction.guildId,
-		);
-		return this._startGame(
-			interaction,
-			currentGame.type,
-			true,
-			startingWord,
-		);
+		const currentGame = await this._game.getCurrentGame(interaction.guildId);
+		return this._startGame(interaction, currentGame.type, true, startingWord);
 	}
 
 	private async _startGame(
 		interaction: CommandInteraction,
 		type: GameType = GameType.NORMAL,
 		recreate: boolean = false,
-		startingWord: string | undefined,
+		startingWord: string | undefined
 	) {
 		const settings = await this._settings.getSettings(interaction.guildId);
 
@@ -106,10 +101,10 @@ export class GameStartCommands {
 
 		let letter: string;
 		if (startingWord?.length) {
-			letter = startingWord[startingWord.length - 1];
+			letter = startingWord.at(-1);
 		}
 
-		if (/[^a-zA-Z]/.test(letter)) {
+		if (/[^A-Za-z]/.test(letter)) {
 			// letter is a non alphabetical character
 			return interaction.reply({
 				content: 'The word must end with an alphabetical character.',
@@ -121,7 +116,7 @@ export class GameStartCommands {
 			interaction.guildId,
 			type,
 			recreate,
-			letter,
+			letter
 		);
 
 		return interaction.reply({

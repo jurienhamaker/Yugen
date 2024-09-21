@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
+
 import { KotoSharedModule } from '../../shared.module';
 import { WordsModule } from '../words/words.module';
+
 import { GameLeaderboardCommands } from './commands/leaderboard.commants';
 import { GamePointsCommands } from './commands/points.commands';
 import { GameStartCommands } from './commands/start.commands';

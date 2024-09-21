@@ -18,20 +18,20 @@ export class DiscordHealthService extends HealthIndicator {
 			const status = this._client.ws.status !== Status.Disconnected;
 
 			if (!status) {
-				throw new Error();
+				throw new Error('No discord status received');
 			}
 
 			return {
 				ping: {
-					status: ping !== -1 ? 'up' : 'down',
+					status: ping === -1 ? 'down' : 'up',
 					value: ping,
 				},
 				status: {
 					status: status ? 'up' : 'down',
 				},
 			};
-		} catch (e) {
-			throw new HealthCheckError('Discord Health check failed', e);
+		} catch (error) {
+			throw new HealthCheckError('Discord Health check failed', error);
 		}
 	}
 }

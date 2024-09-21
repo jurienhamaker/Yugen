@@ -1,11 +1,15 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Game, GameStatus, GameType, Settings } from '@prisma/kazu';
-import { PrismaService } from '@yugen/prisma/kazu';
-import { getTimestamp, isPalindrome } from '@yugen/util';
 import { addMinutes, subMinutes } from 'date-fns';
 import { ChannelType, Client, Message } from 'discord.js';
+
 import { SavesService } from '../../../services/saves.service';
 import { SettingsService } from '../../settings';
+
+import { getTimestamp, isPalindrome } from '@yugen/util';
+
+import { PrismaService } from '@yugen/prisma/kazu';
+
 import { GamePointsService } from './points.service';
 
 @Injectable()
@@ -17,7 +21,7 @@ export class GameService {
 		private _points: GamePointsService,
 		private _saves: SavesService,
 		private _settings: SettingsService,
-		private _client: Client,
+		private _client: Client
 	) {}
 
 	async start(
@@ -29,7 +33,7 @@ export class GameService {
 			message: Message;
 			lastShameUserId: string;
 			roleId: string;
-		},
+		}
 	) {
 		this._logger.log(`Trying to start a game for ${guildId}`);
 
@@ -75,9 +79,9 @@ Start the count from **${startingNumber}**`);
 
 	async addNumber(
 		guildId: string,
-		num: number,
+		number_: number,
 		message: Message,
-		settings: Settings,
+		settings: Settings
 	) {
 		const game = await this.getCurrentGame(guildId);
 
@@ -87,60 +91,39 @@ Start the count from **${startingNumber}**`);
 
 		const lastNumber = await this.getLastNumber(game);
 
-		const isNextNumber = num === lastNumber.number + 1;
+		const isNextNumber = number_ === lastNumber.number + 1;
 		const isSameUser =
 			lastNumber.userId === message.author.id &&
 			process.env['NODE_ENV'] !== 'development';
 		if (!isNextNumber || isSameUser) {
 			const failReason = isSameUser
 				? `<@${message.author.id}> counted twice in a row!`
-				: `${num} is not the next number!`;
+				: `${number_} is not the next number!`;
 
-			const saveAvailable = await this._getSaves(
-				settings,
-				message.author.id,
-			);
+			const saveAvailable = await this._getSaves(settings, message.author.id);
 
 			const count = await this._getCount(game.id);
 			message.react('❌').catch(() => null);
 
 			if (saveAvailable.player >= 1) {
-				const { saves } = await this._saves.deductSave(
-					message.author.id,
-					1,
-				);
+				const { saves } = await this._saves.deductSave(message.author.id, 1);
 
-				await this._settings.set(
-					guildId,
-					'savesUsed',
-					settings.savesUsed + 1,
-				);
+				await this._settings.set(guildId, 'savesUsed', settings.savesUsed + 1);
 
 				return message.reply(`${failReason}
 Used **1 of your own** saves, You have **${saves}/2** saves left.`);
 			}
 
 			if (saveAvailable.guild >= 1) {
-				const { saves, maxSaves } = await this._settings.deductSave(
-					guildId,
-					1,
-				);
+				const { saves, maxSaves } = await this._settings.deductSave(guildId, 1);
 
-				await this._settings.set(
-					guildId,
-					'savesUsed',
-					settings.savesUsed + 1,
-				);
+				await this._settings.set(guildId, 'savesUsed', settings.savesUsed + 1);
 
 				return message.reply(`${failReason}
 Used **1 server** save, There are **${saves}/${maxSaves}** server saves left.`);
 			}
 
-			const { isHighscore } = await this._checkStreak(
-				settings,
-				game,
-				count,
-			);
+			const { isHighscore } = await this._checkStreak(settings, game, count);
 
 			await message.reply(
 				`${failReason}
@@ -151,7 +134,7 @@ Used **1 server** save, There are **${saves}/${maxSaves}** server saves left.`);
 						: ''
 				}
 
-**Want to save the game?** Make sure to **/vote** for Kazu and earn yourself saves to save the game!`,
+**Want to save the game?** Make sure to **/vote** for Kazu and earn yourself saves to save the game!`
 			);
 
 			return this.start(guildId, game.type, 1, true, {
@@ -164,22 +147,22 @@ Used **1 server** save, There are **${saves}/${maxSaves}** server saves left.`);
 		const cooldown = await this._checkCooldown(
 			message.author.id,
 			game.id,
-			settings.cooldown,
+			settings.cooldown
 		);
 		if (cooldown) {
 			return this._doReply(
 				message,
 				`You're on a cooldown, you can try again <t:${getTimestamp(
-					cooldown,
+					cooldown
 				)}:R>`,
-				'🕒',
+				'🕒'
 			);
 		}
 
 		await this._points.addPointAndNumber(guildId, message.author.id);
 		await this._prisma.history.create({
 			data: {
-				number: num,
+				number: number_,
 				userId: message.author.id,
 				gameId: game.id,
 			},
@@ -189,7 +172,7 @@ Used **1 server** save, There are **${saves}/${maxSaves}** server saves left.`);
 		const { isHighscore, isGameHighscored } = await this._checkStreak(
 			settings,
 			game,
-			count,
+			count
 		);
 		if (isGameHighscored) {
 			await message.react('🎉').catch(() => null);
@@ -204,11 +187,7 @@ Used **1 server** save, There are **${saves}/${maxSaves}** server saves left.`);
 						.remove(settings.shameRoleId)
 						.catch(() => null);
 
-					await this._settings.set(
-						message.guild.id,
-						'lastShameUserId',
-						null,
-					);
+					await this._settings.set(message.guild.id, 'lastShameUserId', null);
 				}
 			}
 		}
@@ -225,7 +204,7 @@ Used **1 server** save, There are **${saves}/${maxSaves}** server saves left.`);
 			message: Message;
 			lastShameUserId: string;
 			roleId: string;
-		},
+		}
 	) {
 		await this._prisma.game.update({
 			where: {
@@ -241,13 +220,11 @@ Used **1 server** save, There are **${saves}/${maxSaves}** server saves left.`);
 			await this._settings.set(
 				message.guild.id,
 				'lastShameUserId',
-				message.author.id,
+				message.author.id
 			);
 
 			const lastShamedMember = lastShameUserId
-				? await message.guild.members
-						.fetch(lastShameUserId)
-						.catch(() => null)
+				? await message.guild.members.fetch(lastShameUserId).catch(() => null)
 				: null;
 			if (lastShamedMember && roleId) {
 				await lastShamedMember.roles.remove(roleId).catch(() => null);
@@ -313,11 +290,7 @@ Used **1 server** save, There are **${saves}/${maxSaves}** server saves left.`);
 		if (count > settings.highscore) {
 			isHighscore = true;
 			await this._settings.set(settings.guildId, 'highscore', count);
-			await this._settings.set(
-				settings.guildId,
-				'highscoreDate',
-				new Date(),
-			);
+			await this._settings.set(settings.guildId, 'highscoreDate', new Date());
 
 			if (!game.isHighscored) {
 				isGameHighscored = true;
@@ -372,11 +345,11 @@ Used **1 server** save, There are **${saves}/${maxSaves}** server saves left.`);
 			await message.react('1262411624019525684').catch(() => null);
 		}
 
-		if (count === 10000) {
+		if (count === 10_000) {
 			await message.react('1262411765996851200').catch(() => null);
 		}
 
-		if (count === 100000) {
+		if (count === 100_000) {
 			await message.react('1262411649407647904').catch(() => null);
 		}
 	}
@@ -384,7 +357,7 @@ Used **1 server** save, There are **${saves}/${maxSaves}** server saves left.`);
 	private async _checkCooldown(
 		userId: string,
 		gameId: number,
-		cooldown: number,
+		cooldown: number
 	): Promise<Date | undefined> {
 		if (process.env['NODE_ENV'] !== 'production') {
 			return;

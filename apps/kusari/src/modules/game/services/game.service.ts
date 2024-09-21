@@ -1,11 +1,15 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Game, GameStatus, GameType, Settings } from '@prisma/kusari';
-import { PrismaService } from '@yugen/prisma/kusari';
-import { getTimestamp, isPalindrome, numberEmojis } from '@yugen/util';
 import { addMinutes, subMinutes } from 'date-fns';
 import { ChannelType, Client, Message } from 'discord.js';
+
 import { SavesService } from '../../../services/saves.service';
 import { SettingsService } from '../../settings';
+
+import { getTimestamp, isPalindrome, numberEmojis } from '@yugen/util';
+
+import { PrismaService } from '@yugen/prisma/kusari';
+
 import { GameDictionaryService } from './dictionary.service';
 import { GamePointsService } from './points.service';
 
@@ -19,14 +23,14 @@ export class GameService {
 		private _points: GamePointsService,
 		private _saves: SavesService,
 		private _settings: SettingsService,
-		private _client: Client,
+		private _client: Client
 	) {}
 
 	async start(
 		guildId: string,
 		type: GameType = GameType.NORMAL,
 		recreate = false,
-		letter?: string,
+		letter?: string
 	) {
 		this._logger.log(`Trying to start a game for ${guildId}`);
 
@@ -77,7 +81,7 @@ The first letter is: **${letter.toUpperCase()}**`);
 		guildId: string,
 		word: string,
 		message: Message,
-		settings: Settings,
+		settings: Settings
 	) {
 		const game = await this.getCurrentGame(guildId);
 
@@ -89,13 +93,13 @@ The first letter is: **${letter.toUpperCase()}**`);
 			return this._doReply(
 				message,
 				`A word must be atleast 3 characters long, try again!`,
-				'❌',
+				'❌'
 			);
 		}
 
 		const exists = await this._dictionary.checkDictionary(word);
 		const lastWord = await this.getLastWord(game);
-		const lastLetter = lastWord.word[lastWord.word.length - 1];
+		const lastLetter = lastWord.word.at(-1);
 
 		if (
 			lastWord.userId === message.author.id &&
@@ -104,61 +108,40 @@ The first letter is: **${letter.toUpperCase()}**`);
 			return this._doReply(
 				message,
 				`Sorry, but you can't add a word twice in a row! Please wait for another player to add a word.`,
-				'🕒',
+				'🕒'
 			);
 		}
 
 		const isLastLetter = word[0] === lastLetter;
 		if (!exists || !isLastLetter) {
-			const failReason = !exists
-				? `Sorry, I couldn't find "**${word}**" in the [English dictionary](https://en.wiktionary.org/wiki/${word}), try again!`
-				: `The word ${word} does not start with the letter **${lastLetter}**`;
+			const failReason = exists
+				? `The word ${word} does not start with the letter **${lastLetter}**`
+				: `Sorry, I couldn't find "**${word}**" in the [English dictionary](https://en.wiktionary.org/wiki/${word}), try again!`;
 
-			const saveAvailable = await this._getSaves(
-				settings,
-				message.author.id,
-			);
+			const saveAvailable = await this._getSaves(settings, message.author.id);
 
 			const count = await this._getCount(game.id);
 			message.react('❌').catch(() => null);
 
 			if (saveAvailable.player >= 1) {
-				const { saves } = await this._saves.deductSave(
-					message.author.id,
-					1,
-				);
+				const { saves } = await this._saves.deductSave(message.author.id, 1);
 
-				await this._settings.set(
-					guildId,
-					'savesUsed',
-					settings.savesUsed + 1,
-				);
+				await this._settings.set(guildId, 'savesUsed', settings.savesUsed + 1);
 
 				return message.reply(`${failReason}
 Used **1 of your own** saves, You have **${saves}/2** saves left.`);
 			}
 
 			if (saveAvailable.guild >= 1) {
-				const { saves, maxSaves } = await this._settings.deductSave(
-					guildId,
-					1,
-				);
+				const { saves, maxSaves } = await this._settings.deductSave(guildId, 1);
 
-				await this._settings.set(
-					guildId,
-					'savesUsed',
-					settings.savesUsed + 1,
-				);
+				await this._settings.set(guildId, 'savesUsed', settings.savesUsed + 1);
 
 				return message.reply(`${failReason}
 Used **1 server** save, There are **${saves}/${maxSaves}** server saves left.`);
 			}
 
-			const { isHighscore } = await this._checkStreak(
-				settings,
-				game,
-				count,
-			);
+			const { isHighscore } = await this._checkStreak(settings, game, count);
 
 			await message.reply(
 				`${failReason}
@@ -169,7 +152,7 @@ Used **1 server** save, There are **${saves}/${maxSaves}** server saves left.`);
 						: ''
 				}
 
-**Want to save the game?** Make sure to **/vote** for Kusari and earn yourself saves to save the game!`,
+**Want to save the game?** Make sure to **/vote** for Kusari and earn yourself saves to save the game!`
 			);
 
 			return this.start(guildId, game.type, true);
@@ -180,22 +163,22 @@ Used **1 server** save, There are **${saves}/${maxSaves}** server saves left.`);
 			return this._doReply(
 				message,
 				`The word ${word} has already been used in the past 100 words, try another word!`,
-				'❌',
+				'❌'
 			);
 		}
 
 		const cooldown = await this._checkCooldown(
 			message.author.id,
 			game.id,
-			settings.cooldown,
+			settings.cooldown
 		);
 		if (cooldown) {
 			return this._doReply(
 				message,
 				`You're on a cooldown, you can try again <t:${getTimestamp(
-					cooldown,
+					cooldown
 				)}:R>`,
-				'🕒',
+				'🕒'
 			);
 		}
 
@@ -212,7 +195,7 @@ Used **1 server** save, There are **${saves}/${maxSaves}** server saves left.`);
 		const { isHighscore, isGameHighscored } = await this._checkStreak(
 			settings,
 			game,
-			count,
+			count
 		);
 		if (isGameHighscored) {
 			await message.react('🎉').catch(() => null);
@@ -291,11 +274,7 @@ Used **1 server** save, There are **${saves}/${maxSaves}** server saves left.`);
 		if (count > settings.highscore) {
 			isHighscore = true;
 			await this._settings.set(settings.guildId, 'highscore', count);
-			await this._settings.set(
-				settings.guildId,
-				'highscoreDate',
-				new Date(),
-			);
+			await this._settings.set(settings.guildId, 'highscoreDate', new Date());
 
 			if (!game.isHighscored) {
 				isGameHighscored = true;
@@ -318,7 +297,7 @@ Used **1 server** save, There are **${saves}/${maxSaves}** server saves left.`);
 
 		const usedEmojis = [];
 		for (const number of stringCount) {
-			const available = numberEmojis[parseInt(number)];
+			const available = numberEmojis[Number.parseInt(number)];
 			for (const emoji of available) {
 				if (usedEmojis.includes(emoji)) {
 					continue;
@@ -334,7 +313,7 @@ Used **1 server** save, There are **${saves}/${maxSaves}** server saves left.`);
 	private async _checkCooldown(
 		userId: string,
 		gameId: number,
-		cooldown: number,
+		cooldown: number
 	): Promise<Date | undefined> {
 		if (process.env['NODE_ENV'] !== 'production') {
 			return;
@@ -371,7 +350,7 @@ Used **1 server** save, There are **${saves}/${maxSaves}** server saves left.`);
 			},
 		});
 
-		const index = history.findIndex((t) => t.word === word);
+		const index = history.findIndex(t => t.word === word);
 		return index >= 0;
 	}
 
@@ -416,15 +395,15 @@ Used **1 server** save, There are **${saves}/${maxSaves}** server saves left.`);
 			'z',
 		];
 		const weights = [
-			382, 963, 1276, 1351, 1411, 1493, 1544, 1603, 1637, 1647, 1657,
-			1730, 1801, 1828, 1858, 1970, 1975, 2077, 2286, 2387, 2408, 2443,
-			2493, 2503, 2513,
+			382, 963, 1276, 1351, 1411, 1493, 1544, 1603, 1637, 1647, 1657, 1730,
+			1801, 1828, 1858, 1970, 1975, 2077, 2286, 2387, 2408, 2443, 2493, 2503,
+			2513,
 		];
 
-		const maxCumulativeWeight = weights[weights.length - 1];
+		const maxCumulativeWeight = weights.at(-1);
 		const randomNumber = maxCumulativeWeight * Math.random();
 
-		const index = weights.findIndex((v) => v >= randomNumber);
+		const index = weights.findIndex(v => v >= randomNumber);
 
 		return letters[index];
 	}

@@ -1,7 +1,4 @@
 import { Injectable, UseFilters, UseGuards } from '@nestjs/common';
-import { WordsService } from '../../words/services/words.service';
-import { noSettingsReply } from '../../../util/no-settings-reply';
-import { AdminGuard, ForbiddenExceptionFilter } from '@yugen/shared';
 import { Client } from 'discord.js';
 import {
 	Context,
@@ -10,9 +7,14 @@ import {
 	StringOption,
 	Subcommand,
 } from 'necord';
+
+import { noSettingsReply } from '../../../util/no-settings-reply';
 import { GameService } from '../../game/services/game.service';
-import { AdminCommandDecorator } from '../admin.decorator';
 import { SettingsService } from '../../settings';
+import { WordsService } from '../../words/services/words.service';
+import { AdminCommandDecorator } from '../admin.decorator';
+
+import { AdminGuard, ForbiddenExceptionFilter } from '@yugen/shared';
 
 class AdminRecreateOptions {
 	@StringOption({
@@ -39,7 +41,7 @@ export class AdminRecreateCommands {
 		private _game: GameService,
 		private _settings: SettingsService,
 		private _word: WordsService,
-		private _client: Client,
+		private _client: Client
 	) {}
 
 	@Subcommand({
@@ -48,12 +50,10 @@ export class AdminRecreateCommands {
 	})
 	public async start(
 		@Context() [interaction]: SlashCommandContext,
-		@Options() { word, guildId }: AdminRecreateOptions,
+		@Options() { word, guildId }: AdminRecreateOptions
 	) {
 		if (guildId) {
-			const guild = await this._client.guilds
-				.fetch(guildId)
-				.catch(() => null);
+			const guild = await this._client.guilds.fetch(guildId).catch(() => null);
 			if (!guild) {
 				return interaction.reply({
 					content: `Koto could not access specified guild with id \`${guildId}\`.`,
@@ -63,7 +63,7 @@ export class AdminRecreateCommands {
 		}
 
 		const settings = await this._settings.getSettings(
-			guildId ?? interaction.guildId,
+			guildId ?? interaction.guildId
 		);
 
 		if (!settings.channelId) {
@@ -81,7 +81,7 @@ export class AdminRecreateCommands {
 			guildId ?? interaction.guildId,
 			false,
 			true,
-			word,
+			word
 		);
 
 		return interaction.reply({

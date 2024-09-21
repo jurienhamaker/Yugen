@@ -1,5 +1,4 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { getEmbedFooter, supportServerButton } from '@yugen/util';
 import {
 	ActionRowBuilder,
 	ButtonBuilder,
@@ -7,16 +6,19 @@ import {
 	EmbedBuilder,
 } from 'discord.js';
 import { Context, SlashCommand, SlashCommandContext } from 'necord';
+
 import {
 	GeneralModuleOptions,
 	MODULE_OPTIONS_TOKEN,
 } from '../general.module-definition';
 
+import { getEmbedFooter, supportServerButton } from '@yugen/util';
+
 @Injectable()
 export class GeneralSupportCommands {
 	constructor(
 		private _client: Client,
-		@Inject(MODULE_OPTIONS_TOKEN) private _options: GeneralModuleOptions,
+		@Inject(MODULE_OPTIONS_TOKEN) private _options: GeneralModuleOptions
 	) {}
 
 	@SlashCommand({
@@ -29,7 +31,7 @@ export class GeneralSupportCommands {
 			.setTitle(`${this._client.user?.displayName} Support`)
 			.setDescription(
 				`Found a bug? Or having issues setting up ${this._client.user?.displayName}?
-Join our support server with the button below, we'll try to help you out the best we can!`,
+Join our support server with the button below, we'll try to help you out the best we can!`
 			)
 			.setColor(this._options.embedColor)
 			.setFooter(footer);
@@ -38,7 +40,7 @@ Join our support server with the button below, we'll try to help you out the bes
 			embeds: [embed],
 			components: [
 				new ActionRowBuilder<ButtonBuilder>().addComponents(
-					supportServerButton,
+					supportServerButton
 				),
 			],
 		});

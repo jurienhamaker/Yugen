@@ -1,4 +1,3 @@
-import { getEmbedFooter, kofiButton, supportServerButton } from '@yugen/util';
 import {
 	ActionRowBuilder,
 	ButtonBuilder,
@@ -7,6 +6,9 @@ import {
 	Client,
 	EmbedBuilder,
 } from 'discord.js';
+
+import { getEmbedFooter, kofiButton, supportServerButton } from '@yugen/util';
+
 import { EMBED_COLOR } from './constants';
 import { noSettingsDescription } from './no-settings-reply';
 
@@ -20,7 +22,7 @@ export const sendWelcomeMessage = async (channel: Channel, _client: Client) => {
 		.setThumbnail(_client.user.avatarURL())
 		.setTitle(`Thank you for inviting Koto!`)
 		.setDescription(
-			`Koto has not yet been set up in this server! ${noSettingsDescription}`,
+			`Koto has not yet been set up in this server! ${noSettingsDescription}`
 		)
 		.setColor(EMBED_COLOR)
 		.setFooter(footer);
@@ -30,7 +32,7 @@ export const sendWelcomeMessage = async (channel: Channel, _client: Client) => {
 		components: [
 			new ActionRowBuilder<ButtonBuilder>().addComponents(
 				kofiButton,
-				supportServerButton,
+				supportServerButton
 			),
 		],
 	});

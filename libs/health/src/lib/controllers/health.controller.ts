@@ -6,6 +6,7 @@ import {
 	HttpHealthIndicator,
 	MemoryHealthIndicator,
 } from '@nestjs/terminus';
+
 import { DiscordHealthService } from '../services/discord-health.service';
 import { PrismaHealthService } from '../services/prisma-health.service';
 
@@ -15,11 +16,11 @@ export class HealthController {
 		private health: HealthCheckService,
 		private http: HttpHealthIndicator,
 		@Inject(PrismaHealthService)
-		private db: PrismaHealthService,
+		private database: PrismaHealthService,
 		@Inject(DiscordHealthService)
 		private discord: DiscordHealthService,
 		private disk: DiskHealthIndicator,
-		private memory: MemoryHealthIndicator,
+		private memory: MemoryHealthIndicator
 	) {}
 
 	@Get()
@@ -32,14 +33,14 @@ export class HealthController {
 					'http://localhost:3000/api/health/ping',
 					{
 						timeout: 100,
-					},
+					}
 				),
 			() =>
 				this.disk.checkStorage('diskStorage', {
 					thresholdPercent: 0.5,
 					path: '/',
 				}),
-			() => this.db.pingCheck(),
+			() => this.database.pingCheck(),
 			() => this.discord.pingCheck(),
 			() => this.memory.checkHeap('memory_heap', 300 * 1024 * 1024),
 			() => this.memory.checkRSS('memory_rss', 300 * 1024 * 1024),

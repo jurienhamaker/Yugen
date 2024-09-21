@@ -1,12 +1,20 @@
 import { Module } from '@nestjs/common';
+
 import { ExternalsModule } from '@yugen/externals';
+
 import { GeneralModule } from '@yugen/general';
+
 import { HealthModule } from '@yugen/health';
-import { LogsModule } from '@yugen/logs';
-import { MetricsModule } from '@yugen/metrics';
+
 import { SharedModule } from '@yugen/shared';
+
+import { LogsModule } from '@yugen/logs';
+
+import { MetricsModule } from '@yugen/metrics';
+
 import { HelpCommands } from './commands/help.commands';
 import { TutorialCommands } from './commands/tutorial.commands';
+import { AppEvents } from './events/app.events';
 import { GuildEvents } from './events/guild.events';
 import { AdminModule } from './modules/admin/admin.module';
 import { GameModule } from './modules/game/game.module';
@@ -15,7 +23,6 @@ import { WordsModule } from './modules/words/words.module';
 import { KotoSharedModule } from './shared.module';
 import { EMBED_COLOR } from './util/constants';
 import { intents } from './util/intents';
-import { AppEvents } from './events/app.events';
 
 @Module({
 	imports: [

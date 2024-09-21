@@ -1,11 +1,12 @@
-import { getBotAuthor } from './get-bot-author';
 import { Client } from 'discord.js';
+
+import { getBotAuthor } from './get-bot-author';
 import { getUsername } from './get-username';
 
 export const getEmbedFooter = async (
 	_client: Client,
 	text: string | null = null,
-	voteText = true,
+	voteText = true
 ) => {
 	const botAuthor = await getBotAuthor(_client);
 	return {
@@ -13,9 +14,9 @@ export const getEmbedFooter = async (
 		text: `${
 			text
 				? `${text} | `
-				: voteText
-					? `Like ${_client.user?.displayName}? Please vote using /vote! | `
-					: ''
+				: (voteText
+				? `Like ${_client.user?.displayName}? Please vote using /vote! | `
+				: '')
 		}Created by @${getUsername(botAuthor)}`,
 	};
 };

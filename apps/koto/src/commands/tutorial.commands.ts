@@ -1,17 +1,17 @@
 import { Injectable } from '@nestjs/common';
-import { EMBED_COLOR } from '../util/constants';
-import { noSettingsReply } from '../util/no-settings-reply';
-import { formatMinutes, getEmbedFooter } from '@yugen/util';
 import { Client, EmbedBuilder } from 'discord.js';
 import { Context, SlashCommand, SlashCommandContext } from 'necord';
+
 import { SettingsService } from '../modules/settings';
+import { EMBED_COLOR } from '../util/constants';
+import { noSettingsReply } from '../util/no-settings-reply';
+
+import { formatMinutes, getEmbedFooter } from '@yugen/util';
+
 
 @Injectable()
 export class TutorialCommands {
-	constructor(
-		private _client: Client,
-		private _settings: SettingsService,
-	) {}
+	constructor(private _client: Client, private _settings: SettingsService) {}
 
 	@SlashCommand({
 		name: 'tutorial',
@@ -43,34 +43,30 @@ export class TutorialCommands {
 					frequencyFormatted.hours
 						? `${frequencyFormatted.hours} hour${
 								frequencyFormatted.hours === 1 ? '' : 's'
-							}`
+						  }`
 						: ''
 				}${
-					frequencyFormatted.hours && frequencyFormatted.minutes
-						? ' & '
-						: ''
+					frequencyFormatted.hours && frequencyFormatted.minutes ? ' & ' : ''
 				}${
 					frequencyFormatted.minutes
 						? `${frequencyFormatted.minutes} minute${
 								frequencyFormatted.minutes === 1 ? '' : 's'
-							}`
+						  }`
 						: ''
 				}**.
 - The time limit of each game is **${
 					timeLimitFormatted.hours
 						? `${timeLimitFormatted.hours} hour${
 								timeLimitFormatted.hours === 1 ? '' : 's'
-							}`
+						  }`
 						: ''
 				}${
-					timeLimitFormatted.hours && timeLimitFormatted.minutes
-						? ' & '
-						: ''
+					timeLimitFormatted.hours && timeLimitFormatted.minutes ? ' & ' : ''
 				}${
 					timeLimitFormatted.minutes
 						? `${timeLimitFormatted.minutes} minute${
 								timeLimitFormatted.minutes === 1 ? '' : 's'
-							}`
+						  }`
 						: ''
 				}**.
 - A game will ${
@@ -81,7 +77,7 @@ export class TutorialCommands {
 - 1 point for finding a yellow letter
 - 1 point for turning a yellow letter green
 - 2 points for finding a green letter
-- 2 points to everyone who participated (if Koto is solved)`,
+- 2 points to everyone who participated (if Koto is solved)`
 			)
 			.setColor(EMBED_COLOR)
 			.setFooter(footer);

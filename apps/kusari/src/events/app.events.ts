@@ -12,10 +12,10 @@ export class AppEvents {
 	}
 
 	private _setPresence(client: Client) {
-		client.user!.setPresence({
+		client.user.setPresence({
 			activities: [
 				{
-					name: `${client.user!.displayName} 📖`,
+					name: `${client.user.displayName} 📖`,
 					type: ActivityType.Playing,
 				},
 			],
@@ -24,9 +24,7 @@ export class AppEvents {
 		if (process.env['KUSARI_AVATAR_URL']) {
 			client.user
 				.setAvatar(process.env['KUSARI_AVATAR_URL'])
-				.then((u) =>
-					this._logger.log(`Set client avatar to ${u.avatarURL()}`),
-				)
+				.then(u => this._logger.log(`Set client avatar to ${u.avatarURL()}`))
 				.catch(() => this._logger.warn('Failed to set bot avatar'));
 		}
 	}

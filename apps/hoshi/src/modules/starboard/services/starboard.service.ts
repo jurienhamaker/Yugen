@@ -1,7 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Log } from '@prisma/hoshi';
-import { PrismaService } from '@yugen/prisma/hoshi';
-import { getUsername, resolveEmoji } from '@yugen/util';
 import {
 	ChannelType,
 	Client,
@@ -10,8 +8,13 @@ import {
 	Message,
 	MessageReaction,
 } from 'discord.js';
+
 import { EMBED_COLOR } from '../../../util/constants';
 import { SettingsService } from '../../settings';
+
+import { getUsername, resolveEmoji } from '@yugen/util';
+
+import { PrismaService } from '@yugen/prisma/hoshi';
 
 @Injectable()
 export class StarboardService {
@@ -20,13 +23,11 @@ export class StarboardService {
 	constructor(
 		private _prisma: PrismaService,
 		private _settings: SettingsService,
-		private _client: Client,
+		private _client: Client
 	) {}
 
 	async checkReaction(reaction: MessageReaction) {
-		const settings = await this._settings.getSettings(
-			reaction.message.guildId,
-		);
+		const settings = await this._settings.getSettings(reaction.message.guildId);
 		const { treshold, self, ignoredChannelIds } = settings;
 
 		let sourceChannelId = reaction.message.channelId;
@@ -44,7 +45,7 @@ export class StarboardService {
 		}
 
 		this._logger.log(
-			`Running starboard check for "${reaction.message.guildId}"`,
+			`Running starboard check for "${reaction.message.guildId}"`
 		);
 
 		const isStarboard = await this.getLogByMessageId(reaction.message.id);
@@ -68,17 +69,17 @@ export class StarboardService {
 			},
 		});
 
-		if (!configurations.length) {
+		if (configurations.length === 0) {
 			return;
 		}
 
 		const configuration =
-			configurations.find((c) => c.sourceChannelId === sourceChannelId) ??
+			configurations.find(c => c.sourceChannelId === sourceChannelId) ??
 			configurations[0];
 
 		const users = await reaction.users.fetch();
 		const filteredUsers = users.filter(
-			(u) => (self || u.id !== reaction.message.author.id) && !u.bot,
+			u => (self || u.id !== reaction.message.author.id) && !u.bot
 		);
 		const log = await this.getLogByOriginalId(reaction.message.id);
 
@@ -94,7 +95,7 @@ export class StarboardService {
 
 		if (!embed) {
 			this._logger.warn(
-				`Couldn't create embed for message ${reaction.message.id} for ${reaction.message.guildId}`,
+				`Couldn't create embed for message ${reaction.message.id} for ${reaction.message.guildId}`
 			);
 			return;
 		}
@@ -105,7 +106,7 @@ export class StarboardService {
 				embed,
 				reaction.message as Message,
 				configuration.sourceEmoji,
-				log,
+				log
 			);
 		}
 
@@ -114,7 +115,7 @@ export class StarboardService {
 			embed,
 			reaction.message as Message,
 			configuration.targetChannelId,
-			configuration.sourceEmoji,
+			configuration.sourceEmoji
 		);
 	}
 
@@ -146,7 +147,7 @@ export class StarboardService {
 	getStarboardBySourceIdAndEmoji(
 		guildId: string,
 		sourceEmoji: string | GuildEmoji,
-		sourceChannelId: string | null,
+		sourceChannelId: string | null
 	) {
 		return this._prisma.starboards.findFirst({
 			where: {
@@ -181,7 +182,7 @@ export class StarboardService {
 		guildId: string,
 		sourceEmoji: string | GuildEmoji,
 		sourceChannelId: string | null,
-		targetChannelId: string,
+		targetChannelId: string
 	) {
 		return this._prisma.starboards.create({
 			data: {
@@ -219,7 +220,7 @@ export class StarboardService {
 		embed: EmbedBuilder,
 		message: Message,
 		starboardChannelId: string,
-		emoji: string,
+		emoji: string
 	) {
 		const channel = await this._getStarboardChannel(starboardChannelId);
 
@@ -246,7 +247,7 @@ export class StarboardService {
 		embed: EmbedBuilder,
 		message: Message,
 		emoji: string,
-		log: Log,
+		log: Log
 	) {
 		const channel = await this._getStarboardChannel(log.channelId);
 		const starboardMessage = await channel.messages.fetch(log.messageId);
@@ -292,10 +293,7 @@ export class StarboardService {
 	}
 
 	private _createEmbed(message: Message) {
-		if (
-			!message.content?.length &&
-			!message.attachments.first()?.url?.length
-		) {
+		if (!message.content?.length && !message.attachments.first()?.url?.length) {
 			return;
 		}
 
@@ -318,11 +316,7 @@ export class StarboardService {
 		return embed;
 	}
 
-	private _createContentString(
-		count: number,
-		emoji: string,
-		message: Message,
-	) {
+	private _createContentString(count: number, emoji: string, message: Message) {
 		const {
 			emoji: resolvedEmoji,
 			clientEmoji,

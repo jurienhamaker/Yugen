@@ -1,26 +1,25 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Events, MessageReaction, PartialMessageReaction } from 'discord.js';
 import { Context, ContextOf, On } from 'necord';
+
 import { StarboardService } from '../services/starboard.service';
 
 @Injectable()
 export class ReactionEvents {
-	private readonly _logger = new Logger(ReactionEvents.name);
-
 	private _debounceMap = new Map<string, NodeJS.Timer>();
 
 	constructor(private _general: StarboardService) {}
 
 	@On(Events.MessageReactionAdd)
 	public onReactionAdd(
-		@Context() [reaction]: ContextOf<Events.MessageReactionAdd>,
+		@Context() [reaction]: ContextOf<Events.MessageReactionAdd>
 	) {
 		this._checkDebounce(reaction);
 	}
 
 	@On(Events.MessageReactionRemove)
 	public onReactionRemove(
-		@Context() [reaction]: ContextOf<Events.MessageReactionRemove>,
+		@Context() [reaction]: ContextOf<Events.MessageReactionRemove>
 	) {
 		this._checkDebounce(reaction);
 	}
@@ -35,12 +34,10 @@ export class ReactionEvents {
 		this._debounceMap.set(reaction.message.id, timer);
 	}
 
-	private async _runCheck(
-		reaction: MessageReaction | PartialMessageReaction,
-	) {
+	private async _runCheck(reaction: MessageReaction | PartialMessageReaction) {
 		try {
 			reaction = await reaction.fetch();
-		} catch (error) {
+		} catch {
 			return;
 		}
 

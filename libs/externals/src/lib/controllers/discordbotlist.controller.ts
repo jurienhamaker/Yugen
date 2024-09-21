@@ -7,6 +7,7 @@ import {
 	Req,
 } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+
 import { ExternalsVoteService } from '../services/vote.service';
 import { DiscordBotListBody } from '../types/discordbotlist-body';
 import { checkAuthorization } from '../util/check-authorization';
@@ -15,12 +16,12 @@ import { checkAuthorization } from '../util/check-authorization';
 export class DiscordBotListController {
 	constructor(
 		private _vote: ExternalsVoteService,
-		private _events: EventEmitter2,
+		private _events: EventEmitter2
 	) {}
 
 	@Post('/webhook')
-	async webhook(@Req() req: Request, @Body() body: DiscordBotListBody) {
-		if (!checkAuthorization(req.headers['authorization'])) {
+	async webhook(@Req() request: Request, @Body() body: DiscordBotListBody) {
+		if (!checkAuthorization(request.headers['authorization'])) {
 			throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
 		}
 
@@ -33,7 +34,7 @@ export class DiscordBotListController {
 		if (!body.id) {
 			throw new HttpException(
 				'Missing user ID in body',
-				HttpStatus.BAD_REQUEST,
+				HttpStatus.BAD_REQUEST
 			);
 		}
 

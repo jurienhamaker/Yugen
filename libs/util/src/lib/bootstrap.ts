@@ -6,7 +6,7 @@ export async function bootstrap(module: unknown) {
 		...(process.env['NODE_ENV'] === 'production'
 			? {
 					logger: ['error', 'warn', 'log'],
-				}
+			  }
 			: {}),
 	});
 

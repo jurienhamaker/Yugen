@@ -1,10 +1,5 @@
 import { Injectable, Logger, UseFilters, UseGuards } from '@nestjs/common';
 import { Settings } from '@prisma/hoshi';
-import {
-	ForbiddenExceptionFilter,
-	GuildModeratorGuard,
-	ManageServerGuard,
-} from '@yugen/shared';
 import { TextChannel } from 'discord.js';
 import {
 	BooleanOption,
@@ -16,9 +11,16 @@ import {
 	StringOption,
 	Subcommand,
 } from 'necord';
+
 import { SettingsService } from '../services';
 import { SettingsCommandDecorator } from '../settings.decorator';
 import { SETTINGS_CHOICES } from '../util/constants';
+
+import {
+	ForbiddenExceptionFilter,
+	GuildModeratorGuard,
+	ManageServerGuard,
+} from '@yugen/shared';
 
 class SettingsResetOptions {
 	@StringOption({
@@ -91,7 +93,7 @@ export class SettingsCommands {
 	})
 	public async reset(
 		@Context() [interaction]: SlashCommandContext,
-		@Options() { setting }: SettingsResetOptions,
+		@Options() { setting }: SettingsResetOptions
 	) {
 		if (!setting) {
 			return interaction.reply({
@@ -116,11 +118,11 @@ export class SettingsCommands {
 
 		await this._settings.set(interaction.guildId, setting, value);
 
-		const name = SETTINGS_CHOICES.find((v) => v.value === setting).name;
+		const name = SETTINGS_CHOICES.find(v => v.value === setting).name;
 
 		return interaction.reply({
 			content: `${name} has been reset to it's default value of \`${
-				value ? value : '-'
+				value ?? '-'
 			}\``,
 			ephemeral: true,
 		});
@@ -133,18 +135,18 @@ export class SettingsCommands {
 	})
 	public async setTreshold(
 		@Context() [interaction]: SlashCommandContext,
-		@Options() { treshold }: SetTresholdOptions,
+		@Options() { treshold }: SetTresholdOptions
 	) {
-		const parsed = parseInt(treshold, 10);
+		const parsed = Number.parseInt(treshold, 10);
 
-		if (isNaN(parsed) || parsed < 1) {
+		if (Number.isNaN(parsed) || parsed < 1) {
 			return interaction.reply({
 				content: `Treshold must be atleast 1.`,
 				ephemeral: true,
 			});
 		}
 
-		await this._settings.set(interaction.guildId!, 'treshold', parsed);
+		await this._settings.set(interaction.guildId, 'treshold', parsed);
 
 		return interaction.reply({
 			content: `Starboard treshold has been set to **${parsed}**.`,
@@ -159,9 +161,9 @@ export class SettingsCommands {
 	})
 	public async setSelf(
 		@Context() [interaction]: SlashCommandContext,
-		@Options() { self }: SetSelfOptions,
+		@Options() { self }: SetSelfOptions
 	) {
-		await this._settings.set(interaction.guildId!, 'self', self);
+		await this._settings.set(interaction.guildId, 'self', self);
 
 		return interaction.reply({
 			content: `Message authors are now **${
@@ -178,12 +180,12 @@ export class SettingsCommands {
 	})
 	public async setBotUpdatesChannel(
 		@Context() [interaction]: SlashCommandContext,
-		@Options() { channel }: SetBotUpdatesChannelOptions,
+		@Options() { channel }: SetBotUpdatesChannelOptions
 	) {
 		await this._settings.set(
-			interaction.guildId!,
+			interaction.guildId,
 			'botUpdatesChannelId',
-			channel.id,
+			channel.id
 		);
 
 		return interaction.reply({
@@ -199,18 +201,18 @@ export class SettingsCommands {
 	})
 	public async ignore(
 		@Context() [interaction]: SlashCommandContext,
-		@Options() { channel }: IgnoreOptions,
+		@Options() { channel }: IgnoreOptions
 	) {
 		this._logger.verbose(
 			`Ignoring starboard channel for ${interaction.guildId} - ${
 				channel?.id ?? interaction.channelId
-			}`,
+			}`
 		);
 
 		await this._settings.ignoreChannel(
 			interaction.guildId,
 			channel?.id ?? interaction.channelId,
-			true,
+			true
 		);
 
 		return interaction.reply({
@@ -228,18 +230,18 @@ export class SettingsCommands {
 	})
 	public async unignore(
 		@Context() [interaction]: SlashCommandContext,
-		@Options() { channel }: IgnoreOptions,
+		@Options() { channel }: IgnoreOptions
 	) {
 		this._logger.verbose(
 			`Unignoring starboard channel for ${interaction.guildId} - ${
 				channel?.id ?? interaction.channelId
-			}`,
+			}`
 		);
 
 		await this._settings.ignoreChannel(
 			interaction.guildId,
 			channel?.id ?? interaction.channelId,
-			false,
+			false
 		);
 
 		return interaction.reply({

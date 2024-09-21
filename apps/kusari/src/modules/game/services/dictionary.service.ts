@@ -1,11 +1,9 @@
 import { HttpService } from '@nestjs/axios';
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { lastValueFrom } from 'rxjs';
 
 @Injectable()
 export class GameDictionaryService {
-	private readonly _logger = new Logger(GameDictionaryService.name);
-
 	constructor(private _http: HttpService) {}
 
 	public async checkDictionary(word: string) {
@@ -13,12 +11,12 @@ export class GameDictionaryService {
 		await lastValueFrom(
 			this._http.get(
 				`https://en.wiktionary.org/w/api.php?action=opensearch&format=json&formatversion=2&search=${encodeURIComponent(
-					word.toLowerCase(),
-				)}&namespace=0&limit=2`,
-			),
+					word.toLowerCase()
+				)}&namespace=0&limit=2`
+			)
 		)
-			.then((response) => {
-				if (!response.data.length) {
+			.then(response => {
+				if (response.data.length === 0) {
 					found = false;
 					return;
 				}
@@ -26,10 +24,10 @@ export class GameDictionaryService {
 				const words = response.data[1];
 
 				if (
-					!(words instanceof Array) ||
+					!Array.isArray(words) ||
 					!words
-						.filter((w) => typeof w === 'string')
-						.map((w) => w.toLowerCase())
+						.filter(w => typeof w === 'string')
+						.map(w => w.toLowerCase())
 						.includes(word.toLowerCase())
 				) {
 					found = false;

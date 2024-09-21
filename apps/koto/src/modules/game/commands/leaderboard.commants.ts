@@ -1,5 +1,4 @@
 import { Injectable, UseFilters, UseGuards } from '@nestjs/common';
-import { getEmbedFooter } from '@yugen/util';
 import {
 	ActionRowBuilder,
 	ButtonBuilder,
@@ -20,8 +19,12 @@ import {
 	SlashCommandContext,
 	StringOption,
 } from 'necord';
+
 import { GamePointsService } from '../services/points.service';
+
 import { ForbiddenExceptionFilter, ManageServerGuard } from '@yugen/shared';
+
+import { getEmbedFooter } from '@yugen/util';
 
 class GameLeaderboardOptions {
 	@StringOption({
@@ -55,10 +58,7 @@ class GameLeaderboardOptions {
 
 @Injectable()
 export class GameLeaderboardCommands {
-	constructor(
-		private _points: GamePointsService,
-		private _client: Client,
-	) {}
+	constructor(private _points: GamePointsService, private _client: Client) {}
 
 	@SlashCommand({
 		name: 'leaderboard',
@@ -66,7 +66,7 @@ export class GameLeaderboardCommands {
 	})
 	public async leaderboard(
 		@Context() [interaction]: SlashCommandContext,
-		@Options() { page, type }: GameLeaderboardOptions,
+		@Options() { page, type }: GameLeaderboardOptions
 	) {
 		return this._listLeaderboard(interaction, type ?? 'points', page);
 	}
@@ -77,32 +77,32 @@ export class GameLeaderboardCommands {
 		name: 'reset-leaderboard',
 		description: 'Reset all player points and completely reset the leaderboard',
 	})
-	public async reset(
-		@Context() [interaction]: SlashCommandContext,
-	) {
-		const footer = await getEmbedFooter(
-			this._client,
-		);
+	public async reset(@Context() [interaction]: SlashCommandContext) {
+		const footer = await getEmbedFooter(this._client);
 		const embed = new EmbedBuilder()
 			.setTitle(`Reset leaderboard`)
-			.setDescription(`Are you sure you want to reset the leaderboard of **${interaction.guild.name}**
-**This action is irreversible**`)
+			.setDescription(
+				`Are you sure you want to reset the leaderboard of **${interaction.guild.name}**
+**This action is irreversible**`
+			)
 			.setFooter(footer);
 
 		return interaction.reply({
 			embeds: [embed],
-			components: [new ActionRowBuilder<ButtonBuilder>().addComponents([
-				new ButtonBuilder()
-					.setCustomId(`RESET_LEADERBOARD/yes`)
-					.setLabel('Reset leaderboard')
-					.setStyle(ButtonStyle.Success),
-				new ButtonBuilder()
-					.setCustomId(`RESET_LEADERBOARD/no`)
-					.setLabel('Cancel')
-					.setStyle(ButtonStyle.Danger),
-			])],
-			ephemeral: true
-		})
+			components: [
+				new ActionRowBuilder<ButtonBuilder>().addComponents([
+					new ButtonBuilder()
+						.setCustomId(`RESET_LEADERBOARD/yes`)
+						.setLabel('Reset leaderboard')
+						.setStyle(ButtonStyle.Success),
+					new ButtonBuilder()
+						.setCustomId(`RESET_LEADERBOARD/no`)
+						.setLabel('Cancel')
+						.setStyle(ButtonStyle.Danger),
+				]),
+			],
+			ephemeral: true,
+		});
 	}
 
 	@UseGuards(ManageServerGuard)
@@ -111,21 +111,21 @@ export class GameLeaderboardCommands {
 	public async resetButton(
 		@Context()
 		[interaction]: ButtonContext,
-		@ComponentParam('type') type: 'yes' | 'no',
+		@ComponentParam('type') type: 'yes' | 'no'
 	) {
-		if(type !== 'yes') {
+		if (type !== 'yes') {
 			return interaction.update({
 				content: `I have not reset the leaderboard`,
 				components: [],
-				embeds: []
+				embeds: [],
 			});
 		}
-		
+
 		await this._points.resetLeaderboard(interaction.guildId);
 		return interaction.update({
 			content: `The leaderboard has been reset.`,
 			components: [],
-			embeds: []
+			embeds: [],
 		});
 	}
 
@@ -134,16 +134,16 @@ export class GameLeaderboardCommands {
 		@Context()
 		[interaction]: ButtonContext,
 		@ComponentParam('type') type: 'points' | 'participated' | 'wins',
-		@ComponentParam('page') page: string,
+		@ComponentParam('page') page: string
 	) {
-		const pageInt = parseInt(page, 10);
+		const pageInt = Number.parseInt(page, 10);
 		return this._listLeaderboard(interaction, type, pageInt);
 	}
 
 	private async _listLeaderboard(
 		interaction: CommandInteraction | ButtonInteraction,
 		type: 'points' | 'participated' | 'wins' = 'points',
-		page: number = 1,
+		page: number = 1
 	) {
 		page = page ?? 1;
 		type = type ?? 'points';
@@ -151,7 +151,7 @@ export class GameLeaderboardCommands {
 		const { players, total } = await this._points.getLeaderboard(
 			interaction.guild.id,
 			type,
-			page,
+			page
 		);
 
 		if (!total) {
@@ -192,34 +192,30 @@ export class GameLeaderboardCommands {
 
 		const footer = await getEmbedFooter(
 			this._client,
-			maxPage > 1 ? `Page ${page}/${maxPage}` : null,
+			maxPage > 1 ? `Page ${page}/${maxPage}` : null
 		);
 
 		const buttons = [];
 		const components = [];
 
 		const title = `Koto ${
-			type === 'points'
-				? 'Points'
-				: type === 'wins'
-					? 'Wins'
-					: 'Participation'
+			type === 'points' ? 'Points' : (type === 'wins' ? 'Wins' : 'Participation')
 		} leaderboard for ${interaction.guild.name}`;
 
 		const embed = new EmbedBuilder()
 			.setTitle(title)
 			.setThumbnail(interaction.guild.iconURL() ?? null)
 			.setDescription(
-				players.length
+				players.length > 0
 					? players
 							.map(
 								(player, index) =>
-									`${(page - 1) * 10 + (index + 1)}. <@${
-										player.userId
-									}>: **${player[type]}**`,
+									`${(page - 1) * 10 + (index + 1)}. <@${player.userId}>: **${
+										player[type]
+									}**`
 							)
 							.join('\n')
-					: '',
+					: ''
 			)
 			.setFooter(footer);
 
@@ -228,7 +224,7 @@ export class GameLeaderboardCommands {
 				new ButtonBuilder()
 					.setCustomId(`LEADERBOARD_LIST/${type}/${page - 1}`)
 					.setLabel('◀️')
-					.setStyle(ButtonStyle.Primary),
+					.setStyle(ButtonStyle.Primary)
 			);
 		}
 
@@ -237,13 +233,13 @@ export class GameLeaderboardCommands {
 				new ButtonBuilder()
 					.setCustomId(`LEADERBOARD_LIST/${type}/${page + 1}`)
 					.setLabel('▶️')
-					.setStyle(ButtonStyle.Primary),
+					.setStyle(ButtonStyle.Primary)
 			);
 		}
 
-		if (buttons.length) {
+		if (buttons.length > 0) {
 			components.push(
-				new ActionRowBuilder<ButtonBuilder>().addComponents(buttons),
+				new ActionRowBuilder<ButtonBuilder>().addComponents(buttons)
 			);
 		}
 

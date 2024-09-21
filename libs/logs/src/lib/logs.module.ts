@@ -1,4 +1,5 @@
 import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
+
 import { LogsGuildEvents } from './events/guild.events';
 import { LogsInteractionEvents } from './events/interaction.events';
 import { LoggerMiddleware } from './middleware/log.middleware';

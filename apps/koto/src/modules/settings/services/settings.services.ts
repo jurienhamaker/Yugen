@@ -1,18 +1,19 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Settings } from '@prisma/koto';
-import { EMBED_COLOR } from '../../../util/constants';
-import { PrismaService } from '@yugen/prisma/koto';
-import { formatMinutes } from '@yugen/util';
 import {
 	CommandInteraction,
 	EmbedBuilder,
 	MessageComponentInteraction,
 } from 'discord.js';
 
+import { EMBED_COLOR } from '../../../util/constants';
+
+import { formatMinutes } from '@yugen/util';
+
+import { PrismaService } from '@yugen/prisma/koto';
+
 @Injectable()
 export class SettingsService {
-	private readonly _logger = new Logger(SettingsService.name);
-
 	constructor(private _prisma: PrismaService) {}
 
 	async getSettings(guildId: string) {
@@ -42,7 +43,7 @@ export class SettingsService {
 	async set(
 		guildId: string,
 		property: keyof Settings,
-		value: string | number | boolean,
+		value: string | number | boolean
 	) {
 		let settings = await this.getSettings(guildId);
 
@@ -60,9 +61,9 @@ export class SettingsService {
 	}
 
 	async showSettings(
-		interaction: MessageComponentInteraction | CommandInteraction,
+		interaction: MessageComponentInteraction | CommandInteraction
 	) {
-		const settings = await this.getSettings(interaction.guildId!);
+		const settings = await this.getSettings(interaction.guildId);
 
 		if (!settings) {
 			return;
@@ -86,9 +87,7 @@ export class SettingsService {
 		const embed = new EmbedBuilder()
 			.setColor(EMBED_COLOR)
 			.setTitle('Koto settings')
-			.setDescription(
-				`These are the settings currently configured for Koto`,
-			)
+			.setDescription(`These are the settings currently configured for Koto`)
 			.addFields(
 				{
 					name: 'Channel',
@@ -97,9 +96,7 @@ export class SettingsService {
 				},
 				{
 					name: 'Bot updates channel',
-					value: botUpdatesChannelId
-						? `<#${botUpdatesChannelId}>`
-						: '-',
+					value: botUpdatesChannelId ? `<#${botUpdatesChannelId}>` : '-',
 					inline: true,
 				},
 				{
@@ -145,17 +142,15 @@ export class SettingsService {
 						frequencyFormatted.hours
 							? `${frequencyFormatted.hours} hour${
 									frequencyFormatted.hours === 1 ? '' : 's'
-								}`
+							  }`
 							: ''
 					}${
-						frequencyFormatted.hours && frequencyFormatted.minutes
-							? ' & '
-							: ''
+						frequencyFormatted.hours && frequencyFormatted.minutes ? ' & ' : ''
 					}${
 						frequencyFormatted.minutes
 							? `${frequencyFormatted.minutes} minute${
 									frequencyFormatted.minutes === 1 ? '' : 's'
-								}`
+							  }`
 							: ''
 					}`,
 					inline: true,
@@ -166,17 +161,15 @@ export class SettingsService {
 						timeLimitFormatted.hours
 							? `${timeLimitFormatted.hours} hour${
 									timeLimitFormatted.hours === 1 ? '' : 's'
-								}`
+							  }`
 							: ''
 					}${
-						timeLimitFormatted.hours && timeLimitFormatted.minutes
-							? ' & '
-							: ''
+						timeLimitFormatted.hours && timeLimitFormatted.minutes ? ' & ' : ''
 					}${
 						timeLimitFormatted.minutes
 							? `${timeLimitFormatted.minutes} minute${
 									timeLimitFormatted.minutes === 1 ? '' : 's'
-								}`
+							  }`
 							: ''
 					}`,
 					inline: true,
@@ -185,7 +178,7 @@ export class SettingsService {
 					name: ' ',
 					value: ' ',
 					inline: true,
-				},
+				}
 			);
 
 		const data = {

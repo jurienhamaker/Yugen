@@ -1,5 +1,7 @@
 import { Module } from '@nestjs/common';
+
 import { KotoSharedModule } from '../../shared.module';
+
 import { WordsService } from './services/words.service';
 
 @Module({

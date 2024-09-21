@@ -1,6 +1,5 @@
 import { Injectable, UseFilters, UseGuards } from '@nestjs/common';
 import { GameType } from '@prisma/kazu';
-import { ForbiddenExceptionFilter, GuildModeratorGuard } from '@yugen/shared';
 import { Client, CommandInteraction } from 'discord.js';
 import {
 	Context,
@@ -10,10 +9,13 @@ import {
 	StringOption,
 	Subcommand,
 } from 'necord';
+
 import { noSettingsReply } from '../../../util/no-settings-reply';
 import { SettingsService } from '../../settings';
 import { GameCommandDecorator } from '../game.decorator';
 import { GameService } from '../services/game.service';
+
+import { ForbiddenExceptionFilter, GuildModeratorGuard } from '@yugen/shared';
 
 const GameStartOptionsChoices = [
 	{
@@ -55,7 +57,7 @@ export class GameStartCommands {
 	constructor(
 		private _game: GameService,
 		private _settings: SettingsService,
-		private _client: Client,
+		private _client: Client
 	) {}
 
 	@Subcommand({
@@ -64,12 +66,12 @@ export class GameStartCommands {
 	})
 	public async start(
 		@Context() [interaction]: SlashCommandContext,
-		@Options() { type, startingNumber }: GameStartOptions,
+		@Options() { type, startingNumber }: GameStartOptions
 	) {
 		return this._startGame(
 			interaction,
 			type ?? GameType.NORMAL,
-			startingNumber ?? 1,
+			startingNumber ?? 1
 		);
 	}
 
@@ -79,16 +81,14 @@ export class GameStartCommands {
 	})
 	public async reset(
 		@Context() [interaction]: SlashCommandContext,
-		@Options() { startingNumber }: GameResetOptions,
+		@Options() { startingNumber }: GameResetOptions
 	) {
-		const currentGame = await this._game.getCurrentGame(
-			interaction.guildId,
-		);
+		const currentGame = await this._game.getCurrentGame(interaction.guildId);
 		return this._startGame(
 			interaction,
 			currentGame.type,
 			startingNumber ?? 1,
-			true,
+			true
 		);
 	}
 
@@ -96,7 +96,7 @@ export class GameStartCommands {
 		interaction: CommandInteraction,
 		type: GameType = GameType.NORMAL,
 		startingNumber: number = 0,
-		recreate: boolean = false,
+		recreate: boolean = false
 	) {
 		const settings = await this._settings.getSettings(interaction.guildId);
 
@@ -108,7 +108,7 @@ export class GameStartCommands {
 			interaction.guildId,
 			type,
 			startingNumber,
-			recreate,
+			recreate
 		);
 
 		return interaction.reply({

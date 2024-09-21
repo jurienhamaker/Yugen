@@ -10,7 +10,7 @@
       "cache": true,
       "inputs": [
         "default",
-        "{workspaceRoot}/.eslintrc.json",
+        "{workspaceRoot}/.eslintrc.js",
         "{workspaceRoot}/.eslintignore",
         "{workspaceRoot}/eslint.config.js"
       ]
@@ -38,7 +38,7 @@
       "!{projectRoot}/jest.config.[jt]s",
       "!{projectRoot}/src/test-setup.[jt]s",
       "!{projectRoot}/test-setup.[jt]s",
-      "!{projectRoot}/.eslintrc.json",
+      "!{projectRoot}/.eslintrc.js",
       "!{projectRoot}/eslint.config.js"
     ],
     "sharedGlobals": []
