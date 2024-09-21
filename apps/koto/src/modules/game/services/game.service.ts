@@ -168,12 +168,6 @@ export class GameService {
 			promises.push(this._points.applyPoints(game, message.author.id));
 		}
 
-		promises.push(
-			this._message.create(game as GameWithMetaAndGuesses, false),
-		);
-
-		await Promise.allSettled(promises);
-
 		if (
 			status !== GameStatus.COMPLETED &&
 			settings.informCooldownAfterGuess
@@ -185,13 +179,20 @@ export class GameService {
 			);
 
 			if (cooldown) {
-				message.reply(
+				const cooldownReply = message.reply(
 					`Thank you for your guess, you are now on a cooldown. You can guess again <t:${getTimestamp(
 						cooldown,
 					)}:R>`,
 				);
+				promises.push(cooldownReply);
 			}
 		}
+
+		promises.push(
+			this._message.create(game as GameWithMetaAndGuesses, false),
+		);
+
+		await Promise.allSettled(promises);
 
 		if (status !== GameStatus.IN_PROGRESS) {
 			// after the message has been send, we can delete the guesses so we don't keep any message content ever.
