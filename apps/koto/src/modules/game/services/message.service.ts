@@ -54,8 +54,8 @@ export class GameMessageService {
 					roles: [settings.pingRoleId],
 				},
 			})
-			.catch(error => {
-				if (error.message?.contains('Missing Permissions')) {
+			.catch((error: Error) => {
+				if (error.message?.includes('Missing Permissions')) {
 					return;
 				}
 
