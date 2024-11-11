@@ -1,0 +1,10 @@
+services:
+  iro:
+    build: .
+    user: "1000:1000"
+    command: "make iro"
+    volumes:
+      - .:/opt/app
+
+  redis:
+    image: redis
