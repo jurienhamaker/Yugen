@@ -1,4 +1,4 @@
-root = "."
+root = "../../"
 testdata_dir = "testdata"
 tmp_dir = "tmp"
 
@@ -7,7 +7,15 @@ args_bin = []
 bin = "./dist/bot"
 cmd = "make build"
 delay = 1000
-exclude_dir = ["assets", "tmp", "vendor", "testdata", "prisma/migrations"]
+exclude_dir = [
+	"tmp",
+	"apps/iro",
+	"apps/kazu/assets",
+	"apps/kazu/tmp",
+	"apps/kazu/vendor",
+	"apps/kazu/testdata",
+	"apps/kazu/prisma/migrations/",
+]
 exclude_file = []
 exclude_regex = ["_test.go"]
 exclude_unchanged = false
@@ -17,7 +25,7 @@ include_dir = []
 include_ext = ["go", "tpl", "tmpl", "html"]
 include_file = []
 kill_delay = "5s"
-log = "build-errors.log"
+log = "./build-errors.log"
 poll = false
 poll_interval = 0
 post_cmd = []
@@ -42,5 +50,5 @@ time = false
 clean_on_exit = false
 
 [screen]
-clear_on_rebuild = false
+clear_on_rebuild = true
 keep_scroll = true

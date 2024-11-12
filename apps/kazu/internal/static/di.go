@@ -1,4 +1,4 @@
-package local
+package static
 
 const (
 	DiSaves  = "saves"

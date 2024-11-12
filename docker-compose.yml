@@ -8,6 +8,8 @@ services:
       - ./apps/kazu/.env
     volumes:
       - .:/opt/app
+    ports:
+      - "$API_LISTEN_PORT:$API_LISTEN_PORT"
   iro:
     build: .
     user: "1000:1000"

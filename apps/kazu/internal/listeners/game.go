@@ -6,8 +6,8 @@ import (
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/sarulabs/di/v2"
-	"jurien.dev/yugen/kazu/internal/local"
 	"jurien.dev/yugen/kazu/internal/services"
+	localStatic "jurien.dev/yugen/kazu/internal/static"
 	"jurien.dev/yugen/kazu/prisma/db"
 	"jurien.dev/yugen/shared/static"
 )
@@ -23,7 +23,7 @@ func GetGameListener(container *di.Container) *GameListener {
 	return &GameListener{
 		database: container.Get(static.DiDatabase).(*db.PrismaClient),
 		settings: container.Get(static.DiSettings).(*services.SettingsService),
-		service:  container.Get(local.DiGame).(*services.GameService),
+		service:  container.Get(localStatic.DiGame).(*services.GameService),
 	}
 }
 

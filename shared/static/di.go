@@ -7,4 +7,8 @@ const (
 	DiCacheLifetimes = "cacheliftimes"
 	DiDatabase       = "database"
 	DiSettings       = "settings"
+	DiCommandHandler = "commandhandler"
+
+	DiEmbedColor = "embedcolor"
+	DiVoteReward = "voterewardfunc"
 )

@@ -13,7 +13,7 @@ import (
 	"github.com/sarulabs/di/v2"
 	"github.com/zekroTJA/shinpuru/pkg/hammertime"
 	"github.com/zekrotja/dgrs"
-	"jurien.dev/yugen/kazu/internal/local"
+	localStatic "jurien.dev/yugen/kazu/internal/static"
 	"jurien.dev/yugen/kazu/internal/utils"
 	"jurien.dev/yugen/kazu/prisma/db"
 	"jurien.dev/yugen/shared/static"
@@ -37,8 +37,8 @@ func CreateGameService(container *di.Container) *GameService {
 		state:    container.Get(static.DiState).(*dgrs.State),
 		database: container.Get(static.DiDatabase).(*db.PrismaClient),
 		settings: container.Get(static.DiSettings).(*SettingsService),
-		saves:    container.Get(local.DiSaves).(*SavesService),
-		points:   container.Get(local.DiPoints).(*PointsService),
+		saves:    container.Get(localStatic.DiSaves).(*SavesService),
+		points:   container.Get(localStatic.DiPoints).(*PointsService),
 	}
 }
 

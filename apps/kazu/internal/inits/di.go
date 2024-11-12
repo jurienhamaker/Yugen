@@ -4,8 +4,8 @@ import (
 	"log"
 
 	"github.com/sarulabs/di/v2"
-	"jurien.dev/yugen/kazu/internal/local"
 	"jurien.dev/yugen/kazu/internal/services"
+	localStatic "jurien.dev/yugen/kazu/internal/static"
 	"jurien.dev/yugen/kazu/prisma/db"
 	"jurien.dev/yugen/shared/inits"
 	"jurien.dev/yugen/shared/static"
@@ -36,6 +36,21 @@ func InitDI() (container di.Container, err error) {
 	// Initialize redis client
 	inits.InitSharedDi(diBuilder)
 
+	diBuilder.Add(&di.Def{
+		Name: static.DiEmbedColor,
+		Build: func(ctn di.Container) (interface{}, error) {
+			// #5d7fed
+			return 0x5d7fed, nil
+		},
+	})
+
+	diBuilder.Add(&di.Def{
+		Name: static.DiVoteReward,
+		Build: func(ctn di.Container) (interface{}, error) {
+			return CreateVoteRewardFunc(&ctn), nil
+		},
+	})
+
 	// init settings service
 	diBuilder.Add(&di.Def{
 		Name: static.DiSettings,
@@ -46,7 +61,7 @@ func InitDI() (container di.Container, err error) {
 
 	// init saves service
 	diBuilder.Add(&di.Def{
-		Name: local.DiSaves,
+		Name: localStatic.DiSaves,
 		Build: func(ctn di.Container) (interface{}, error) {
 			return services.CreateSavesService(&ctn), nil
 		},
@@ -54,7 +69,7 @@ func InitDI() (container di.Container, err error) {
 
 	// init points service
 	diBuilder.Add(&di.Def{
-		Name: local.DiPoints,
+		Name: localStatic.DiPoints,
 		Build: func(ctn di.Container) (interface{}, error) {
 			return services.CreatePointsService(&ctn), nil
 		},
@@ -62,14 +77,13 @@ func InitDI() (container di.Container, err error) {
 
 	// init game service
 	diBuilder.Add(&di.Def{
-		Name: local.DiGame,
+		Name: localStatic.DiGame,
 		Build: func(ctn di.Container) (interface{}, error) {
 			return services.CreateGameService(&ctn), nil
 		},
 	})
 
 	container, _ = diBuilder.Build()
-	// defer container.DeleteWithSubContainers()
 
 	return
 }
