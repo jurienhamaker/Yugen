@@ -1,6 +1,7 @@
 package static
 
 const (
+	Env             = "ENV"
 	EnvDiscordToken = "DISCORD_TOKEN"
 	EnvDiscordAppId = "DISCORD_APP_ID"
 

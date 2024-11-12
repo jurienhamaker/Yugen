@@ -5,4 +5,6 @@ const (
 	DiState          = "state"
 	DiRedis          = "redis"
 	DiCacheLifetimes = "cacheliftimes"
+	DiDatabase       = "database"
+	DiSettings       = "settings"
 )

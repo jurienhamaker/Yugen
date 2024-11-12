@@ -1,4 +1,13 @@
 services:
+  kazu:
+    build: .
+    user: "1000:1000"
+    command: "make kazu"
+    env_file:
+      - .env
+      - ./apps/kazu/.env
+    volumes:
+      - .:/opt/app
   iro:
     build: .
     user: "1000:1000"
@@ -6,5 +15,15 @@ services:
     volumes:
       - .:/opt/app
 
+  db:
+    image: postgres:12.2-alpine
+    volumes:
+      - ./pg-init-script:/docker-entrypoint-initdb.d/pg-init-scripts.sh
+    environment:
+      - "POSTGRES_USER=$DATABASE_USER"
+      - "POSTGRES_PASSWORD=$DATABASE_PASSWORD"
+      - "POSTGRES_MULTIPLE_DATABASES=$DATABASE_NAME"
+    ports:
+      - "$DATABASE_PORT:5432"
   redis:
     image: redis

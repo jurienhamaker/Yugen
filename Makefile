@@ -4,4 +4,8 @@ iro:
 	@echo "Starting Iro..."
 	cd apps/iro && make watch 
 
-.PHONY: iro
+kazu:
+	@echo "Starting Kazu..."
+	cd apps/kazu && make watch 
+
+.PHONY: iro kazu

@@ -22,17 +22,6 @@ func InitSharedDi(diBuilder *di.EnhancedBuilder) {
 	})
 
 	diBuilder.Add(&di.Def{
-		Name: static.DiCacheLifetimes,
-		Build: func(ctn di.Container) (interface{}, error) {
-			return CacheLifetime{
-				General: "30d",
-				Member:  "90d",
-				User:    "90d",
-			}, nil
-		},
-	})
-
-	diBuilder.Add(&di.Def{
 		Name: static.DiState,
 		Build: func(ctn di.Container) (interface{}, error) {
 			return InitState(ctn)
