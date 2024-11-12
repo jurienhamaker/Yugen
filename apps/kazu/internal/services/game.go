@@ -120,17 +120,16 @@ func (service *GameService) End(gameID int, status db.GameStatus, shame *ShameOp
 	).Exec(context.Background())
 
 	if shame != nil {
-		roleID, ok := shame.settings.ShameRoleID()
-		if !ok {
-			return
-		}
-
-		lastShameUserID, ok := shame.settings.LastShameUserID()
-		if ok {
+		roleID, okRoleID := shame.settings.ShameRoleID()
+		lastShameUserID, okLastShameUserID := shame.settings.LastShameUserID()
+		if okLastShameUserID && okRoleID {
 			go service.session.GuildMemberRoleRemove(shame.settings.GuildID, lastShameUserID, roleID)
 		}
 
-		go service.session.GuildMemberRoleAdd(shame.settings.GuildID, shame.message.Author.ID, roleID)
+		if okRoleID {
+			go service.session.GuildMemberRoleAdd(shame.settings.GuildID, shame.message.Author.ID, roleID)
+		}
+
 		_, err = service.settings.Update(shame.settings.ID, db.Settings.LastShameUserID.Set(shame.message.Author.ID))
 		if err != nil {
 			return
