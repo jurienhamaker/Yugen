@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/FedorLap2006/disgolf"
 	"github.com/bwmarrin/discordgo"
 	"github.com/zekrotja/dgrs"
 )
@@ -13,7 +14,7 @@ type CreateEmbedFooterParams struct {
 	IsVote bool
 }
 
-func CreateEmbedFooter(session *discordgo.Session, state *dgrs.State, params *CreateEmbedFooterParams) (embed *discordgo.MessageEmbedFooter, err error) {
+func CreateEmbedFooter(bot *disgolf.Bot, state *dgrs.State, params *CreateEmbedFooterParams) (embed *discordgo.MessageEmbedFooter, err error) {
 	botAuthor, err := state.User(os.Getenv("OWNER_ID"))
 	if err != nil {
 		return
@@ -25,7 +26,7 @@ func CreateEmbedFooter(session *discordgo.Session, state *dgrs.State, params *Cr
 	}
 
 	if !params.IsVote {
-		name := session.State.User.Username
+		name := bot.State.User.Username
 		text = fmt.Sprintf("Like %s? Please vote using /vote! | %s", name, text)
 	}
 

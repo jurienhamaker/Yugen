@@ -3,7 +3,13 @@ package static
 const (
 	Env             = "ENV"
 	EnvDiscordToken = "DISCORD_TOKEN"
-	EnvDiscordAppId = "DISCORD_APP_ID"
+	EnvDiscordAppID = "DISCORD_APP_ID"
+
+	EnvOwnerIDs = "OWNER_IDS"
+
+	EnvSyncCommands = "SYNC_COMMANDS"
+
+	EnvDiscordDevelopmentGuildID = "DISCORD_DEVELOPMENT_GUILD_ID"
 
 	EnvApiHost = "API_LISTEN_HOST"
 	EnvApiPort = "API_LISTEN_PORT"

@@ -4,7 +4,6 @@
 all: build test
 
 build:
-	@echo "Building..."
 	@go build -o dist/bot cmd/bot/main.go
 
 # Run the application

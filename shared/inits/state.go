@@ -1,7 +1,7 @@
 package inits
 
 import (
-	"github.com/bwmarrin/discordgo"
+	"github.com/FedorLap2006/disgolf"
 	"github.com/go-redis/redis/v8"
 	"github.com/sarulabs/di/v2"
 	"github.com/zekrotja/dgrs"
@@ -9,12 +9,12 @@ import (
 )
 
 func InitState(container di.Container) (state *dgrs.State, err error) {
-	session := container.Get(static.DiDiscordSession).(*discordgo.Session)
+	bot := container.Get(static.DiBot).(*disgolf.Bot)
 	redis := container.Get(static.DiRedis).(*redis.Client)
 
 	return dgrs.New(dgrs.Options{
 		RedisClient:    redis,
-		DiscordSession: session,
+		DiscordSession: bot,
 		FetchAndStore:  true,
 	})
 }

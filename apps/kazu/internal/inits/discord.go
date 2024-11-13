@@ -2,8 +2,8 @@ package inits
 
 import (
 	"log"
-	"os"
 
+	"github.com/FedorLap2006/disgolf"
 	"github.com/bwmarrin/discordgo"
 	"github.com/sarulabs/di/v2"
 	"jurien.dev/yugen/kazu/internal/listeners"
@@ -19,23 +19,27 @@ const (
 		discordgo.IntentsGuildMessageReactions
 )
 
-func InitDiscordSession(container *di.Container) (release func()) {
+func InitDiscordBot(container *di.Container) (release func()) {
 	release = func() {}
 
-	session := container.Get(static.DiDiscordSession).(*discordgo.Session)
+	bot := container.Get(static.DiBot).(*disgolf.Bot)
 
-	session.Token = "Bot " + os.Getenv(static.EnvDiscordToken)
-	session.Identify.Intents = Intents
+	bot.Identify.Intents = Intents
 
-	session.State.MaxMessageCount = 100
+	bot.State.MaxMessageCount = 100
 
-	session.AddHandler(func(session *discordgo.Session, event *discordgo.Ready) {
-		log.Printf("Logged in as: %v#%v", session.State.User.Username, session.State.User.Discriminator)
+	bot.AddHandler(func(bot *discordgo.Session, event *discordgo.Ready) {
+		log.Printf("Logged in as: %v#%v", bot.State.User.Username, bot.State.User.Discriminator)
 	})
 
 	listeners.AddGameListeners(container)
 
-	err := session.Open()
+	err := InitCommands(container)
+	if err != nil {
+		log.Panic(err)
+	}
+
+	err = bot.Open()
 	if err != nil {
 		log.Panic(err)
 	}

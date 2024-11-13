@@ -1,7 +1,7 @@
 package static
 
 const (
-	DiDiscordSession = "discordgosession"
+	DiBot            = "discordbot"
 	DiState          = "state"
 	DiRedis          = "redis"
 	DiCacheLifetimes = "cacheliftimes"

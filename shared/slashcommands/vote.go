@@ -5,49 +5,40 @@ import (
 	"log"
 	"os"
 
+	"github.com/FedorLap2006/disgolf"
 	"github.com/bwmarrin/discordgo"
+	"github.com/sarulabs/di/v2"
 	"github.com/zekrotja/dgrs"
-	"github.com/zekrotja/ken"
 	"jurien.dev/yugen/shared/static"
 	"jurien.dev/yugen/shared/utils"
 )
 
-type Vote struct {
-	ken.SlashCommand
+type VoteModule struct {
+	container *di.Container
 }
 
-func (c *Vote) Name() string {
-	return "vote"
+func GetVoteModule(container *di.Container) *VoteModule {
+	return &VoteModule{
+		container: container,
+	}
 }
 
-func (c *Vote) Description() string {
-	return "Vote for the bot!"
-}
-
-func (c *Vote) Version() string {
-	return "1.0.0"
-}
-
-func (c *Vote) Options() []*discordgo.ApplicationCommandOption {
-	return nil
-}
-
-func (c *Vote) Run(ctx ken.Context) (err error) {
-	err = ctx.Defer()
+func (m *VoteModule) Run(ctx *disgolf.Ctx) {
+	err := utils.Defer(ctx)
 	if err != nil {
 		return
 	}
 
-	user := ctx.User()
-	session := ctx.GetSession()
-	name := session.State.User.Username
+	user := ctx.Interaction.Member.User
+	bot := ctx.State.User
+	name := bot.Username
 
 	voteReward := ""
 
-	voteRewardFunc := ctx.Get(static.DiVoteReward).(func(userId string) string)
-	embedColor := ctx.Get(static.DiEmbedColor).(int)
+	voteRewardFunc := m.container.Get(static.DiVoteReward).(func(userId string) string)
+	embedColor := m.container.Get(static.DiEmbedColor).(int)
 
-	if voteRewardFunc != nil {
+	if voteRewardFunc != nil && user != nil {
 		voteReward = voteRewardFunc(user.ID)
 	}
 
@@ -56,8 +47,8 @@ func (c *Vote) Run(ctx ken.Context) (err error) {
 	}
 
 	footer, err := utils.CreateEmbedFooter(
-		ctx.Get(static.DiDiscordSession).(*discordgo.Session),
-		ctx.Get(static.DiState).(*dgrs.State),
+		m.container.Get(static.DiBot).(*disgolf.Bot),
+		m.container.Get(static.DiState).(*dgrs.State),
 		&utils.CreateEmbedFooterParams{
 			IsVote: true,
 		},
@@ -74,41 +65,60 @@ Please use any of the links below to vote for %s!%s`, name, name, voteReward),
 		Footer: footer,
 	}
 
-	resp := ctx.FollowUpEmbed(embed)
+	components := []discordgo.MessageComponent{}
 
 	topGGVoteLink := os.Getenv(static.EnvTopGGVoteLink)
 	discordBotListVoteLink := os.Getenv(static.EnvDiscordBotListVoteLink)
 	botsGGVoteLink := os.Getenv(static.EnvBotsGGVoteLink)
 
-	if len(topGGVoteLink) > 0 || len(discordBotListVoteLink) > 0 || len(botsGGVoteLink) > 0 {
-		resp.AddComponents(func(cb *ken.ComponentBuilder) {
-			cb.AddActionsRow(func(b ken.ComponentAssembler) {
-				if len(topGGVoteLink) > 0 {
-					log.Println("Adding top.gg", topGGVoteLink)
-					b.Add(discordgo.Button{
-						Label: "Vote on Top.GG",
-						URL:   topGGVoteLink,
-					}, nil)
-				}
-
-				if len(discordBotListVoteLink) > 0 {
-					log.Println("Adding discordbotlist", discordBotListVoteLink)
-					b.Add(discordgo.Button{
-						Label: "Vote on Discord Bot List",
-						URL:   discordBotListVoteLink,
-					}, nil)
-				}
-
-				if len(botsGGVoteLink) > 0 {
-					log.Println("Adding bots.gg", botsGGVoteLink)
-					b.Add(discordgo.Button{
-						Label: "Vote on Bots.GG",
-						URL:   botsGGVoteLink,
-					}, nil)
-				}
-			})
+	if len(topGGVoteLink) > 0 {
+		components = append(components, discordgo.Button{
+			Style: discordgo.LinkButton,
+			Label: "Vote on Top.GG",
+			URL:   topGGVoteLink,
 		})
 	}
 
-	return resp.Send().Error
+	if len(discordBotListVoteLink) > 0 {
+		components = append(components, discordgo.Button{
+			Style: discordgo.LinkButton,
+			Label: "Vote on Discord Bot List",
+			URL:   discordBotListVoteLink,
+		})
+	}
+
+	if len(botsGGVoteLink) > 0 {
+		components = append(components, discordgo.Button{
+			Style: discordgo.LinkButton,
+			Label: "Vote on Bots.GG",
+			URL:   botsGGVoteLink,
+		})
+	}
+
+	messageComponents := []discordgo.MessageComponent{}
+
+	if len(components) > 0 {
+		messageComponents = append(messageComponents, discordgo.ActionsRow{
+			Components: components,
+		})
+	}
+
+	err = utils.FollowUp(ctx, &discordgo.WebhookParams{
+		Content:    "Hello",
+		Embeds:     []*discordgo.MessageEmbed{embed},
+		Components: messageComponents,
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func (m *VoteModule) Commands() []*disgolf.Command {
+	return []*disgolf.Command{
+		{
+			Name:        "vote",
+			Description: "Vote for the bot!",
+			Handler:     disgolf.HandlerFunc(m.Run),
+		},
+	}
 }

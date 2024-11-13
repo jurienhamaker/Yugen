@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/FedorLap2006/disgolf"
 	"github.com/bwmarrin/discordgo"
 	"github.com/sarulabs/di/v2"
 	"jurien.dev/yugen/kazu/internal/services"
@@ -28,15 +29,15 @@ func GetGameListener(container *di.Container) *GameListener {
 }
 
 func AddGameListeners(container *di.Container) {
-	session := container.Get(static.DiDiscordSession).(*discordgo.Session)
+	bot := container.Get(static.DiBot).(*disgolf.Bot)
 
 	colorListener := GetGameListener(container)
-	session.AddHandler(colorListener.MessageCreateHandler)
-	session.AddHandler(colorListener.MessageUpdateHandler)
-	session.AddHandler(colorListener.MessageDeleteHandler)
+	bot.AddHandler(colorListener.MessageCreateHandler)
+	bot.AddHandler(colorListener.MessageUpdateHandler)
+	bot.AddHandler(colorListener.MessageDeleteHandler)
 }
 
-func (listener *GameListener) MessageCreateHandler(session *discordgo.Session, event *discordgo.MessageCreate) {
+func (listener *GameListener) MessageCreateHandler(bot *discordgo.Session, event *discordgo.MessageCreate) {
 	ok, settings := listener.getSettings(event.GuildID, event.ChannelID)
 	if !ok {
 		return
@@ -50,7 +51,7 @@ func (listener *GameListener) MessageCreateHandler(session *discordgo.Session, e
 	listener.service.AddNumber(event.GuildID, number, event.Message, settings)
 }
 
-func (listener *GameListener) MessageUpdateHandler(session *discordgo.Session, event *discordgo.MessageUpdate) {
+func (listener *GameListener) MessageUpdateHandler(bot *discordgo.Session, event *discordgo.MessageUpdate) {
 	ok, settings := listener.getSettings(event.GuildID, event.ChannelID)
 	if !ok {
 		return
@@ -61,14 +62,14 @@ func (listener *GameListener) MessageUpdateHandler(session *discordgo.Session, e
 		return
 	}
 
-	go session.ChannelMessageSend(
+	go bot.ChannelMessageSend(
 		event.ChannelID,
 		fmt.Sprintf(`<@%s> just edited their guess 😒
 Last number was **%d**!`, event.Author.ID, number),
 	)
 }
 
-func (listener *GameListener) MessageDeleteHandler(session *discordgo.Session, event *discordgo.MessageDelete) {
+func (listener *GameListener) MessageDeleteHandler(bot *discordgo.Session, event *discordgo.MessageDelete) {
 	ok, settings := listener.getSettings(event.GuildID, event.ChannelID)
 	if !ok {
 		return
@@ -79,7 +80,7 @@ func (listener *GameListener) MessageDeleteHandler(session *discordgo.Session, e
 		return
 	}
 
-	go session.ChannelMessageSend(
+	go bot.ChannelMessageSend(
 		event.ChannelID,
 		fmt.Sprintf(`<@%s> just deleted their number 😒 
 Last number was **%d**!`, event.BeforeDelete.Author.ID, number),

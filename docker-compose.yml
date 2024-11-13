@@ -14,6 +14,9 @@ services:
     build: .
     user: "1000:1000"
     command: "make iro"
+    env_file:
+      - .env
+      - ./apps/iro/.env
     volumes:
       - .:/opt/app
 

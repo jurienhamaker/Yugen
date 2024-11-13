@@ -4,10 +4,9 @@ import (
 	"log"
 	"os"
 
-	"github.com/bwmarrin/discordgo"
+	"github.com/FedorLap2006/disgolf"
 	"github.com/go-redis/redis/v8"
 	"github.com/sarulabs/di/v2"
-	"github.com/zekrotja/ken"
 	"jurien.dev/yugen/shared/static"
 )
 
@@ -30,26 +29,15 @@ func InitSharedDi(diBuilder *di.EnhancedBuilder) {
 	})
 
 	diBuilder.Add(&di.Def{
-		Name: static.DiDiscordSession,
+		Name: static.DiBot,
 		Build: func(ctn di.Container) (interface{}, error) {
-			return discordgo.New("")
+			return disgolf.New(os.Getenv(static.EnvDiscordToken))
 		},
 		Close: func(obj interface{}) error {
-			session := obj.(*discordgo.Session)
+			bot := obj.(*disgolf.Bot)
 			log.Println("Shutting down bot...")
-			session.Close()
+			bot.Close()
 			return nil
-		},
-	})
-
-	// Initialize command handler
-	diBuilder.Add(&di.Def{
-		Name: static.DiCommandHandler,
-		Build: func(ctn di.Container) (interface{}, error) {
-			return InitCommandHandler(&ctn)
-		},
-		Close: func(obj interface{}) error {
-			return obj.(*ken.Ken).Unregister()
 		},
 	})
 }

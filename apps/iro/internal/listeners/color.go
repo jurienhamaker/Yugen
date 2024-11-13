@@ -10,6 +10,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/FedorLap2006/disgolf"
 	"github.com/bwmarrin/discordgo"
 	"github.com/sarulabs/di/v2"
 	"github.com/zekroTJA/colorname"
@@ -40,23 +41,23 @@ func GetColorListener(container *di.Container) *ColorListener {
 }
 
 func AddColorListeners(container *di.Container) {
-	session := container.Get(static.DiDiscordSession).(*discordgo.Session)
+	bot := container.Get(static.DiBot).(*disgolf.Bot)
 
 	colorListener := GetColorListener(container)
-	session.AddHandler(colorListener.MessageCreateHandler)
-	session.AddHandler(colorListener.MessageUpdateHandler)
-	session.AddHandler(colorListener.MessageReactionHandler)
+	bot.AddHandler(colorListener.MessageCreateHandler)
+	bot.AddHandler(colorListener.MessageUpdateHandler)
+	bot.AddHandler(colorListener.MessageReactionHandler)
 }
 
-func (listener *ColorListener) MessageCreateHandler(session *discordgo.Session, event *discordgo.MessageCreate) {
-	listener.process(session, event.Message, false)
+func (listener *ColorListener) MessageCreateHandler(bot *discordgo.Session, event *discordgo.MessageCreate) {
+	listener.process(bot, event.Message, false)
 }
 
-func (listener *ColorListener) MessageUpdateHandler(session *discordgo.Session, event *discordgo.MessageUpdate) {
-	listener.process(session, event.Message, true)
+func (listener *ColorListener) MessageUpdateHandler(bot *discordgo.Session, event *discordgo.MessageUpdate) {
+	listener.process(bot, event.Message, true)
 }
 
-func (listener *ColorListener) MessageReactionHandler(session *discordgo.Session, event *discordgo.MessageReactionAdd) {
+func (listener *ColorListener) MessageReactionHandler(bot *discordgo.Session, event *discordgo.MessageReactionAdd) {
 	self, err := listener.state.SelfUser()
 	if err != nil {
 		return
@@ -129,7 +130,7 @@ func (listener *ColorListener) MessageReactionHandler(session *discordgo.Session
 		},
 	}
 
-	_, err = session.ChannelMessageSendComplex(event.ChannelID, &discordgo.MessageSend{
+	_, err = bot.ChannelMessageSendComplex(event.ChannelID, &discordgo.MessageSend{
 		Embed: emb,
 		Reference: &discordgo.MessageReference{
 			MessageID: event.MessageID,
@@ -144,7 +145,7 @@ func (listener *ColorListener) MessageReactionHandler(session *discordgo.Session
 	listener.emojiCache.Remove(cacheKey)
 }
 
-func (listener *ColorListener) process(session *discordgo.Session, message *discordgo.Message, removeReactions bool) {
+func (listener *ColorListener) process(bot *discordgo.Session, message *discordgo.Message, removeReactions bool) {
 	if len(message.Content) < 6 {
 		return
 	}
@@ -174,18 +175,18 @@ func (listener *ColorListener) process(session *discordgo.Session, message *disc
 	}
 
 	if removeReactions {
-		if err := session.MessageReactionsRemoveAll(message.ChannelID, message.ID); err != nil {
+		if err := bot.MessageReactionsRemoveAll(message.ChannelID, message.ID); err != nil {
 			log.Println("Could not remove previous color reactions", err)
 		}
 	}
 
 	// Execute reaction for each match
 	for _, hexClr := range matches {
-		listener.createReaction(session, message, hexClr)
+		listener.createReaction(bot, message, hexClr)
 	}
 }
 
-func (listener *ColorListener) createReaction(session *discordgo.Session, message *discordgo.Message, hexClr string) {
+func (listener *ColorListener) createReaction(bot *discordgo.Session, message *discordgo.Message, hexClr string) {
 	// Remove trailing '#' from color code,
 	// when existent
 	hexClr = strings.TrimPrefix(hexClr, "#")
@@ -212,8 +213,8 @@ func (listener *ColorListener) createReaction(session *discordgo.Session, messag
 	dataUri := fmt.Sprintf("data:image/png;base64,%s", b64Data)
 
 	// Upload guild emote
-	clientId := os.Getenv(static.EnvDiscordAppId)
-	emoji, err := session.ApplicationEmojiCreate(clientId, &discordgo.EmojiParams{
+	clientId := os.Getenv(static.EnvDiscordAppID)
+	emoji, err := bot.ApplicationEmojiCreate(clientId, &discordgo.EmojiParams{
 		Name:  "hex" + hexClr,
 		Image: dataUri,
 	})
@@ -226,13 +227,13 @@ func (listener *ColorListener) createReaction(session *discordgo.Session, messag
 	// to give discords caching or whatever some
 	// time to save the emoji.
 	defer time.AfterFunc(5*time.Second, func() {
-		if err = session.ApplicationEmojiDelete(clientId, emoji.ID); err != nil {
+		if err = bot.ApplicationEmojiDelete(clientId, emoji.ID); err != nil {
 			log.Println("Failed deleting emoji", err)
 		}
 	})
 
 	// Add reaction of the uploaded emote to the message
-	err = session.MessageReactionAdd(message.ChannelID, message.ID, emoji.APIName())
+	err = bot.MessageReactionAdd(message.ChannelID, message.ID, emoji.APIName())
 	if err != nil {
 		log.Println("Failed creating message reaction", err)
 		return

@@ -5,7 +5,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/bwmarrin/discordgo"
+	"github.com/FedorLap2006/disgolf"
 	"github.com/sarulabs/di/v2"
 	"jurien.dev/yugen/kazu/prisma/db"
 	"jurien.dev/yugen/shared/static"
@@ -13,14 +13,14 @@ import (
 
 type SettingsService struct {
 	database *db.PrismaClient
-	session  *discordgo.Session
+	bot      *disgolf.Bot
 }
 
 func CreateSettingsService(container *di.Container) *SettingsService {
 	log.Println("Creating Settings Service")
 	return &SettingsService{
 		database: container.Get(static.DiDatabase).(*db.PrismaClient),
-		session:  container.Get(static.DiDiscordSession).(*discordgo.Session),
+		bot:      container.Get(static.DiBot).(*disgolf.Bot),
 	}
 }
 
@@ -66,7 +66,7 @@ func (service *SettingsService) ResetShame(guildID string) (err error) {
 		return
 	}
 
-	err = service.session.GuildMemberRoleRemove(guildID, lastShameUserID, shameRoleID)
+	err = service.bot.GuildMemberRoleRemove(guildID, lastShameUserID, shameRoleID)
 
 	return
 }

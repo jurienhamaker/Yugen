@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"os/signal"
@@ -8,20 +9,31 @@ import (
 
 	"github.com/joho/godotenv"
 	"jurien.dev/yugen/iro/internal/inits"
+	"jurien.dev/yugen/shared/static"
+
+	sharedInits "jurien.dev/yugen/shared/inits"
 )
 
-func main() {
+func init() {
 	err := godotenv.Load()
 	if err != nil {
-		log.Panic(err)
+		log.Fatal(fmt.Errorf("cannot load .env: %w", err))
 	}
+}
 
+func main() {
 	container, _ := inits.InitDI()
+	defer container.DeleteWithSubContainers()
 
-	inits.InitDiscordSession(&container)
+	release := inits.InitDiscordBot(&container)
+	defer release()
 
-	log.Println("Started, press CTRL-C to close")
+	api := sharedInits.InitAPI(&container)
+	log.Fatal(api.Listen(fmt.Sprintf("%s:%s", os.Getenv(static.EnvApiHost), os.Getenv(static.EnvApiPort))))
+
+	log.Println("Started kazu. Stop with CTRL-C...")
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
 	<-sc
+	log.Println("Bot stopped.")
 }
