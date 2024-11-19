@@ -31,7 +31,7 @@ func main() {
 	api := sharedInits.InitAPI(&container)
 	log.Fatal(api.Listen(fmt.Sprintf("%s:%s", os.Getenv(static.EnvApiHost), os.Getenv(static.EnvApiPort))))
 
-	log.Println("Started kazu. Stop with CTRL-C...")
+	log.Println("Started iro. Stop with CTRL-C...")
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
 	<-sc

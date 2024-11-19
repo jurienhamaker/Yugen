@@ -6,7 +6,6 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
-	"time"
 
 	"github.com/joho/godotenv"
 	"jurien.dev/yugen/kazu/internal/inits"
@@ -37,7 +36,4 @@ func main() {
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
 	<-sc
 	log.Println("Bot stopped.")
-
-	time.Sleep(time.Minute)
-	log.Println("Hello?")
 }

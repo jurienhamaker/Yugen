@@ -98,7 +98,6 @@ func (m *ServerModule) server(ctx *disgolf.Ctx) {
 	}
 
 	lastCountedText := "-"
-	log.Println(historyExists, history, self.ID)
 	if historyExists && history.UserID != self.ID {
 		lastCountedText = fmt.Sprintf("<@%s>", history.UserID)
 	}
