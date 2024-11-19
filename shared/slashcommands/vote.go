@@ -104,7 +104,6 @@ Please use any of the links below to vote for %s!%s`, name, name, voteReward),
 	}
 
 	err = utils.FollowUp(ctx, &discordgo.WebhookParams{
-		Content:    "Hello",
 		Embeds:     []*discordgo.MessageEmbed{embed},
 		Components: messageComponents,
 	})

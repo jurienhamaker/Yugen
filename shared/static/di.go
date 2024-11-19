@@ -9,6 +9,11 @@ const (
 	DiSettings       = "settings"
 	DiCommandHandler = "commandhandler"
 
+	DiAppName = "appname"
+
 	DiEmbedColor = "embedcolor"
 	DiVoteReward = "voterewardfunc"
+
+	DiTutorialText = "tutorialtext"
+	DiHelpText     = "helptext"
 )

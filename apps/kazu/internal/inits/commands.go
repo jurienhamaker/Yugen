@@ -20,6 +20,12 @@ func InitCommands(container *di.Container) (err error) {
 	modules := []utils.CommandsModule{
 		// shared
 		slashcommands.GetVoteModule(container),
+		slashcommands.GetDonateModule(container),
+		slashcommands.GetSupportModule(container),
+		slashcommands.GetInviteModule(container),
+
+		slashcommands.GetHelpModule(container),
+		slashcommands.GetTutorialModule(container),
 
 		// internal
 		game.GetGameModule(container),
