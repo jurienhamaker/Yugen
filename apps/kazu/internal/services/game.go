@@ -51,7 +51,7 @@ type ShameOptions struct {
 func (service *GameService) Start(guildID string, gameType db.GameType, startingNumber int, recreate bool, shame ...*ShameOptions) (game *db.GameModel, started bool, err error) {
 	log.Printf("Trying to start a game for %s", guildID)
 
-	currentGame, exists, err := service.getCurrentGame(guildID)
+	currentGame, exists, err := service.GetCurrentGame(guildID)
 	if err != nil && err != db.ErrNotFound {
 		return
 	}
@@ -174,7 +174,7 @@ func (service *GameService) ParseNumber(message *discordgo.Message, math bool) (
 }
 
 func (service *GameService) AddNumber(guildID string, number int, message *discordgo.Message, settings *db.SettingsModel) {
-	game, exists, err := service.getCurrentGame(guildID)
+	game, exists, err := service.GetCurrentGame(guildID)
 	if err != nil {
 		log.Println(err)
 		return
@@ -184,7 +184,7 @@ func (service *GameService) AddNumber(guildID string, number int, message *disco
 		return
 	}
 
-	history, err := service.getLastHistory(game)
+	history, _, err := service.GetLastHistory(game)
 	if err != nil {
 		log.Println(err)
 		return
@@ -197,7 +197,7 @@ func (service *GameService) AddNumber(guildID string, number int, message *disco
 		failReason := fmt.Sprintf("<@%s> counted twice in a row!", message.Author.ID)
 
 		if !isNextNumber {
-			failReason = fmt.Sprintf(`%d is not the next number!`, number)
+			failReason = fmt.Sprintf("%d is not the next number!\n**The next number is %d**", number, history.Number+1)
 		}
 
 		if err != nil {
@@ -224,9 +224,9 @@ func (service *GameService) AddNumber(guildID string, number int, message *disco
 				message.ChannelID,
 				fmt.Sprintf(
 					`%s
-Used **1 of your own** saves, You have **%d/2** saves left.`,
+Used **1 of your own** saves, You have **%s/2** saves left.`,
 					failReason,
-					leftoverSaves,
+					strconv.FormatFloat(leftoverSaves, 'f', -1, 64),
 				),
 				message.Reference(),
 			)
@@ -349,13 +349,13 @@ func (service *GameService) IsEqualToLast(message *discordgo.Message, settings *
 	ok = true
 	number = -1
 
-	game, exists, err := service.getCurrentGame(message.GuildID)
+	game, exists, err := service.GetCurrentGame(message.GuildID)
 	if err != nil || !exists {
 		log.Println("Couldnt find game", err)
 		return
 	}
 
-	history, err := service.getLastHistory(game)
+	history, _, err := service.GetLastHistory(game)
 	if err != nil {
 		log.Println("Couldnt find last history", err)
 		return
@@ -391,7 +391,7 @@ func (service *GameService) IsEqualToLast(message *discordgo.Message, settings *
 	return
 }
 
-func (service *GameService) getCurrentGame(guildID string) (game *db.GameModel, exists bool, err error) {
+func (service *GameService) GetCurrentGame(guildID string) (game *db.GameModel, exists bool, err error) {
 	exists = true
 	game, err = service.database.Game.FindFirst(
 		db.Game.GuildID.Equals(guildID),
@@ -408,18 +408,25 @@ func (service *GameService) getCurrentGame(guildID string) (game *db.GameModel, 
 	return
 }
 
-func (service *GameService) getLastHistory(game *db.GameModel) (*db.HistoryModel, error) {
+func (service *GameService) GetLastHistory(game *db.GameModel) (history *db.HistoryModel, exists bool, err error) {
 	if game == nil || game.Status != db.GameStatusInProgress {
-		return nil, errors.New("Game is not in progress")
+		exists = false
+		return
 	}
 
-	history, err := service.database.History.FindFirst(
+	exists = true
+	history, err = service.database.History.FindFirst(
 		db.History.Game.Where(db.Game.ID.Equals(game.ID)),
 	).OrderBy(
 		db.History.CreatedAt.Order(db.SortOrderDesc),
 	).Exec(context.Background())
 
-	return history, err
+	if err == db.ErrNotFound {
+		err = nil
+		exists = false
+	}
+
+	return
 }
 
 func (service *GameService) getCount(gameID int) (count int, err error) {

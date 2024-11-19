@@ -53,7 +53,7 @@ func (service *SavesService) GetSaves(settings *db.SettingsModel, userID string)
 	return
 }
 
-func (service *SavesService) DeductSaveFromPlayer(userID string, amount int) (leftover int, err error) {
+func (service *SavesService) DeductSaveFromPlayer(userID string, amount float64) (leftover float64, err error) {
 	player, err := service.GetPlayerSavesByUserID(userID)
 
 	newSaves := player.Saves - 1
@@ -66,13 +66,13 @@ func (service *SavesService) DeductSaveFromPlayer(userID string, amount int) (le
 		db.PlayerSaves.Saves.Set(newSaves),
 	).Exec(context.Background())
 
-	leftover = int(player.Saves)
+	leftover = player.Saves
 
 	return
 }
 
-func (service *SavesService) DeductSaveFromGuild(guildID string, settings *db.SettingsModel, amount int) (leftover int, maxSaves int, err error) {
-	newSaves := settings.Saves - 1
+func (service *SavesService) DeductSaveFromGuild(guildID string, settings *db.SettingsModel, amount float64) (leftover float64, maxSaves float64, err error) {
+	newSaves := settings.Saves - amount
 
 	if newSaves < 0 {
 		newSaves = 0
@@ -82,8 +82,59 @@ func (service *SavesService) DeductSaveFromGuild(guildID string, settings *db.Se
 		db.Settings.Saves.Set(newSaves),
 	).Exec(context.Background())
 
-	leftover = int(settings.Saves)
-	maxSaves = int(settings.MaxSaves)
+	leftover = settings.Saves
+	maxSaves = settings.MaxSaves
+
+	return
+}
+
+func (service *SavesService) AddSaveToPlayer(userID string, amount float64) (saves float64, maxSaves float64, err error) {
+	player, err := service.GetPlayerSavesByUserID(userID)
+	if err != nil {
+		return
+	}
+
+	if player.Saves == 2 {
+		saves = 2
+		maxSaves = 2
+		return
+	}
+
+	newSaves := player.Saves + amount
+
+	if newSaves > 2 {
+		newSaves = 2
+	}
+
+	player, err = service.database.PlayerSaves.FindUnique(db.PlayerSaves.ID.Equals(player.ID)).Update(
+		db.PlayerSaves.Saves.Set(newSaves),
+	).Exec(context.Background())
+	if err != nil {
+		return
+	}
+
+	saves = player.Saves
+	maxSaves = 2
+
+	return
+}
+
+func (service *SavesService) AddSaveToGuild(guildID string, settings *db.SettingsModel, amount float64) (saves float64, maxSaves float64, err error) {
+	newSaves := settings.Saves + amount
+
+	if newSaves > settings.MaxSaves {
+		newSaves = settings.MaxSaves
+	}
+
+	settings, err = service.database.Settings.FindUnique(db.Settings.ID.Equals(settings.ID)).Update(
+		db.Settings.Saves.Set(newSaves),
+	).Exec(context.Background())
+	if err != nil {
+		return
+	}
+
+	saves = settings.Saves
+	maxSaves = settings.MaxSaves
 
 	return
 }

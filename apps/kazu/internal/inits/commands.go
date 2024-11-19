@@ -11,6 +11,7 @@ import (
 	"jurien.dev/yugen/shared/utils"
 
 	game "jurien.dev/yugen/kazu/internal/slashcommands/game"
+	points "jurien.dev/yugen/kazu/internal/slashcommands/points"
 	settings "jurien.dev/yugen/kazu/internal/slashcommands/settings"
 )
 
@@ -29,7 +30,12 @@ func InitCommands(container *di.Container) (err error) {
 
 		// internal
 		game.GetGameModule(container),
+
 		settings.GetSettingsModule(container),
+
+		points.GetDonateSaveModule(container),
+		points.GetProfileModule(container),
+		points.GetServerModule(container),
 	}
 
 	os.Getenv(static.EnvDiscordAppID)
