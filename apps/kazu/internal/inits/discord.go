@@ -8,6 +8,8 @@ import (
 	"github.com/sarulabs/di/v2"
 	"jurien.dev/yugen/kazu/internal/listeners"
 	"jurien.dev/yugen/shared/static"
+
+	sharedListeners "jurien.dev/yugen/shared/listeners"
 )
 
 const (
@@ -32,6 +34,10 @@ func InitDiscordBot(container *di.Container) (release func()) {
 		log.Printf("Logged in as: %v#%v", bot.State.User.Username, bot.State.User.Discriminator)
 	})
 
+	// shared
+	sharedListeners.AddLogListeners(container)
+
+	// internal
 	listeners.AddGameListeners(container)
 
 	err := InitCommands(container)

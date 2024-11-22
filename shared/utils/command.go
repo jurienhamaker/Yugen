@@ -19,7 +19,11 @@ func Defer(ctx *disgolf.Ctx, ephemeral ...bool) (err error) {
 	return
 }
 
-func Respond(ctx *disgolf.Ctx, data *discordgo.InteractionResponseData) (err error) {
+func Respond(ctx *disgolf.Ctx, data *discordgo.InteractionResponseData, ephemeral ...bool) (err error) {
+	if len(ephemeral) > 0 && ephemeral[0] {
+		data.Flags = discordgo.MessageFlagsEphemeral
+	}
+
 	err = ctx.Respond(&discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: data,
@@ -33,6 +37,14 @@ func FollowUp(ctx *disgolf.Ctx, response *discordgo.WebhookParams, ephemeral ...
 	}
 
 	_, err = ctx.Session.FollowupMessageCreate(ctx.Interaction, true, response)
+	return
+}
+
+func Update(ctx *disgolf.Ctx, data *discordgo.InteractionResponseData) (err error) {
+	err = ctx.Respond(&discordgo.InteractionResponse{
+		Type: discordgo.InteractionResponseUpdateMessage,
+		Data: data,
+	})
 	return
 }
 
@@ -67,5 +79,26 @@ func ErrorResponse(ctx *disgolf.Ctx, ephemeral ...bool) error {
 	return Respond(ctx, &discordgo.InteractionResponseData{
 		Flags:  discordgo.MessageFlagsEphemeral,
 		Embeds: []*discordgo.MessageEmbed{embed},
+	})
+}
+
+func InteractionError(ctx *disgolf.Ctx, isFollowup bool) {
+	content := "Something wen't wrong, try again later."
+	if isFollowup {
+		FollowUp(ctx, &discordgo.WebhookParams{
+			Content: content,
+		}, true)
+		return
+	}
+
+	Respond(ctx, &discordgo.InteractionResponseData{
+		Content: content,
+	}, true)
+}
+
+func MessageComponentError(ctx *disgolf.Ctx) {
+	Update(ctx, &discordgo.InteractionResponseData{
+		Content: "Something wen't wrong, try again later.",
+		Flags:   discordgo.MessageFlagsEphemeral,
 	})
 }

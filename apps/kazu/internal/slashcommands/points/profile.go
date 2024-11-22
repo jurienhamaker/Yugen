@@ -30,7 +30,14 @@ func GetProfileModule(container *di.Container) *ProfileModule {
 func (m *ProfileModule) profile(ctx *disgolf.Ctx) {
 	utils.Defer(ctx, true)
 
-	saves, err := m.saves.GetPlayerSavesByUserID(ctx.Interaction.Member.User.ID)
+	playerOption := ctx.Options["player"]
+
+	player := ctx.Interaction.Member.User
+	if playerOption != nil {
+		player = playerOption.UserValue(ctx.Session)
+	}
+
+	saves, err := m.saves.GetPlayerSavesByUserID(player.ID)
 	if err != nil {
 		utils.FollowUp(ctx, &discordgo.WebhookParams{
 			Content: "Sorry couldn't find your profile...",
@@ -38,22 +45,40 @@ func (m *ProfileModule) profile(ctx *disgolf.Ctx) {
 		return
 	}
 
-	points, err := m.points.GetPlayer(ctx.Interaction.GuildID, ctx.Interaction.Member.User.ID, true)
+	points, err := m.points.GetPlayer(ctx.Interaction.GuildID, player.ID, true)
 	if err != nil {
 		utils.FollowUp(ctx, &discordgo.WebhookParams{
 			Content: "Sorry couldn't find your profile...",
 		}, true)
 		return
+	}
+
+	name := "You"
+	addressing := "have"
+	if playerOption != nil && player.ID != ctx.Interaction.Member.User.ID {
+		name = fmt.Sprintf("<@%s>", player.ID)
+		addressing = "has"
 	}
 
 	utils.FollowUp(ctx, &discordgo.WebhookParams{
 		Content: fmt.Sprintf(
-			`You currently have **%d** points!
+			`%s currently %s **%d** points!
 And you have **%s/2** saves available!`,
+			name,
+			addressing,
 			points.Points,
 			strconv.FormatFloat(saves.Saves, 'f', -1, 64),
 		),
 	}, true)
+}
+
+var profileOptions = []*discordgo.ApplicationCommandOption{
+	{
+		Type:        discordgo.ApplicationCommandOptionUser,
+		Name:        "player",
+		Description: "The player for which you want to load the profile",
+		Required:    false,
+	},
 }
 
 func (m *ProfileModule) Commands() []*disgolf.Command {
@@ -62,11 +87,13 @@ func (m *ProfileModule) Commands() []*disgolf.Command {
 			Name:        "profile",
 			Description: "Get your kazu profile!",
 			Handler:     disgolf.HandlerFunc(m.profile),
+			Options:     profileOptions,
 		},
 		{
 			Name:        "points",
 			Description: "[Deprecated] Get your current points!",
 			Handler:     disgolf.HandlerFunc(m.profile),
+			Options:     profileOptions,
 		},
 	}
 }

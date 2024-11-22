@@ -36,12 +36,16 @@ func InitCommands(container *di.Container) (err error) {
 		points.GetDonateSaveModule(container),
 		points.GetProfileModule(container),
 		points.GetServerModule(container),
+
+		points.GetResetLeaderboardModule(container),
+		points.GetLeaderboardModule(container),
 	}
 
 	os.Getenv(static.EnvDiscordAppID)
 	utils.RegisterCommandModules(bot, modules)
 
 	bot.AddHandler(bot.Router.HandleInteraction)
+	bot.AddHandler(bot.Router.HandleInteractionMessageComponent)
 
 	if os.Getenv(static.EnvSyncCommands) == "true" {
 		log.Printf("Syncing commands of %d modules", len(modules))

@@ -12,6 +12,11 @@ type CommandsModule interface {
 	Commands() []*disgolf.Command
 }
 
+type CommandsAndMessageComponentsModule interface {
+	Commands() []*disgolf.Command
+	MessageComponents() []*disgolf.MessageComponent
+}
+
 func getStructName(m interface{}) string {
 	if t := reflect.TypeOf(m); t.Kind() == reflect.Ptr {
 		return t.Elem().Name()
@@ -22,10 +27,11 @@ func getStructName(m interface{}) string {
 
 func RegisterCommandModules(bot *disgolf.Bot, modules []CommandsModule) {
 	for _, m := range modules {
-		commandsStr := "command"
+		commandsStr := "commands"
 		commandsLen := 0
+		commands := m.Commands()
 
-		for _, command := range m.Commands() {
+		for _, command := range commands {
 			if command.SubCommands.Count() > 0 {
 				commandsLen = commandsLen + command.SubCommands.Count()
 				continue
@@ -34,13 +40,38 @@ func RegisterCommandModules(bot *disgolf.Bot, modules []CommandsModule) {
 			commandsLen = commandsLen + 1
 		}
 
-		if commandsLen != 1 {
-			commandsStr = "commands"
+		if commandsLen == 1 {
+			commandsStr = "command"
 		}
 
-		log.Printf("Registering '%s' module with %d %s", strings.Replace(getStructName(m), "Module", "", 1), commandsLen, commandsStr)
-		for _, command := range m.Commands() {
+		for _, command := range commands {
 			bot.Router.Register(command)
 		}
+
+		messageComponentsStr := "message components"
+		messageComponentsLen := 0
+
+		if a, ok := m.(CommandsAndMessageComponentsModule); ok {
+			messageComponents := a.MessageComponents()
+			messageComponentsLen = len(messageComponents)
+
+			if messageComponentsLen == 1 {
+				messageComponentsStr = "message component"
+			}
+
+			for _, messageComponent := range messageComponents {
+				bot.Router.RegisterMessageComponent(messageComponent)
+				bot.Router.RegisterMessageComponent(messageComponent)
+			}
+		}
+
+		log.Printf(
+			"Registered '%s' module with %d %s and %d %s",
+			strings.Replace(getStructName(m), "Module", "", 1),
+			commandsLen,
+			commandsStr,
+			messageComponentsLen,
+			messageComponentsStr,
+		)
 	}
 }

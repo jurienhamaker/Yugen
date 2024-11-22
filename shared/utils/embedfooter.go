@@ -25,7 +25,7 @@ func CreateEmbedFooter(bot *disgolf.Bot, state *dgrs.State, params *CreateEmbedF
 		text = fmt.Sprintf("%s | %s", params.Text, text)
 	}
 
-	if !params.IsVote {
+	if !params.IsVote && len(params.Text) == 0 {
 		name := bot.State.User.Username
 		text = fmt.Sprintf("Like %s? Please vote using /vote! | %s", name, text)
 	}
