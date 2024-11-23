@@ -19,7 +19,8 @@ services:
       - ./apps/iro/.env
     volumes:
       - .:/opt/app
-
+    ports:
+      - "3001:$API_LISTEN_PORT"
   db:
     image: postgres:12.2-alpine
     volumes:

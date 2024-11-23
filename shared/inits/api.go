@@ -13,6 +13,7 @@ import (
 )
 
 func listen(app *fiber.App) {
+	utils.Logger.Info("Initializing api...")
 	utils.Logger.Fatal(app.Listen(fmt.Sprintf("%s:%s", os.Getenv(static.EnvApiHost), os.Getenv(static.EnvApiPort))))
 }
 
