@@ -11,11 +11,7 @@ import (
 )
 
 const (
-	Intents = discordgo.IntentsDirectMessages |
-		discordgo.IntentsGuildBans |
-		discordgo.IntentsGuildEmojis |
-		discordgo.IntentsGuildIntegrations |
-		discordgo.IntentsGuildInvites |
+	Intents = discordgo.IntentGuilds |
 		discordgo.IntentsGuildMessageReactions |
 		discordgo.IntentsGuildMessages
 )

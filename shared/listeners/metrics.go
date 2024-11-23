@@ -7,7 +7,6 @@ import (
 	"github.com/bwmarrin/discordgo"
 	"github.com/robfig/cron/v3"
 	"github.com/sarulabs/di/v2"
-	"github.com/zekrotja/dgrs"
 	"jurien.dev/yugen/shared/metrics"
 	"jurien.dev/yugen/shared/static"
 	"jurien.dev/yugen/shared/utils"
@@ -18,23 +17,21 @@ func setLatency(bot *disgolf.Bot) {
 	metrics.DiscordLatency.Set(float64(latency.Milliseconds()))
 }
 
-func reloadGuilds(state *dgrs.State) {
+func reloadGuilds(bot *disgolf.Bot) {
 	time.Sleep(time.Second)
-	guilds, err := state.Guilds()
-	guildsLen := 0
-	if err == nil {
-		guildsLen = len(guilds)
-	}
-
-	metrics.TotalGuilds.Set(float64(guildsLen))
+	guilds := bot.State.Guilds
+	metrics.TotalGuilds.Set(float64(len(guilds)))
 }
 
-func reloadChannels(state *dgrs.State) {
+func reloadChannels(bot *disgolf.Bot) {
 	time.Sleep(time.Second)
-	channels, err := state.Channels("")
+	guilds := bot.State.Guilds
+
 	channelsLen := 0
-	if err == nil {
-		channelsLen = len(channels)
+	for _, guild := range guilds {
+		utils.Logger.Infof("Got %d channels for %s", len(guild.Channels), guild.Name)
+		channelsLen = channelsLen + len(guild.Channels)
+
 	}
 
 	metrics.TotalChannels.Set(float64(channelsLen))
@@ -55,15 +52,14 @@ func reloadInteractions(bot *disgolf.Bot) {
 	metrics.TotalInteractions.Set(float64(interactionsLen))
 }
 
-func reloadGuages(bot *disgolf.Bot, state *dgrs.State) {
-	go reloadGuilds(state)
-	go reloadChannels(state)
+func reloadGuages(bot *disgolf.Bot) {
+	go reloadGuilds(bot)
+	go reloadChannels(bot)
 	go reloadInteractions(bot)
 }
 
 func AddMetricsListeners(container *di.Container) {
 	bot := container.Get(static.DiBot).(*disgolf.Bot)
-	state := container.Get(static.DiState).(*dgrs.State)
 	cron := container.Get(static.DiCron).(*cron.Cron)
 
 	setLatency(bot)
@@ -73,7 +69,7 @@ func AddMetricsListeners(container *di.Container) {
 
 	bot.AddHandler(func(session *discordgo.Session, event *discordgo.Ready) {
 		metrics.DiscordConnected.Set(1)
-		go reloadGuages(bot, state)
+		go reloadGuages(bot)
 	})
 
 	bot.AddHandler(func(session *discordgo.Session, event *discordgo.Disconnect) {
@@ -81,19 +77,19 @@ func AddMetricsListeners(container *di.Container) {
 	})
 
 	bot.AddHandler(func(session *discordgo.Session, event *discordgo.GuildCreate) {
-		go reloadGuilds(state)
+		go reloadGuilds(bot)
 	})
 
 	bot.AddHandler(func(session *discordgo.Session, event *discordgo.GuildDelete) {
-		go reloadGuilds(state)
+		go reloadGuilds(bot)
 	})
 
 	bot.AddHandler(func(session *discordgo.Session, event *discordgo.ChannelCreate) {
-		go reloadChannels(state)
+		go reloadChannels(bot)
 	})
 
 	bot.AddHandler(func(session *discordgo.Session, event *discordgo.ChannelDelete) {
-		go reloadChannels(state)
+		go reloadChannels(bot)
 	})
 
 	bot.AddHandler(func(session *discordgo.Session, event *discordgo.InteractionCreate) {
