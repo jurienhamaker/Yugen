@@ -5,6 +5,7 @@ import (
 	"github.com/bwmarrin/discordgo"
 	"github.com/sarulabs/di/v2"
 	"jurien.dev/yugen/iro/internal/listeners"
+	sharedListeners "jurien.dev/yugen/shared/listeners"
 	"jurien.dev/yugen/shared/static"
 	"jurien.dev/yugen/shared/utils"
 )
@@ -35,9 +36,19 @@ func InitDiscordBot(container *di.Container) (release func()) {
 		utils.Logger.Infof("Logged in as: %v#%v", bot.State.User.Username, bot.State.User.Discriminator)
 	})
 
+	// shared
+	sharedListeners.AddLogListeners(container)
+	sharedListeners.AddMetricsListeners(container)
+
+	// internal
 	listeners.AddColorListeners(container)
 
-	err := bot.Open()
+	err := InitCommands(container)
+	if err != nil {
+		utils.Logger.Panic(err)
+	}
+
+	err = bot.Open()
 	if err != nil {
 		utils.Logger.Panic(err)
 	}
