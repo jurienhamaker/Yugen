@@ -1,0 +1,26 @@
+FROM golang:1.23 AS build
+
+WORKDIR /opt/app
+
+COPY go.work.iro ./go.work
+COPY external ./external
+COPY apps/iro/go.mod apps/iro/go.sum ./apps/iro/
+COPY shared/go.mod shared/go.sum ./shared/
+
+RUN go mod download 
+
+COPY ./ ./
+
+RUN make build-iro
+
+
+# Production
+FROM scratch
+
+WORKDIR /opt/app
+
+COPY --from=build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
+# We transport the binary to our deployable image
+COPY --from=build /opt/app/apps/iro/dist/iro /opt/app/
+
+CMD ["/opt/app/iro"]

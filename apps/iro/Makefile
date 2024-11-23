@@ -5,9 +5,11 @@ all: build test
 
 build:
 	@echo "Building..."
-	
-	
-	@go build -o dist/bot cmd/bot/main.go 
+	@go build -o dist/iro cmd/bot/main.go 
+
+build-prod:
+	@echo "Building..."
+	@CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o dist/iro cmd/bot/main.go
 
 # Run the application
 run:

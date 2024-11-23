@@ -4,6 +4,10 @@ iro:
 	@echo "Starting Iro..."
 	cd apps/iro && make watch 
 
+build-iro:
+	@echo "Building Iro..."
+	cd apps/iro && make build-prod
+
 kazu:
 	@echo "Starting Kazu..."
 	cd apps/kazu && make watch 
