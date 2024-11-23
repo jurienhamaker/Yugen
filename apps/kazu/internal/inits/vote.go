@@ -24,7 +24,10 @@ func CreateVoteHandler(container *di.Container) func(userID string, source strin
 			return err
 		}
 
-		utils.Logger.Infof("Processing vote for %s from %s", userID, source)
+		utils.Logger.With(
+			"userID", userID,
+			"source", source,
+		).Infof("Processing vote for %s from %s", userID, source)
 		_, _, err = saves.AddSaveToPlayer(user.ID, 1)
 		return err
 	}

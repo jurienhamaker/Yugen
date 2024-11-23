@@ -39,7 +39,12 @@ func AddLogListeners(container *di.Container) {
 
 		data := event.ApplicationCommandData()
 		name := utils.GetInteractionName(&data)
-		utils.Logger.Info("Interaction \"%s\" used by %s", name, event.Member.User.Username)
+		utils.Logger.With(
+			"interaction", name,
+			"username", event.Member.User.Username,
+			"userID", event.Member.User.ID,
+			"guildID", event.GuildID,
+		).Infof("Interaction \"%s\" used by %s", name, event.Member.User.Username)
 
 		go sendLogMessage(container, event, &data)
 	})
@@ -50,6 +55,12 @@ func AddLogListeners(container *di.Container) {
 		}
 
 		data := event.MessageComponentData()
-		utils.Logger.Info("Message component \"%s\" used by %s", data.CustomID, event.Member.User.Username)
+
+		utils.Logger.With(
+			"customID", data.CustomID,
+			"username", event.Member.User.Username,
+			"userID", event.Member.User.ID,
+			"guildID", event.GuildID,
+		).Infof("Message component \"%s\" used by %s", data.CustomID, event.Member.User.Username)
 	})
 }
