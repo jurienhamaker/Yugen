@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://discord.gg/UttZbEd9zn" target="blank"><img src="https://raw.githubusercontent.com/jurienhamaker/Yugen/go/assets/iro%20sticker.png" width="200" alt="Iro logo" /></a>
+  <a href="https://discord.gg/UttZbEd9zn" target="blank"><img src="https://raw.githubusercontent.com/jurienhamaker/Yugen/main/assets/iro%20sticker.png" width="200" alt="Iro logo" /></a>
 </p>
 
   <p align="center">A color utility bot on <a href="http://discord.com" target="_blank">Discord</a>.</p>
