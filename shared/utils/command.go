@@ -7,14 +7,19 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-func GetInteractionName(data *discordgo.ApplicationCommandInteractionData) string {
+func GetInteractionName(data *discordgo.ApplicationCommandInteractionData, delimeter ...string) string {
+	delimeterStr := "/"
+	if len(delimeter) > 0 {
+		delimeterStr = delimeter[0]
+	}
+
 	suffix := ""
 	for _, option := range data.Options {
 		if option.Type != discordgo.ApplicationCommandOptionSubCommand {
 			continue
 		}
 
-		suffix = fmt.Sprintf("%s/%s", suffix, option.Name)
+		suffix = fmt.Sprintf("%s%s%s", suffix, delimeterStr, option.Name)
 	}
 
 	return fmt.Sprintf("%s%s", data.Name, suffix)

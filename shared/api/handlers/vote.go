@@ -1,8 +1,10 @@
 package handlers
 
 import (
+	"fmt"
 	"os"
 
+	"github.com/FedorLap2006/disgolf"
 	"github.com/gofiber/fiber/v2"
 	"github.com/sarulabs/di/v2"
 	"github.com/zekrotja/dgrs"
@@ -110,11 +112,21 @@ func (handler *VoteHandler) handleDiscordBotList(c *fiber.Ctx) error {
 	return c.SendStatus(200)
 }
 
-func (handler VoteHandler) handleVote(userID string, source string) {
+func (handler *VoteHandler) handleVote(userID string, source string) {
+	go handler.sendLogMessage(userID, source)
+
 	voteRewardHandler, err := handler.container.SafeGet(static.DiVoteHandler)
 	if err != nil {
 		return
 	}
 
 	voteRewardHandler.(func(userID string, source string) error)(userID, source)
+}
+
+func (handler *VoteHandler) sendLogMessage(userID string, source string) {
+	bot := handler.container.Get(static.DiBot).(*disgolf.Bot)
+
+	message := fmt.Sprintf("<@%s> has voted on **%s**!", userID, source)
+	channelID := os.Getenv(static.EnvDiscordVoteReportChannelID)
+	bot.ChannelMessageSend(channelID, message)
 }

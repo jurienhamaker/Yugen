@@ -9,7 +9,9 @@ const (
 
 	EnvSyncCommands = "SYNC_COMMANDS"
 
-	EnvDiscordDevelopmentGuildID = "DISCORD_DEVELOPMENT_GUILD_ID"
+	EnvDiscordDevelopmentGuildID  = "DISCORD_DEVELOPMENT_GUILD_ID"
+	EnvDiscordLogsReportChannelID = "DISCORD_LOGS_REPORT_CHANNEL_ID"
+	EnvDiscordVoteReportChannelID = "DISCORD_VOTE_REPORT_CHANNEL_ID"
 
 	EnvApiHost = "API_LISTEN_HOST"
 	EnvApiPort = "API_LISTEN_PORT"
