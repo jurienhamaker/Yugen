@@ -29,9 +29,7 @@ func reloadChannels(bot *disgolf.Bot) {
 
 	channelsLen := 0
 	for _, guild := range guilds {
-		utils.Logger.Infof("Got %d channels for %s", len(guild.Channels), guild.Name)
 		channelsLen = channelsLen + len(guild.Channels)
-
 	}
 
 	metrics.TotalChannels.Set(float64(channelsLen))
