@@ -16,7 +16,7 @@ import (
 
 func init() {
 	godotenv.Load()
-	utils.CreateLogger("kazu-go")
+	utils.CreateLogger("kazu")
 }
 
 func main() {
