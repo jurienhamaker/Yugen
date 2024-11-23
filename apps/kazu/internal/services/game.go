@@ -198,7 +198,7 @@ func (service *GameService) AddNumber(guildID string, number int, message *disco
 		failReason := fmt.Sprintf("<@%s> counted twice in a row!", message.Author.ID)
 
 		if !isNextNumber {
-			failReason = fmt.Sprintf("%d is not the next number!\n**The next number is %d**", number, history.Number+1)
+			failReason = fmt.Sprintf("%d is not the next number!", number)
 		}
 
 		if err != nil {
