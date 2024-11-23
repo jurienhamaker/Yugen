@@ -1,4 +1,3 @@
-# Build
 FROM golang:1.23 AS build
 
 WORKDIR /opt/app
