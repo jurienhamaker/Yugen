@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/FedorLap2006/disgolf"
+	"github.com/Knetic/govaluate"
 	"github.com/bwmarrin/discordgo"
 	"github.com/sarulabs/di/v2"
 	"github.com/zekroTJA/shinpuru/pkg/hammertime"
@@ -18,8 +19,6 @@ import (
 	"jurien.dev/yugen/kazu/internal/utils"
 	"jurien.dev/yugen/kazu/prisma/db"
 	"jurien.dev/yugen/shared/static"
-
-	"github.com/Pramod-Devireddy/go-exprtk"
 )
 
 type GameService struct {
@@ -161,15 +160,17 @@ func (service *GameService) ParseNumber(message *discordgo.Message, math bool) (
 		return
 	}
 
-	exprtkObj := exprtk.NewExprtk()
-	exprtkObj.SetExpression(message.Content)
-
-	err = exprtkObj.CompileExpression()
+	expression, err := govaluate.NewEvaluableExpression(message.Content)
 	if err != nil {
 		return
 	}
 
-	i = int(exprtkObj.GetEvaluatedValue())
+	result, err := expression.Evaluate(nil)
+	if err != nil {
+		return
+	}
+
+	i = int(result.(float64))
 	return
 }
 
@@ -224,10 +225,10 @@ func (service *GameService) AddNumber(guildID string, number int, message *disco
 				message.ChannelID,
 				fmt.Sprintf(
 					`%s
-Used **1 of your own** saves, You have **%s/%d** saves left.`,
+Used **1 of your own** saves, You have **%s/%s** saves left.`,
 					failReason,
 					strconv.FormatFloat(leftoverSaves, 'f', -1, 64),
-					maxSaves,
+					strconv.FormatFloat(maxSaves, 'f', -1, 64),
 				),
 				message.Reference(),
 			)
@@ -244,10 +245,10 @@ Used **1 of your own** saves, You have **%s/%d** saves left.`,
 				message.ChannelID,
 				fmt.Sprintf(
 					`%s
-Used **1 server** save, There are **%d/%d** server saves left.`,
+Used **1 server** save, There are **%s/%s** server saves left.`,
 					failReason,
-					leftoverSaves,
-					maxSaves,
+					strconv.FormatFloat(leftoverSaves, 'f', -1, 64),
+					strconv.FormatFloat(maxSaves, 'f', -1, 64),
 				),
 				message.Reference(),
 			)

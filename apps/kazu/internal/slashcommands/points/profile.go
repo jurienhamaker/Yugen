@@ -63,11 +63,12 @@ func (m *ProfileModule) profile(ctx *disgolf.Ctx) {
 	utils.FollowUp(ctx, &discordgo.WebhookParams{
 		Content: fmt.Sprintf(
 			`%s currently %s **%d** points!
-And you have **%s/2** saves available!`,
+And you have **%s/%s** saves available!`,
 			name,
 			addressing,
 			points.Points,
 			strconv.FormatFloat(saves.Saves, 'f', -1, 64),
+			strconv.FormatFloat(saves.MaxSaves, 'f', -1, 64),
 		),
 	}, true)
 }

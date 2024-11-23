@@ -4,7 +4,14 @@
 all: build test
 
 build:
-	@go build -o dist/bot cmd/bot/main.go
+	@echo "Building..."
+	@go generate ./cmd/bot/main.go
+	@go build -o dist/kazu cmd/bot/main.go
+
+build-prod:
+	@echo "Building..."
+	@go generate ./cmd/bot/main.go
+	@CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o dist/kazu cmd/bot/main.go
 
 # Run the application
 run:

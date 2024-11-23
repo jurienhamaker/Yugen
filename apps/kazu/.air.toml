@@ -4,7 +4,7 @@ tmp_dir = "tmp"
 
 [build]
 args_bin = []
-bin = "./dist/bot"
+bin = "./dist/kazu"
 cmd = "make build"
 delay = 1000
 exclude_dir = [
@@ -15,6 +15,7 @@ exclude_dir = [
 	"apps/kazu/vendor",
 	"apps/kazu/testdata",
 	"apps/kazu/prisma/migrations/",
+	"apps/kazu/prisma/db/",
 ]
 exclude_file = []
 exclude_regex = ["_test.go"]
