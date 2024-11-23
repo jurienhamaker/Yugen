@@ -6,6 +6,7 @@ import (
 
 	"github.com/FedorLap2006/disgolf"
 	"github.com/go-redis/redis/v8"
+	"github.com/robfig/cron/v3"
 	"github.com/sarulabs/di/v2"
 	"jurien.dev/yugen/shared/static"
 )
@@ -37,6 +38,19 @@ func InitSharedDi(diBuilder *di.EnhancedBuilder) {
 			bot := obj.(*disgolf.Bot)
 			log.Println("Shutting down bot...")
 			bot.Close()
+			return nil
+		},
+	})
+
+	diBuilder.Add(&di.Def{
+		Name: static.DiCron,
+		Build: func(ctn di.Container) (interface{}, error) {
+			return cron.New(), nil
+		},
+		Close: func(obj interface{}) error {
+			cron := obj.(*cron.Cron)
+			log.Println("Stopping cron jobs...")
+			cron.Stop()
 			return nil
 		},
 	})

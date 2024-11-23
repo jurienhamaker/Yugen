@@ -121,6 +121,14 @@ Donating a save will turn 1 personal save into 0.2 server saves.
 		},
 	})
 
+	// create vote handler
+	diBuilder.Add(&di.Def{
+		Name: static.DiVoteHandler,
+		Build: func(ctn di.Container) (interface{}, error) {
+			return CreateVoteHandler(&ctn), nil
+		},
+	})
+
 	container, _ = diBuilder.Build()
 
 	return

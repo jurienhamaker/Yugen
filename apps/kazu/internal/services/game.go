@@ -214,7 +214,7 @@ func (service *GameService) AddNumber(guildID string, number int, message *disco
 		service.bot.MessageReactionAdd(message.ChannelID, message.ID, "❌")
 
 		if saves.player >= 1 {
-			leftoverSaves, err := service.saves.DeductSaveFromPlayer(message.Author.ID, 1)
+			leftoverSaves, maxSaves, err := service.saves.DeductSaveFromPlayer(message.Author.ID, 1)
 			if err != nil {
 				log.Println(err)
 				return
@@ -224,9 +224,10 @@ func (service *GameService) AddNumber(guildID string, number int, message *disco
 				message.ChannelID,
 				fmt.Sprintf(
 					`%s
-Used **1 of your own** saves, You have **%s/2** saves left.`,
+Used **1 of your own** saves, You have **%s/%d** saves left.`,
 					failReason,
 					strconv.FormatFloat(leftoverSaves, 'f', -1, 64),
+					maxSaves,
 				),
 				message.Reference(),
 			)

@@ -69,7 +69,6 @@ Please use any of the links below to vote for %s!%s`, name, name, voteReward),
 
 	topGGVoteLink := os.Getenv(static.EnvTopGGVoteLink)
 	discordBotListVoteLink := os.Getenv(static.EnvDiscordBotListVoteLink)
-	botsGGVoteLink := os.Getenv(static.EnvBotsGGVoteLink)
 
 	if len(topGGVoteLink) > 0 {
 		components = append(components, discordgo.Button{
@@ -84,14 +83,6 @@ Please use any of the links below to vote for %s!%s`, name, name, voteReward),
 			Style: discordgo.LinkButton,
 			Label: "Vote on Discord Bot List",
 			URL:   discordBotListVoteLink,
-		})
-	}
-
-	if len(botsGGVoteLink) > 0 {
-		components = append(components, discordgo.Button{
-			Style: discordgo.LinkButton,
-			Label: "Vote on Bots.GG",
-			URL:   botsGGVoteLink,
 		})
 	}
 

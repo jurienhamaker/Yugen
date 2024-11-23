@@ -2,6 +2,7 @@ package static
 
 const (
 	DiBot            = "discordbot"
+	DiCron           = "cron"
 	DiState          = "state"
 	DiRedis          = "redis"
 	DiCacheLifetimes = "cacheliftimes"
@@ -11,8 +12,9 @@ const (
 
 	DiAppName = "appname"
 
-	DiEmbedColor = "embedcolor"
-	DiVoteReward = "voterewardfunc"
+	DiEmbedColor  = "embedcolor"
+	DiVoteReward  = "voterewardfunc"
+	DiVoteHandler = "votehandlerfunc"
 
 	DiTutorialText = "tutorialtext"
 	DiHelpText     = "helptext"

@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "PlayerSaves" ADD COLUMN     "maxSaves" DOUBLE PRECISION NOT NULL DEFAULT 2;

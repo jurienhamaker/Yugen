@@ -9,7 +9,6 @@ import (
 
 	"github.com/joho/godotenv"
 	"jurien.dev/yugen/kazu/internal/inits"
-	"jurien.dev/yugen/shared/static"
 
 	sharedInits "jurien.dev/yugen/shared/inits"
 )
@@ -28,12 +27,14 @@ func main() {
 	release := inits.InitDiscordBot(&container)
 	defer release()
 
-	api := sharedInits.InitAPI(&container)
-	log.Fatal(api.Listen(fmt.Sprintf("%s:%s", os.Getenv(static.EnvApiHost), os.Getenv(static.EnvApiPort))))
+	// start Cron
+	sharedInits.InitCron(&container)
+
+	// start Api
+	sharedInits.InitAPI(&container)
 
 	log.Println("Started kazu. Stop with CTRL-C...")
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
 	<-sc
-	log.Println("Bot stopped.")
 }

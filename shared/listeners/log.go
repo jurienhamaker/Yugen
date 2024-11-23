@@ -7,6 +7,7 @@ import (
 	"github.com/bwmarrin/discordgo"
 	"github.com/sarulabs/di/v2"
 	"jurien.dev/yugen/shared/static"
+	"jurien.dev/yugen/shared/utils"
 )
 
 func AddLogListeners(container *di.Container) {
@@ -18,7 +19,8 @@ func AddLogListeners(container *di.Container) {
 		}
 
 		data := event.ApplicationCommandData()
-		log.Printf("Interaction \"%s\" used by %s", data.Name, event.Member.User.Username)
+		name := utils.GetInteractionName(&data)
+		log.Printf("Interaction \"%s\" used by %s", name, event.Member.User.Username)
 	})
 
 	bot.AddHandler(func(bot *discordgo.Session, event *discordgo.InteractionCreate) {

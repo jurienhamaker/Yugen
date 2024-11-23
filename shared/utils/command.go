@@ -1,9 +1,24 @@
 package utils
 
 import (
+	"fmt"
+
 	"github.com/FedorLap2006/disgolf"
 	"github.com/bwmarrin/discordgo"
 )
+
+func GetInteractionName(data *discordgo.ApplicationCommandInteractionData) string {
+	suffix := ""
+	for _, option := range data.Options {
+		if option.Type != discordgo.ApplicationCommandOptionSubCommand {
+			continue
+		}
+
+		suffix = fmt.Sprintf("%s/%s", suffix, option.Name)
+	}
+
+	return fmt.Sprintf("%s%s", data.Name, suffix)
+}
 
 func Defer(ctx *disgolf.Ctx, ephemeral ...bool) (err error) {
 	data := discordgo.InteractionResponseData{}

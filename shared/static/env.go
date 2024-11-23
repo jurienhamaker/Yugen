@@ -22,6 +22,5 @@ const (
 	EnvDiscordBotListToken    = "DISCORDBOTLIST_TOKEN"
 	EnvDiscordBotListVoteLink = "DISCORDBOTLIST_VOTE_LINK"
 
-	EnvBotsGGToken    = "BOTS_GG_TOKEN"
-	EnvBotsGGVoteLink = "BOTS_GG_VOTE_LINK"
+	EnvWebhookAuthorizationToken = "WEBHOOK_AUTHORIZATION_TOKEN"
 )

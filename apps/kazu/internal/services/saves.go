@@ -53,7 +53,7 @@ func (service *SavesService) GetSaves(settings *db.SettingsModel, userID string)
 	return
 }
 
-func (service *SavesService) DeductSaveFromPlayer(userID string, amount float64) (leftover float64, err error) {
+func (service *SavesService) DeductSaveFromPlayer(userID string, amount float64) (leftover float64, maxSaves float64, err error) {
 	player, err := service.GetPlayerSavesByUserID(userID)
 
 	newSaves := player.Saves - 1
@@ -67,6 +67,7 @@ func (service *SavesService) DeductSaveFromPlayer(userID string, amount float64)
 	).Exec(context.Background())
 
 	leftover = player.Saves
+	maxSaves = player.MaxSaves
 
 	return
 }
@@ -94,16 +95,16 @@ func (service *SavesService) AddSaveToPlayer(userID string, amount float64) (sav
 		return
 	}
 
-	if player.Saves == 2 {
-		saves = 2
-		maxSaves = 2
+	if player.Saves == player.MaxSaves {
+		saves = player.MaxSaves
+		maxSaves = player.MaxSaves
 		return
 	}
 
 	newSaves := player.Saves + amount
 
-	if newSaves > 2 {
-		newSaves = 2
+	if newSaves > player.MaxSaves {
+		newSaves = player.MaxSaves
 	}
 
 	player, err = service.database.PlayerSaves.FindUnique(db.PlayerSaves.ID.Equals(player.ID)).Update(
@@ -114,7 +115,7 @@ func (service *SavesService) AddSaveToPlayer(userID string, amount float64) (sav
 	}
 
 	saves = player.Saves
-	maxSaves = 2
+	maxSaves = player.MaxSaves
 
 	return
 }

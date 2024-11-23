@@ -89,6 +89,7 @@ model PlayerSaves {
   userId            String
 
   saves             Float       @default(0)
+  maxSaves          Float       @default(2)
   lastVoteTime      DateTime?
 
   // timestamps
