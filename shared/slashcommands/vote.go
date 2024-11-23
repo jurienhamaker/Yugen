@@ -2,7 +2,6 @@ package slashcommands
 
 import (
 	"fmt"
-	"log"
 	"os"
 
 	"github.com/FedorLap2006/disgolf"
@@ -26,6 +25,7 @@ func GetVoteModule(container *di.Container) *VoteModule {
 func (m *VoteModule) Run(ctx *disgolf.Ctx) {
 	err := utils.Defer(ctx)
 	if err != nil {
+		utils.Logger.Error(err)
 		return
 	}
 
@@ -54,6 +54,7 @@ func (m *VoteModule) Run(ctx *disgolf.Ctx) {
 		},
 	)
 	if err != nil {
+		utils.Logger.Error(err)
 		return
 	}
 
@@ -99,7 +100,7 @@ Please use any of the links below to vote for %s!%s`, name, name, voteReward),
 		Components: messageComponents,
 	})
 	if err != nil {
-		log.Fatal(err)
+		utils.Logger.Error(err)
 	}
 }
 

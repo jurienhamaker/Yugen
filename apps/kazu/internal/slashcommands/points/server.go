@@ -2,7 +2,6 @@ package slashcommands
 
 import (
 	"fmt"
-	"log"
 	"strconv"
 
 	"github.com/FedorLap2006/disgolf"
@@ -44,30 +43,35 @@ func (m *ServerModule) server(ctx *disgolf.Ctx) {
 
 	settings, err := m.settings.GetByGuildId(ctx.Interaction.GuildID)
 	if err != nil {
+		utils.Logger.Error(err)
 		m.err(ctx)
 		return
 	}
 
 	game, gameExists, err := m.game.GetCurrentGame(ctx.Interaction.GuildID)
 	if err != nil {
+		utils.Logger.Error(err)
 		m.err(ctx)
 		return
 	}
 
 	history, historyExists, err := m.game.GetLastHistory(game)
 	if err != nil {
+		utils.Logger.Error(err)
 		m.err(ctx)
 		return
 	}
 
 	guild, err := m.state.Guild(ctx.Interaction.GuildID, false)
 	if err != nil {
+		utils.Logger.Error(err)
 		m.err(ctx)
 		return
 	}
 
 	self, err := m.state.SelfUser()
 	if err != nil {
+		utils.Logger.Error(err)
 		m.err(ctx)
 		return
 	}
@@ -80,6 +84,7 @@ func (m *ServerModule) server(ctx *disgolf.Ctx) {
 		},
 	)
 	if err != nil {
+		utils.Logger.Error(err)
 		return
 	}
 
@@ -146,7 +151,7 @@ Saves used: **%s**
 		Embeds: []*discordgo.MessageEmbed{embed},
 	}, true)
 	if err != nil {
-		log.Fatal(err)
+		utils.Logger.Error(err)
 	}
 }
 

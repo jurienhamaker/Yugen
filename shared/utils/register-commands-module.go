@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"log"
 	"reflect"
 	"strings"
 
@@ -65,7 +64,7 @@ func RegisterCommandModules(bot *disgolf.Bot, modules []CommandsModule) {
 			}
 		}
 
-		log.Printf(
+		Logger.Infof(
 			"Registered '%s' module with %d %s and %d %s",
 			strings.Replace(getStructName(m), "Module", "", 1),
 			commandsLen,

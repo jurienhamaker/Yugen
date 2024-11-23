@@ -2,13 +2,13 @@ package services
 
 import (
 	"context"
-	"log"
 	"time"
 
 	"github.com/FedorLap2006/disgolf"
 	"github.com/sarulabs/di/v2"
 	"jurien.dev/yugen/kazu/prisma/db"
 	"jurien.dev/yugen/shared/static"
+	"jurien.dev/yugen/shared/utils"
 )
 
 type SettingsService struct {
@@ -17,7 +17,7 @@ type SettingsService struct {
 }
 
 func CreateSettingsService(container *di.Container) *SettingsService {
-	log.Println("Creating Settings Service")
+	utils.Logger.Info("Creating Settings Service")
 	return &SettingsService{
 		database: container.Get(static.DiDatabase).(*db.PrismaClient),
 		bot:      container.Get(static.DiBot).(*disgolf.Bot),

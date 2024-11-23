@@ -2,12 +2,12 @@ package services
 
 import (
 	"context"
-	"log"
 	"strconv"
 
 	"github.com/sarulabs/di/v2"
 	"jurien.dev/yugen/kazu/prisma/db"
 	"jurien.dev/yugen/shared/static"
+	"jurien.dev/yugen/shared/utils"
 )
 
 type PointsService struct {
@@ -15,7 +15,7 @@ type PointsService struct {
 }
 
 func CreatePointsService(container *di.Container) *PointsService {
-	log.Println("Creating Points Service")
+	utils.Logger.Info("Creating Points Service")
 	return &PointsService{
 		database: container.Get(static.DiDatabase).(*db.PrismaClient),
 	}

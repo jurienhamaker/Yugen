@@ -2,7 +2,6 @@ package utils
 
 import (
 	"fmt"
-	"log"
 	"math"
 	"strconv"
 
@@ -79,7 +78,7 @@ func ShowLeaderboard(ctx *disgolf.Ctx, container *di.Container, state *dgrs.Stat
 
 	items, total, err := getItems(ctx, page)
 	if err != nil {
-		log.Println(err)
+		Logger.Error(err)
 		if source == LEADERBOARD_INTERACTION {
 			InteractionError(ctx, true)
 		}
@@ -142,14 +141,14 @@ func doLeaderboardResponse(ctx *disgolf.Ctx, container *di.Container, state *dgr
 		&footerParams,
 	)
 	if err != nil {
-		log.Println(err)
+		Logger.Error(err)
 		doError(ctx, source)
 		return
 	}
 
 	guild, err := state.Guild(ctx.Interaction.GuildID)
 	if err != nil {
-		log.Println(err)
+		Logger.Error(err)
 		doError(ctx, source)
 		return
 	}
@@ -200,7 +199,7 @@ func doLeaderboardResponse(ctx *disgolf.Ctx, container *di.Container, state *dgr
 			Components: messageComponents,
 		})
 		if err != nil {
-			log.Println(err)
+			Logger.Error(err)
 		}
 		return
 	}
@@ -211,7 +210,7 @@ func doLeaderboardResponse(ctx *disgolf.Ctx, container *di.Container, state *dgr
 		Components: messageComponents,
 	})
 	if err != nil {
-		log.Println(err)
+		Logger.Error(err)
 	}
 }
 

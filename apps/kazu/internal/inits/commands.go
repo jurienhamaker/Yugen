@@ -1,7 +1,6 @@
 package inits
 
 import (
-	"log"
 	"os"
 
 	"github.com/FedorLap2006/disgolf"
@@ -48,7 +47,7 @@ func InitCommands(container *di.Container) (err error) {
 	bot.AddHandler(bot.Router.HandleInteractionMessageComponent)
 
 	if os.Getenv(static.EnvSyncCommands) == "true" {
-		log.Printf("Syncing commands of %d modules", len(modules))
+		utils.Logger.Infof("Syncing commands of %d modules", len(modules))
 		err = bot.Router.Sync(bot.Session, os.Getenv(static.EnvDiscordAppID), os.Getenv(static.EnvDiscordDevelopmentGuildID))
 	}
 	return

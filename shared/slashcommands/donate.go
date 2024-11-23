@@ -2,7 +2,6 @@ package slashcommands
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/FedorLap2006/disgolf"
 	"github.com/bwmarrin/discordgo"
@@ -58,7 +57,7 @@ Thanks for playing!`, appName),
 		},
 	})
 	if err != nil {
-		log.Fatal(err)
+		utils.Logger.Error(err)
 	}
 }
 

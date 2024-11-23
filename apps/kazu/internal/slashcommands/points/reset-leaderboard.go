@@ -2,7 +2,6 @@ package slashcommands
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/FedorLap2006/disgolf"
 	"github.com/bwmarrin/discordgo"
@@ -45,12 +44,14 @@ func (m *ResetLeaderboardModule) request(ctx *disgolf.Ctx) {
 		},
 	)
 	if err != nil {
+		utils.Logger.Error(err)
 		m.err(ctx)
 		return
 	}
 
 	guild, err := m.state.Guild(ctx.Interaction.GuildID, false)
 	if err != nil {
+		utils.Logger.Error(err)
 		m.err(ctx)
 		return
 	}
@@ -88,13 +89,12 @@ func (m *ResetLeaderboardModule) request(ctx *disgolf.Ctx) {
 		},
 	}, true)
 	if err != nil {
-		log.Fatal(err)
+		utils.Logger.Error(err)
 	}
 }
 
 func (m *ResetLeaderboardModule) reset(ctx *disgolf.Ctx) {
 	reset := ctx.MessageComponentOptions["reset"] == "true"
-	log.Println(reset)
 
 	if !reset {
 		utils.Update(ctx, &discordgo.InteractionResponseData{

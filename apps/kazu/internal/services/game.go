@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log"
 	"os"
 	"strconv"
 	"time"
@@ -16,9 +15,10 @@ import (
 	"github.com/zekroTJA/shinpuru/pkg/hammertime"
 	"github.com/zekrotja/dgrs"
 	localStatic "jurien.dev/yugen/kazu/internal/static"
-	"jurien.dev/yugen/kazu/internal/utils"
+	localUtils "jurien.dev/yugen/kazu/internal/utils"
 	"jurien.dev/yugen/kazu/prisma/db"
 	"jurien.dev/yugen/shared/static"
+	"jurien.dev/yugen/shared/utils"
 )
 
 type GameService struct {
@@ -31,7 +31,7 @@ type GameService struct {
 }
 
 func CreateGameService(container *di.Container) *GameService {
-	log.Println("Creating Game Service")
+	utils.Logger.Info("Creating Game Service")
 	return &GameService{
 		bot:      container.Get(static.DiBot).(*disgolf.Bot),
 		state:    container.Get(static.DiState).(*dgrs.State),
@@ -48,26 +48,30 @@ type ShameOptions struct {
 }
 
 func (service *GameService) Start(guildID string, gameType db.GameType, startingNumber int, recreate bool, shame ...*ShameOptions) (game *db.GameModel, started bool, err error) {
-	log.Printf("Trying to start a game for %s", guildID)
+	utils.Logger.Infof("Trying to start a game for %s", guildID)
 
 	currentGame, exists, err := service.GetCurrentGame(guildID)
 	if err != nil && err != db.ErrNotFound {
+		utils.Logger.Error(err)
 		return
 	}
 
 	settings, err := service.settings.GetByGuildId(guildID)
 	if err != nil {
+		utils.Logger.Error(err)
 		return
 	}
 
 	channelID, ok := settings.ChannelID()
 	if !ok {
 		err = errors.New("No channelID configured")
+		utils.Logger.Error(err)
 		return
 	}
 
 	channel, err := service.bot.Channel(channelID)
 	if err != nil {
+		utils.Logger.Error(err)
 		return
 	}
 
@@ -89,11 +93,13 @@ func (service *GameService) Start(guildID string, gameType db.GameType, starting
 		db.Game.Type.Set(gameType),
 	).Exec(context.Background())
 	if err != nil {
+		utils.Logger.Error(err)
 		return
 	}
 
 	self, err := service.state.SelfUser()
 	if err != nil {
+		utils.Logger.Error(err)
 		return
 	}
 
@@ -106,6 +112,9 @@ func (service *GameService) Start(guildID string, gameType db.GameType, starting
 		db.History.Game.Link(db.Game.ID.Equals(game.ID)),
 		db.History.Number.Set(number),
 	).Exec(context.Background())
+	if err != nil {
+		utils.Logger.Error(err)
+	}
 
 	if channel.Type == discordgo.ChannelTypeGuildText {
 		service.bot.ChannelMessageSend(
@@ -141,6 +150,7 @@ func (service *GameService) End(gameID int, status db.GameStatus, shame ...*Sham
 
 		_, err = service.settings.Update(shame.settings.ID, db.Settings.LastShameUserID.Set(shame.message.Author.ID))
 		if err != nil {
+			utils.Logger.Error(err)
 			return
 		}
 	}
@@ -177,7 +187,7 @@ func (service *GameService) ParseNumber(message *discordgo.Message, math bool) (
 func (service *GameService) AddNumber(guildID string, number int, message *discordgo.Message, settings *db.SettingsModel) {
 	game, exists, err := service.GetCurrentGame(guildID)
 	if err != nil {
-		log.Println(err)
+		utils.Logger.Error(err)
 		return
 	}
 
@@ -187,7 +197,7 @@ func (service *GameService) AddNumber(guildID string, number int, message *disco
 
 	history, _, err := service.GetLastHistory(game)
 	if err != nil {
-		log.Println(err)
+		utils.Logger.Error(err)
 		return
 	}
 
@@ -202,13 +212,13 @@ func (service *GameService) AddNumber(guildID string, number int, message *disco
 		}
 
 		if err != nil {
-			log.Println(err)
+			utils.Logger.Error(err)
 			return
 		}
 
 		saves, err := service.saves.GetSaves(settings, message.Author.ID)
 		if err != nil {
-			log.Println(err)
+			utils.Logger.Error(err)
 			return
 		}
 
@@ -217,7 +227,7 @@ func (service *GameService) AddNumber(guildID string, number int, message *disco
 		if saves.player >= 1 {
 			leftoverSaves, maxSaves, err := service.saves.DeductSaveFromPlayer(message.Author.ID, 1)
 			if err != nil {
-				log.Println(err)
+				utils.Logger.Error(err)
 				return
 			}
 
@@ -257,13 +267,13 @@ Used **1 server** save, There are **%s/%s** server saves left.`,
 
 		count, err := service.getCount(game.ID)
 		if err != nil {
-			log.Println(err)
+			utils.Logger.Error(err)
 			return
 		}
 
 		isHighscore, _, err := service.checkStreak(settings, game, count)
 		if err != nil {
-			log.Println(err)
+			utils.Logger.Error(err)
 			return
 		}
 
@@ -300,7 +310,7 @@ Used **1 server** save, There are **%s/%s** server saves left.`,
 		settings.Cooldown,
 	)
 	if err != nil && err != db.ErrNotFound {
-		log.Println(err)
+		utils.Logger.Error(err)
 		return
 	}
 
@@ -322,13 +332,13 @@ Used **1 server** save, There are **%s/%s** server saves left.`,
 		db.History.MessageID.Set(message.ID),
 	).Exec(context.Background())
 	if err != nil {
-		log.Println(err)
+		utils.Logger.Error(err)
 		return
 	}
 
 	count, err := service.getCount(game.ID)
 	if err != nil {
-		log.Println(err)
+		utils.Logger.Error(err)
 		return
 	}
 
@@ -353,13 +363,13 @@ func (service *GameService) IsEqualToLast(message *discordgo.Message, settings *
 
 	game, exists, err := service.GetCurrentGame(message.GuildID)
 	if err != nil || !exists {
-		log.Println("Couldnt find game", err)
+		utils.Logger.Info("Couldnt find game", err)
 		return
 	}
 
 	history, _, err := service.GetLastHistory(game)
 	if err != nil {
-		log.Println("Couldnt find last history", err)
+		utils.Logger.Info("Couldnt find last history", err)
 		return
 	}
 
@@ -385,7 +395,7 @@ func (service *GameService) IsEqualToLast(message *discordgo.Message, settings *
 		return
 	}
 
-	log.Println("Checking is equal", message.Content)
+	utils.Logger.Info("Checking is equal", message.Content)
 	if parsedNumber != number {
 		ok = false
 	}
@@ -513,7 +523,7 @@ func (service *GameService) replyAndDelete(message *discordgo.Message, messageTo
 		message.Reference(),
 	)
 	if err != nil {
-		log.Println(err)
+		utils.Logger.Error(err)
 		return
 	}
 
@@ -525,7 +535,7 @@ func (service *GameService) replyAndDelete(message *discordgo.Message, messageTo
 }
 
 func (service *GameService) checkSpecialReactions(message *discordgo.Message, number int) {
-	if number > 10 && utils.IsPalindrome(strconv.Itoa(number)) {
+	if number > 10 && localUtils.IsPalindrome(strconv.Itoa(number)) {
 		go service.bot.MessageReactionAdd(message.ChannelID, message.ID, "🪞")
 	}
 

@@ -2,14 +2,13 @@ package slashcommands
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/FedorLap2006/disgolf"
 	"github.com/bwmarrin/discordgo"
 	"github.com/sarulabs/di/v2"
 	"jurien.dev/yugen/kazu/internal/services"
 	local "jurien.dev/yugen/kazu/internal/static"
-	internalUtils "jurien.dev/yugen/kazu/internal/utils"
+	localUtils "jurien.dev/yugen/kazu/internal/utils"
 	"jurien.dev/yugen/kazu/prisma/db"
 	"jurien.dev/yugen/shared/middlewares"
 	"jurien.dev/yugen/shared/static"
@@ -40,7 +39,7 @@ func (m *GameModule) startGame(ctx *disgolf.Ctx, recreate bool) {
 
 	channelId, ok := settings.ChannelID()
 	if !ok {
-		internalUtils.NoSettingsReply(ctx, m.container, true)
+		localUtils.NoSettingsReply(ctx, m.container, true)
 		return
 	}
 
@@ -78,7 +77,7 @@ func (m *GameModule) startGame(ctx *disgolf.Ctx, recreate bool) {
 		Content: respond,
 	}, true)
 	if err != nil {
-		log.Println(err)
+		utils.Logger.Error(err)
 	}
 }
 

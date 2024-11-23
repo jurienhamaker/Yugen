@@ -2,7 +2,6 @@ package slashcommands
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/FedorLap2006/disgolf"
 	"github.com/bwmarrin/discordgo"
@@ -31,6 +30,7 @@ func (m *HelpModule) tutorial(ctx *disgolf.Ctx) {
 		},
 	)
 	if err != nil {
+		utils.Logger.Error(err)
 		return
 	}
 
@@ -49,7 +49,7 @@ func (m *HelpModule) tutorial(ctx *disgolf.Ctx) {
 		Embeds: []*discordgo.MessageEmbed{embed},
 	})
 	if err != nil {
-		log.Fatal(err)
+		utils.Logger.Error(err)
 	}
 }
 

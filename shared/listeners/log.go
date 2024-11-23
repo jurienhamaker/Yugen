@@ -2,7 +2,6 @@ package listeners
 
 import (
 	"fmt"
-	"log"
 	"os"
 
 	"github.com/FedorLap2006/disgolf"
@@ -21,7 +20,7 @@ func sendLogMessage(container *di.Container, event *discordgo.InteractionCreate,
 
 	guild, err := state.Guild(event.GuildID)
 	if err != nil {
-		log.Println(err)
+		utils.Logger.Error(err)
 		return
 	}
 
@@ -40,7 +39,7 @@ func AddLogListeners(container *di.Container) {
 
 		data := event.ApplicationCommandData()
 		name := utils.GetInteractionName(&data)
-		log.Printf("Interaction \"%s\" used by %s", name, event.Member.User.Username)
+		utils.Logger.Info("Interaction \"%s\" used by %s", name, event.Member.User.Username)
 
 		go sendLogMessage(container, event, &data)
 	})
@@ -51,6 +50,6 @@ func AddLogListeners(container *di.Container) {
 		}
 
 		data := event.MessageComponentData()
-		log.Printf("Message component \"%s\" used by %s", data.CustomID, event.Member.User.Username)
+		utils.Logger.Info("Message component \"%s\" used by %s", data.CustomID, event.Member.User.Username)
 	})
 }

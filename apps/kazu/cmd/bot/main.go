@@ -3,7 +3,6 @@
 package main
 
 import (
-	"log"
 	"os"
 	"os/signal"
 	"syscall"
@@ -12,13 +11,17 @@ import (
 	"jurien.dev/yugen/kazu/internal/inits"
 
 	sharedInits "jurien.dev/yugen/shared/inits"
+	"jurien.dev/yugen/shared/utils"
 )
 
 func init() {
 	godotenv.Load()
+	utils.CreateLogger("kazu-go")
 }
 
 func main() {
+	defer utils.Logger.Sync()
+
 	container, _ := inits.InitDI()
 	defer container.DeleteWithSubContainers()
 
@@ -31,7 +34,8 @@ func main() {
 	// start Api
 	sharedInits.InitAPI(&container)
 
-	log.Println("Started kazu. Stop with CTRL-C...")
+	utils.Logger.Info("Started kazu. Stop with CTRL-C...")
+
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
 	<-sc

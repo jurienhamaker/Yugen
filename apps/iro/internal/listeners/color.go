@@ -4,7 +4,6 @@ import (
 	"encoding/base64"
 	"fmt"
 	"image/color"
-	"log"
 	"os"
 	"regexp"
 	"strings"
@@ -18,6 +17,7 @@ import (
 	"github.com/zekroTJA/timedmap"
 	"github.com/zekrotja/dgrs"
 	"jurien.dev/yugen/shared/static"
+	"jurien.dev/yugen/shared/utils"
 )
 
 const (
@@ -33,7 +33,7 @@ type ColorListener struct {
 }
 
 func GetColorListener(container *di.Container) *ColorListener {
-	log.Println("Creating Color Listener")
+	utils.Logger.Info("Creating Color Listener")
 	return &ColorListener{
 		state:      container.Get(static.DiState).(*dgrs.State),
 		emojiCache: timedmap.New(1 * time.Minute),
@@ -139,7 +139,7 @@ func (listener *ColorListener) MessageReactionHandler(bot *discordgo.Session, ev
 		},
 	})
 	if err != nil {
-		log.Println("Could not send embed message", err)
+		utils.Logger.Info("Could not send embed message", err)
 	}
 
 	listener.emojiCache.Remove(cacheKey)
@@ -176,7 +176,7 @@ func (listener *ColorListener) process(bot *discordgo.Session, message *discordg
 
 	if removeReactions {
 		if err := bot.MessageReactionsRemoveAll(message.ChannelID, message.ID); err != nil {
-			log.Println("Could not remove previous color reactions", err)
+			utils.Logger.Info("Could not remove previous color reactions", err)
 		}
 	}
 
@@ -194,7 +194,7 @@ func (listener *ColorListener) createReaction(bot *discordgo.Session, message *d
 	// Parse hex color code to color.RGBA object
 	clr, err := colors.FromHex(hexClr)
 	if err != nil {
-		log.Println("Failed parsing color code", err)
+		utils.Logger.Info("Failed parsing color code", err)
 		return
 	}
 
@@ -202,7 +202,7 @@ func (listener *ColorListener) createReaction(bot *discordgo.Session, message *d
 	// rendered as PNG into a buffer
 	buff, err := colors.CreateImage(clr, 24, 24)
 	if err != nil {
-		log.Println("Failed generating image data", err)
+		utils.Logger.Info("Failed generating image data", err)
 		return
 	}
 
@@ -219,7 +219,7 @@ func (listener *ColorListener) createReaction(bot *discordgo.Session, message *d
 		Image: dataUri,
 	})
 	if err != nil {
-		log.Println("Failed uploading emoji", err)
+		utils.Logger.Info("Failed uploading emoji", err)
 		return
 	}
 
@@ -228,14 +228,14 @@ func (listener *ColorListener) createReaction(bot *discordgo.Session, message *d
 	// time to save the emoji.
 	defer time.AfterFunc(5*time.Second, func() {
 		if err = bot.ApplicationEmojiDelete(clientId, emoji.ID); err != nil {
-			log.Println("Failed deleting emoji", err)
+			utils.Logger.Info("Failed deleting emoji", err)
 		}
 	})
 
 	// Add reaction of the uploaded emote to the message
 	err = bot.MessageReactionAdd(message.ChannelID, message.ID, emoji.APIName())
 	if err != nil {
-		log.Println("Failed creating message reaction", err)
+		utils.Logger.Info("Failed creating message reaction", err)
 		return
 	}
 

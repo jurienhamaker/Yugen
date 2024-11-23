@@ -1,13 +1,12 @@
 package inits
 
 import (
-	"log"
-
 	"github.com/FedorLap2006/disgolf"
 	"github.com/bwmarrin/discordgo"
 	"github.com/sarulabs/di/v2"
 	"jurien.dev/yugen/iro/internal/listeners"
 	"jurien.dev/yugen/shared/static"
+	"jurien.dev/yugen/shared/utils"
 )
 
 const (
@@ -33,14 +32,14 @@ func InitDiscordBot(container *di.Container) (release func()) {
 	bot.Identify.Intents = Intents
 
 	bot.AddHandler(func(bot *discordgo.Session, event *discordgo.Ready) {
-		log.Printf("Logged in as: %v#%v", bot.State.User.Username, bot.State.User.Discriminator)
+		utils.Logger.Infof("Logged in as: %v#%v", bot.State.User.Username, bot.State.User.Discriminator)
 	})
 
 	listeners.AddColorListeners(container)
 
 	err := bot.Open()
 	if err != nil {
-		log.Panic(err)
+		utils.Logger.Panic(err)
 	}
 
 	return

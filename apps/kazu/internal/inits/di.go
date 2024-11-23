@@ -2,21 +2,19 @@ package inits
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/sarulabs/di/v2"
 	"jurien.dev/yugen/kazu/internal/services"
 	localStatic "jurien.dev/yugen/kazu/internal/static"
-	"jurien.dev/yugen/kazu/internal/utils"
+	localUtils "jurien.dev/yugen/kazu/internal/utils"
 	"jurien.dev/yugen/kazu/prisma/db"
 	"jurien.dev/yugen/shared/inits"
 	"jurien.dev/yugen/shared/static"
+	"jurien.dev/yugen/shared/utils"
 )
 
 func InitDI() (container di.Container, err error) {
 	diBuilder, _ := di.NewEnhancedBuilder()
-
-	log.Println("Building DI")
 
 	// init database
 	diBuilder.Add(&di.Def{
@@ -29,7 +27,7 @@ func InitDI() (container di.Container, err error) {
 		},
 		Close: func(obj interface{}) error {
 			database := obj.(*db.PrismaClient)
-			log.Println("Shutting down database connection...")
+			utils.Logger.Info("Shutting down database connection...")
 			database.Disconnect()
 			return nil
 		},
@@ -48,7 +46,7 @@ func InitDI() (container di.Container, err error) {
 	diBuilder.Add(&di.Def{
 		Name: static.DiHelpText,
 		Build: func(ctn di.Container) (interface{}, error) {
-			return fmt.Sprintf("%s\n\nWant to know how to play the game? Use `/tutorial`!", utils.NoSettingsDescription), nil
+			return fmt.Sprintf("%s\n\nWant to know how to play the game? Use `/tutorial`!", localUtils.NoSettingsDescription), nil
 		},
 	})
 

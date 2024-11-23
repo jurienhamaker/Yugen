@@ -1,7 +1,6 @@
 package middlewares
 
 import (
-	"log"
 	"os"
 	"slices"
 	"strings"
@@ -68,7 +67,7 @@ func checkResponse(ctx *disgolf.Ctx, pass bool) {
 	if !pass {
 		err := utils.ForbiddenResponse(ctx)
 		if err != nil {
-			log.Println(err)
+			utils.Logger.Error(err)
 		}
 		return
 	}

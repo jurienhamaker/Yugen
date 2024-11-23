@@ -2,7 +2,6 @@ package slashcommands
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/FedorLap2006/disgolf"
 	"github.com/bwmarrin/discordgo"
@@ -31,6 +30,7 @@ func (m *SupportModule) support(ctx *disgolf.Ctx) {
 		},
 	)
 	if err != nil {
+		utils.Logger.Error(err)
 		return
 	}
 
@@ -56,7 +56,7 @@ Join our support server with the button below, we'll try to help you out the bes
 		},
 	})
 	if err != nil {
-		log.Fatal(err)
+		utils.Logger.Error(err)
 	}
 }
 

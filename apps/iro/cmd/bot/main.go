@@ -1,8 +1,6 @@
 package main
 
 import (
-	"fmt"
-	"log"
 	"os"
 	"os/signal"
 	"syscall"
@@ -11,16 +9,17 @@ import (
 	"jurien.dev/yugen/iro/internal/inits"
 
 	sharedInits "jurien.dev/yugen/shared/inits"
+	"jurien.dev/yugen/shared/utils"
 )
 
 func init() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal(fmt.Errorf("cannot load .env: %w", err))
-	}
+	godotenv.Load()
+	utils.CreateLogger("iro")
 }
 
 func main() {
+	defer utils.Logger.Sync()
+
 	container, _ := inits.InitDI()
 	defer container.DeleteWithSubContainers()
 
@@ -29,7 +28,7 @@ func main() {
 
 	sharedInits.InitAPI(&container)
 
-	log.Println("Started iro. Stop with CTRL-C...")
+	utils.Logger.Info("Started iro. Stop with CTRL-C...")
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
 	<-sc

@@ -2,7 +2,6 @@ package listeners
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/FedorLap2006/disgolf"
 	"github.com/bwmarrin/discordgo"
@@ -11,6 +10,7 @@ import (
 	localStatic "jurien.dev/yugen/kazu/internal/static"
 	"jurien.dev/yugen/kazu/prisma/db"
 	"jurien.dev/yugen/shared/static"
+	"jurien.dev/yugen/shared/utils"
 )
 
 type GameListener struct {
@@ -20,7 +20,7 @@ type GameListener struct {
 }
 
 func GetGameListener(container *di.Container) *GameListener {
-	log.Println("Creating Color Listener")
+	utils.Logger.Info("Creating Color Listener")
 	return &GameListener{
 		database: container.Get(static.DiDatabase).(*db.PrismaClient),
 		settings: container.Get(static.DiSettings).(*services.SettingsService),
@@ -92,7 +92,7 @@ func (listener *GameListener) getSettings(guildID string, channelID string) (ok 
 
 	settings, err := listener.settings.GetByGuildId(guildID)
 	if err != nil {
-		log.Println("Failed to get settings", err)
+		utils.Logger.Error("Failed to get settings", err)
 		return
 	}
 

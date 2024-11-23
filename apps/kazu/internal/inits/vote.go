@@ -2,7 +2,6 @@ package inits
 
 import (
 	"fmt"
-	"log"
 	"time"
 
 	"github.com/sarulabs/di/v2"
@@ -11,6 +10,7 @@ import (
 	"jurien.dev/yugen/kazu/internal/services"
 	localStatic "jurien.dev/yugen/kazu/internal/static"
 	"jurien.dev/yugen/shared/static"
+	"jurien.dev/yugen/shared/utils"
 )
 
 func CreateVoteHandler(container *di.Container) func(userID string, source string) error {
@@ -20,10 +20,11 @@ func CreateVoteHandler(container *di.Container) func(userID string, source strin
 	return func(userID string, source string) error {
 		user, err := state.User(userID)
 		if err != nil {
+			utils.Logger.Error(err)
 			return err
 		}
 
-		log.Printf("Processing vote for %s from %s", userID, source)
+		utils.Logger.Infof("Processing vote for %s from %s", userID, source)
 		_, _, err = saves.AddSaveToPlayer(user.ID, 1)
 		return err
 	}
@@ -34,6 +35,7 @@ func CreateVoteRewardFunc(container *di.Container) func(userID string) string {
 		saves := container.Get(localStatic.DiSaves).(*services.SavesService)
 		player, err := saves.GetPlayerSavesByUserID(userID)
 		if err != nil {
+			utils.Logger.Error(err)
 			return ""
 		}
 

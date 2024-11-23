@@ -2,11 +2,11 @@ package services
 
 import (
 	"context"
-	"log"
 
 	"github.com/sarulabs/di/v2"
 	"jurien.dev/yugen/kazu/prisma/db"
 	"jurien.dev/yugen/shared/static"
+	"jurien.dev/yugen/shared/utils"
 )
 
 type SavesService struct {
@@ -20,7 +20,7 @@ type GetSavesResult struct {
 }
 
 func CreateSavesService(container *di.Container) *SavesService {
-	log.Println("Creating Saves Service")
+	utils.Logger.Info("Creating Saves Service")
 	return &SavesService{
 		database: container.Get(static.DiDatabase).(*db.PrismaClient),
 		settings: container.Get(static.DiSettings).(*SettingsService),

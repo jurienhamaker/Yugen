@@ -15,7 +15,6 @@ func AddSharedRoutes(app *fiber.App, router fiber.Router, container *di.Containe
 	})
 
 	router.Get("/monitor", monitor.New())
-
 	router.Get("/metrics", adaptor.HTTPHandler(promhttp.Handler()))
 
 	// Custom shared handlers

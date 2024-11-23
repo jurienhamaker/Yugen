@@ -1,7 +1,6 @@
 package inits
 
 import (
-	"log"
 	"os"
 
 	"github.com/FedorLap2006/disgolf"
@@ -9,6 +8,7 @@ import (
 	"github.com/robfig/cron/v3"
 	"github.com/sarulabs/di/v2"
 	"jurien.dev/yugen/shared/static"
+	"jurien.dev/yugen/shared/utils"
 )
 
 func InitSharedDi(diBuilder *di.EnhancedBuilder) {
@@ -36,7 +36,8 @@ func InitSharedDi(diBuilder *di.EnhancedBuilder) {
 		},
 		Close: func(obj interface{}) error {
 			bot := obj.(*disgolf.Bot)
-			log.Println("Shutting down bot...")
+
+			utils.Logger.Info("Shutting down bot...")
 			bot.Close()
 			return nil
 		},
@@ -49,7 +50,7 @@ func InitSharedDi(diBuilder *di.EnhancedBuilder) {
 		},
 		Close: func(obj interface{}) error {
 			cron := obj.(*cron.Cron)
-			log.Println("Stopping cron jobs...")
+			utils.Logger.Info("Stopping cron jobs...")
 			cron.Stop()
 			return nil
 		},

@@ -2,7 +2,6 @@ package slashcommands
 
 import (
 	"fmt"
-	"log"
 	"os"
 
 	"github.com/FedorLap2006/disgolf"
@@ -32,6 +31,7 @@ func (m *InviteModule) invite(ctx *disgolf.Ctx) {
 		},
 	)
 	if err != nil {
+		utils.Logger.Error(err)
 		return
 	}
 
@@ -61,7 +61,7 @@ Don't hesitate now and **invite %s** wherever you want using the button bellow!`
 		},
 	})
 	if err != nil {
-		log.Fatal(err)
+		utils.Logger.Error(err)
 	}
 }
 

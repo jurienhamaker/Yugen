@@ -1,7 +1,14 @@
 package static
 
 const (
-	Env             = "ENV"
+	Env = "ENV"
+
+	EnvDebug = "YUGEN_DEBUG"
+
+	EnvLokiHost     = "LOKI_HOST"
+	EnvLokiUsername = "LOKI_USERNAME"
+	EnvLokiPassword = "LOKI_PASSWORD"
+
 	EnvDiscordToken = "DISCORD_TOKEN"
 	EnvDiscordAppID = "DISCORD_APP_ID"
 
