@@ -13,6 +13,9 @@ build-prod:
 	@go generate ./cmd/bot/main.go
 	@CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o dist/kazu cmd/bot/main.go
 
+migrate:
+	@go run github.com/steebchen/prisma-client-go migrate deploy
+
 # Run the application
 run:
 	@go run cmd/bot/main.go
