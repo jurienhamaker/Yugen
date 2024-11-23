@@ -16,13 +16,8 @@ const (
 		discordgo.IntentsGuildEmojis |
 		discordgo.IntentsGuildIntegrations |
 		discordgo.IntentsGuildInvites |
-		discordgo.IntentsGuildMembers |
 		discordgo.IntentsGuildMessageReactions |
-		discordgo.IntentsGuildMessages |
-		// discordgo.IntentsGuildPresences |
-		discordgo.IntentsGuildVoiceStates |
-		discordgo.IntentsGuilds |
-		discordgo.IntentsGuildVoiceStates
+		discordgo.IntentsGuildMessages
 )
 
 func InitDiscordBot(container *di.Container) (release func()) {
@@ -34,6 +29,7 @@ func InitDiscordBot(container *di.Container) (release func()) {
 
 	bot.AddHandler(func(bot *discordgo.Session, event *discordgo.Ready) {
 		utils.Logger.Infof("Logged in as: %v#%v", bot.State.User.Username, bot.State.User.Discriminator)
+		bot.UpdateWatchStatus(0, "colors 🎨")
 	})
 
 	// shared

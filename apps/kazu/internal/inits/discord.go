@@ -1,6 +1,8 @@
 package inits
 
 import (
+	"fmt"
+
 	"github.com/FedorLap2006/disgolf"
 	"github.com/bwmarrin/discordgo"
 	"github.com/sarulabs/di/v2"
@@ -31,6 +33,7 @@ func InitDiscordBot(container *di.Container) (release func()) {
 
 	bot.AddHandler(func(bot *discordgo.Session, event *discordgo.Ready) {
 		utils.Logger.Infof("Logged in as: %v#%v", bot.State.User.Username, bot.State.User.Discriminator)
+		bot.UpdateGameStatus(0, fmt.Sprintf("%s 🧮", bot.State.User.Username))
 	})
 
 	// shared
