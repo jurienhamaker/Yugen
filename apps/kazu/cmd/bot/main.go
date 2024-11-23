@@ -1,7 +1,8 @@
+//go:generate go run github.com/steebchen/prisma-client-go generate --schema=../../prisma/schema.prisma
+
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"os/signal"
@@ -14,10 +15,7 @@ import (
 )
 
 func init() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal(fmt.Errorf("cannot load .env: %w", err))
-	}
+	godotenv.Load()
 }
 
 func main() {
