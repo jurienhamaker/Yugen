@@ -12,6 +12,13 @@ func InitDI() (container di.Container, err error) {
 
 	utils.Logger.Info("Building DI")
 
+	diBuilder.Add(&di.Def{
+		Name: static.DiAppName,
+		Build: func(ctn di.Container) (interface{}, error) {
+			return "Iro", nil
+		},
+	})
+
 	// Initialize redis client
 	inits.InitSharedDi(diBuilder)
 
