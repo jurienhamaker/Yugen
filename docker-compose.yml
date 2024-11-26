@@ -9,7 +9,7 @@ services:
     volumes:
       - .:/opt/app
     ports:
-      - "$API_LISTEN_PORT:$API_LISTEN_PORT"
+      - "$KAZU_API_LISTEN_PORT:$API_LISTEN_PORT"
   iro:
     build: .
     user: "1000:1000"
@@ -20,7 +20,7 @@ services:
     volumes:
       - .:/opt/app
     ports:
-      - "3001:$API_LISTEN_PORT"
+      - "$IRO_API_LISTEN_PORT:$API_LISTEN_PORT"
   db:
     image: postgres:12.2-alpine
     volumes:

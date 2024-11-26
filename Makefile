@@ -13,7 +13,7 @@ kazu:
 	cd apps/kazu && make watch 
 
 kazu-migrate:
-	@echo "Starting Kazu..."
+	@echo "Running Kazu migrations..."
 	cd apps/kazu && make migrate 
 
 build-kazu:

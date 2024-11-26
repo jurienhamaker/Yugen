@@ -10,6 +10,7 @@ delay = 1000
 exclude_dir = [
 	"tmp",
 	"apps/iro",
+	"apps/kusari",
 	"apps/kazu/assets",
 	"apps/kazu/tmp",
 	"apps/kazu/vendor",
