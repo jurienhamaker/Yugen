@@ -7,18 +7,16 @@ import (
 	"github.com/FedorLap2006/disgolf"
 	"github.com/bwmarrin/discordgo"
 	"github.com/sarulabs/di/v2"
-	"github.com/zekrotja/dgrs"
 	"jurien.dev/yugen/shared/static"
 	"jurien.dev/yugen/shared/utils"
 )
 
 func sendLogMessage(container *di.Container, event *discordgo.InteractionCreate, data *discordgo.ApplicationCommandInteractionData) {
 	bot := container.Get(static.DiBot).(*disgolf.Bot)
-	state := container.Get(static.DiState).(*dgrs.State)
 
 	name := utils.GetInteractionName(data, " ")
 
-	guild, err := state.Guild(event.GuildID)
+	guild, err := bot.Guild(event.GuildID)
 	if err != nil {
 		utils.Logger.Error(err)
 		return

@@ -5,10 +5,8 @@ go 1.23.3
 require (
 	github.com/FedorLap2006/disgolf v0.0.0-20221004200601-99cfc3d9a0e1
 	github.com/bwmarrin/discordgo v0.28.1
-	github.com/go-redis/redis/v8 v8.11.5
 	github.com/gofiber/fiber/v2 v2.52.5
 	github.com/sarulabs/di/v2 v2.5.1
-	github.com/zekrotja/dgrs v0.5.7
 )
 
 require (

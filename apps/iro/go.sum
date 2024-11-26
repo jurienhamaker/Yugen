@@ -22,8 +22,6 @@ github.com/fsnotify/fsnotify v1.4.9/go.mod h1:znqG4EE+3YCdAaPaxE2ZRY/06pZUdp0tY4
 github.com/go-logr/logr v1.2.2/go.mod h1:jdQByPbusPIv2/zmleS9BjJVeZ6kBagPoEUsqbVz/1A=
 github.com/go-logr/logr v1.2.3/go.mod h1:jdQByPbusPIv2/zmleS9BjJVeZ6kBagPoEUsqbVz/1A=
 github.com/go-logr/stdr v1.2.2/go.mod h1:mMo/vtBO5dYbehREoey6XUKy/eSumjCCveDpRre4VKE=
-github.com/go-redis/redis/v8 v8.11.5 h1:AcZZR7igkdvfVmQTPnu9WE37LRrO/YrBH5zWyjDC0oI=
-github.com/go-redis/redis/v8 v8.11.5/go.mod h1:gREzHqY1hg6oD9ngVRbLStwAWKhA0FEgq8Jd4h5lpwo=
 github.com/go-task/slim-sprig v0.0.0-20210107165309-348f09dbbbc0/go.mod h1:fyg7847qk6SyHyPtNmDHnmrv/HOrqktSC+C9fM+CJOE=
 github.com/golang/protobuf v1.2.0/go.mod h1:6lQm79b+lXiMfvg/cZm0SGofjICqVBUtrP5yJMmIC1U=
 github.com/golang/protobuf v1.4.0-rc.1/go.mod h1:ceaxUfeHdC40wWswd/P6IGgMaK3YpKi5j83Wpe3EHw8=
@@ -106,8 +104,6 @@ github.com/zekroTJA/shinpuru v0.0.0-20240828005211-d93172643d5f h1:/vvBnnaBkoTk/
 github.com/zekroTJA/shinpuru v0.0.0-20240828005211-d93172643d5f/go.mod h1:AWNc2t5z05DQIjWoxuaJDo4Vg4glBdirsiURrNi0/mA=
 github.com/zekroTJA/timedmap v1.5.2 h1:5bhWBdyvekLHLrZu8cNJB6iCpIQl4bGaG4HTmPbTNKY=
 github.com/zekroTJA/timedmap v1.5.2/go.mod h1:Go4uPxMN1Wjl5IgO6HYD1tM9IQhkYEVqcrrdsI4ljXo=
-github.com/zekrotja/dgrs v0.5.7 h1:CEUMiDI60RU1gP9IjAcL3to2xp49GZmhN+UeklwOBXM=
-github.com/zekrotja/dgrs v0.5.7/go.mod h1:H2yDqIV052TN/1FDo+CKoJgcxxz/6r8MJcxFkxomVBs=
 github.com/zekrotja/rogu v0.8.0 h1:pav+WsvssaQ671x4yAgVvZU5c+nbfCDWWHUJ6l3dpew=
 github.com/zekrotja/rogu v0.8.0/go.mod h1:4pOJq4Qyv20znbSIpLEWIxq+P5MvgtGIFAMrOA75sXE=
 go.opentelemetry.io/otel v0.20.0/go.mod h1:Y3ugLH2oa81t5QO+Lty+zXf8zC9L26ax4Nzoxm/dooo=

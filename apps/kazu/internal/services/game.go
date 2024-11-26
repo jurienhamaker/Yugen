@@ -13,7 +13,6 @@ import (
 	"github.com/bwmarrin/discordgo"
 	"github.com/sarulabs/di/v2"
 	"github.com/zekroTJA/shinpuru/pkg/hammertime"
-	"github.com/zekrotja/dgrs"
 	localStatic "jurien.dev/yugen/kazu/internal/static"
 	localUtils "jurien.dev/yugen/kazu/internal/utils"
 	"jurien.dev/yugen/kazu/prisma/db"
@@ -23,7 +22,6 @@ import (
 
 type GameService struct {
 	bot      *disgolf.Bot
-	state    *dgrs.State
 	database *db.PrismaClient
 	settings *SettingsService
 	saves    *SavesService
@@ -34,7 +32,6 @@ func CreateGameService(container *di.Container) *GameService {
 	utils.Logger.Info("Creating Game Service")
 	return &GameService{
 		bot:      container.Get(static.DiBot).(*disgolf.Bot),
-		state:    container.Get(static.DiState).(*dgrs.State),
 		database: container.Get(static.DiDatabase).(*db.PrismaClient),
 		settings: container.Get(static.DiSettings).(*SettingsService),
 		saves:    container.Get(localStatic.DiSaves).(*SavesService),
@@ -97,11 +94,7 @@ func (service *GameService) Start(guildID string, gameType db.GameType, starting
 		return
 	}
 
-	self, err := service.state.SelfUser()
-	if err != nil {
-		utils.Logger.Error(err)
-		return
-	}
+	self := service.bot.State.User
 
 	if number < 0 {
 		number = 0
@@ -167,6 +160,12 @@ func (service *GameService) ParseNumber(message *discordgo.Message, math bool) (
 
 	if !math {
 		i, err = strconv.Atoi(message.Content)
+
+		if i == 0 {
+			i = -1
+			err = errors.New("Can't have the number be 0")
+		}
+
 		return
 	}
 
@@ -181,6 +180,12 @@ func (service *GameService) ParseNumber(message *discordgo.Message, math bool) (
 	}
 
 	i = int(result.(float64))
+
+	if i == 0 {
+		i = -1
+		err = errors.New("Can't have the number be 0")
+	}
+
 	return
 }
 

@@ -8,7 +8,6 @@ import (
 	"github.com/FedorLap2006/disgolf"
 	"github.com/bwmarrin/discordgo"
 	"github.com/sarulabs/di/v2"
-	"github.com/zekrotja/dgrs"
 	"jurien.dev/yugen/shared/static"
 )
 
@@ -51,7 +50,7 @@ func GetLeaderboardMessageComponents(handler disgolf.HandlerFunc) []*disgolf.Mes
 	}
 }
 
-func LeaderboardCommandHandler(ctx *disgolf.Ctx, container *di.Container, state *dgrs.State, getItems LeaderboardDataFunc, formatter LeaderboardFormatFunc) {
+func LeaderboardCommandHandler(ctx *disgolf.Ctx, container *di.Container, getItems LeaderboardDataFunc, formatter LeaderboardFormatFunc) {
 	page := 1
 
 	pageOption := ctx.Options["page"]
@@ -59,19 +58,19 @@ func LeaderboardCommandHandler(ctx *disgolf.Ctx, container *di.Container, state 
 		page = int(pageOption.IntValue())
 	}
 
-	ShowLeaderboard(ctx, container, state, LEADERBOARD_INTERACTION, page, getItems, formatter)
+	ShowLeaderboard(ctx, container, LEADERBOARD_INTERACTION, page, getItems, formatter)
 }
 
-func LeaderboardMessageComponentHandler(ctx *disgolf.Ctx, container *di.Container, state *dgrs.State, getItems LeaderboardDataFunc, formatter LeaderboardFormatFunc) {
+func LeaderboardMessageComponentHandler(ctx *disgolf.Ctx, container *di.Container, getItems LeaderboardDataFunc, formatter LeaderboardFormatFunc) {
 	page, err := strconv.Atoi(ctx.MessageComponentOptions["page"])
 	if err != nil {
 		return
 	}
 
-	ShowLeaderboard(ctx, container, state, LEADERBOARD_MESSAGE_COMPONENT, page, getItems, formatter)
+	ShowLeaderboard(ctx, container, LEADERBOARD_MESSAGE_COMPONENT, page, getItems, formatter)
 }
 
-func ShowLeaderboard(ctx *disgolf.Ctx, container *di.Container, state *dgrs.State, source leaderboardSourceType, page int, getItems LeaderboardDataFunc, formatter LeaderboardFormatFunc) {
+func ShowLeaderboard(ctx *disgolf.Ctx, container *di.Container, source leaderboardSourceType, page int, getItems LeaderboardDataFunc, formatter LeaderboardFormatFunc) {
 	if source == LEADERBOARD_INTERACTION {
 		Defer(ctx, true)
 	}
@@ -118,10 +117,10 @@ func ShowLeaderboard(ctx *disgolf.Ctx, container *di.Container, state *dgrs.Stat
 		return
 	}
 
-	doLeaderboardResponse(ctx, container, state, source, page, total, items, formatter)
+	doLeaderboardResponse(ctx, container, source, page, total, items, formatter)
 }
 
-func doLeaderboardResponse(ctx *disgolf.Ctx, container *di.Container, state *dgrs.State, source leaderboardSourceType, page int, total int, items []interface{}, formatter LeaderboardFormatFunc) {
+func doLeaderboardResponse(ctx *disgolf.Ctx, container *di.Container, source leaderboardSourceType, page int, total int, items []interface{}, formatter LeaderboardFormatFunc) {
 	embedColor := container.Get(static.DiEmbedColor).(int)
 
 	maxPage := int(math.Ceil(float64(total) / 10))
@@ -137,7 +136,6 @@ func doLeaderboardResponse(ctx *disgolf.Ctx, container *di.Container, state *dgr
 
 	footer, err := CreateEmbedFooter(
 		container.Get(static.DiBot).(*disgolf.Bot),
-		container.Get(static.DiState).(*dgrs.State),
 		&footerParams,
 	)
 	if err != nil {
@@ -146,7 +144,8 @@ func doLeaderboardResponse(ctx *disgolf.Ctx, container *di.Container, state *dgr
 		return
 	}
 
-	guild, err := state.Guild(ctx.Interaction.GuildID)
+	bot := container.Get(static.DiBot).(*disgolf.Bot)
+	guild, err := bot.Guild(ctx.Interaction.GuildID)
 	if err != nil {
 		Logger.Error(err)
 		doError(ctx, source)

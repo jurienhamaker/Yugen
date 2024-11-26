@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/FedorLap2006/disgolf"
 	"github.com/sarulabs/di/v2"
 	"github.com/zekroTJA/shinpuru/pkg/hammertime"
-	"github.com/zekrotja/dgrs"
 	"jurien.dev/yugen/kazu/internal/services"
 	localStatic "jurien.dev/yugen/kazu/internal/static"
 	"jurien.dev/yugen/shared/static"
@@ -15,10 +15,10 @@ import (
 
 func CreateVoteHandler(container *di.Container) func(userID string, source string) error {
 	saves := container.Get(localStatic.DiSaves).(*services.SavesService)
-	state := container.Get(static.DiState).(*dgrs.State)
+	bot := container.Get(static.DiBot).(*disgolf.Bot)
 
 	return func(userID string, source string) error {
-		user, err := state.User(userID)
+		user, err := bot.User(userID)
 		if err != nil {
 			utils.Logger.Error(err)
 			return err

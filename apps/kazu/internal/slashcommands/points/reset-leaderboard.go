@@ -6,7 +6,6 @@ import (
 	"github.com/FedorLap2006/disgolf"
 	"github.com/bwmarrin/discordgo"
 	"github.com/sarulabs/di/v2"
-	"github.com/zekrotja/dgrs"
 	"jurien.dev/yugen/shared/middlewares"
 	"jurien.dev/yugen/shared/static"
 	"jurien.dev/yugen/shared/utils"
@@ -17,14 +16,14 @@ import (
 
 type ResetLeaderboardModule struct {
 	container *di.Container
-	state     *dgrs.State
+	bot       *disgolf.Bot
 	points    *services.PointsService
 }
 
 func GetResetLeaderboardModule(container *di.Container) *ResetLeaderboardModule {
 	return &ResetLeaderboardModule{
 		container: container,
-		state:     container.Get(static.DiState).(*dgrs.State),
+		bot:       container.Get(static.DiBot).(*disgolf.Bot),
 		points:    container.Get(local.DiPoints).(*services.PointsService),
 	}
 }
@@ -38,7 +37,6 @@ func (m *ResetLeaderboardModule) err(ctx *disgolf.Ctx) {
 func (m *ResetLeaderboardModule) request(ctx *disgolf.Ctx) {
 	footer, err := utils.CreateEmbedFooter(
 		m.container.Get(static.DiBot).(*disgolf.Bot),
-		m.container.Get(static.DiState).(*dgrs.State),
 		&utils.CreateEmbedFooterParams{
 			IsVote: false,
 		},
@@ -49,7 +47,7 @@ func (m *ResetLeaderboardModule) request(ctx *disgolf.Ctx) {
 		return
 	}
 
-	guild, err := m.state.Guild(ctx.Interaction.GuildID, false)
+	guild, err := m.bot.Guild(ctx.Interaction.GuildID)
 	if err != nil {
 		utils.Logger.Error(err)
 		m.err(ctx)

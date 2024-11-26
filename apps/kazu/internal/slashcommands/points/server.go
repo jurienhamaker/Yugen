@@ -8,7 +8,6 @@ import (
 	"github.com/bwmarrin/discordgo"
 	"github.com/sarulabs/di/v2"
 	"github.com/zekroTJA/shinpuru/pkg/hammertime"
-	"github.com/zekrotja/dgrs"
 	"jurien.dev/yugen/shared/static"
 	"jurien.dev/yugen/shared/utils"
 
@@ -20,7 +19,7 @@ type ServerModule struct {
 	container *di.Container
 	settings  *services.SettingsService
 	game      *services.GameService
-	state     *dgrs.State
+	bot       *disgolf.Bot
 }
 
 func GetServerModule(container *di.Container) *ServerModule {
@@ -28,7 +27,7 @@ func GetServerModule(container *di.Container) *ServerModule {
 		container: container,
 		settings:  container.Get(static.DiSettings).(*services.SettingsService),
 		game:      container.Get(local.DiGame).(*services.GameService),
-		state:     container.Get(static.DiState).(*dgrs.State),
+		bot:       container.Get(static.DiBot).(*disgolf.Bot),
 	}
 }
 
@@ -62,23 +61,17 @@ func (m *ServerModule) server(ctx *disgolf.Ctx) {
 		return
 	}
 
-	guild, err := m.state.Guild(ctx.Interaction.GuildID, false)
+	guild, err := m.bot.Guild(ctx.Interaction.GuildID)
 	if err != nil {
 		utils.Logger.Error(err)
 		m.err(ctx)
 		return
 	}
 
-	self, err := m.state.SelfUser()
-	if err != nil {
-		utils.Logger.Error(err)
-		m.err(ctx)
-		return
-	}
+	self := m.bot.State.User
 
 	footer, err := utils.CreateEmbedFooter(
 		m.container.Get(static.DiBot).(*disgolf.Bot),
-		m.container.Get(static.DiState).(*dgrs.State),
 		&utils.CreateEmbedFooterParams{
 			IsVote: false,
 		},

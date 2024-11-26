@@ -6,7 +6,6 @@ import (
 	"github.com/FedorLap2006/disgolf"
 	"github.com/bwmarrin/discordgo"
 	"github.com/sarulabs/di/v2"
-	"github.com/zekrotja/dgrs"
 	"jurien.dev/yugen/kazu/internal/services"
 	"jurien.dev/yugen/shared/middlewares"
 	"jurien.dev/yugen/shared/static"
@@ -94,7 +93,6 @@ func (m *SettingsModule) Show(ctx *disgolf.Ctx) {
 
 	footer, _ := utils.CreateEmbedFooter(
 		m.container.Get(static.DiBot).(*disgolf.Bot),
-		m.container.Get(static.DiState).(*dgrs.State),
 		&utils.CreateEmbedFooterParams{
 			IsVote: false,
 		},

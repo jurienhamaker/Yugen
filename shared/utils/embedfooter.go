@@ -6,7 +6,6 @@ import (
 
 	"github.com/FedorLap2006/disgolf"
 	"github.com/bwmarrin/discordgo"
-	"github.com/zekrotja/dgrs"
 )
 
 type CreateEmbedFooterParams struct {
@@ -14,8 +13,8 @@ type CreateEmbedFooterParams struct {
 	IsVote bool
 }
 
-func CreateEmbedFooter(bot *disgolf.Bot, state *dgrs.State, params *CreateEmbedFooterParams) (embed *discordgo.MessageEmbedFooter, err error) {
-	botAuthor, err := state.User(os.Getenv("OWNER_ID"))
+func CreateEmbedFooter(bot *disgolf.Bot, params *CreateEmbedFooterParams) (embed *discordgo.MessageEmbedFooter, err error) {
+	botAuthor, err := bot.User(os.Getenv("OWNER_ID"))
 	if err != nil {
 		return
 	}

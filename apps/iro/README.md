@@ -33,7 +33,7 @@ $ git clone git@github.com:jurienhamaker/yugen.git
 ### Running the app
 
 ```bash
-$ docker compose up -d db redis
+$ docker compose up -d db
 $ docker compose up iro
 ```
 
@@ -45,7 +45,6 @@ $ docker compose up iro
 
 - [Golang 1.23.x](https://go.dev/)
 - [PostgresDB](https://www.postgresql.org/)
-- [Redis](https://www.redis.io/)
 
 ````
 

@@ -23,8 +23,6 @@ const (
 	EnvApiHost = "API_LISTEN_HOST"
 	EnvApiPort = "API_LISTEN_PORT"
 
-	EnvRedisHost = "REDIS_HOST"
-
 	EnvTopGGVoteLink = "TOP_GG_VOTE_LINK"
 	EnvTopGGToken    = "TOP_GG_TOKEN"
 

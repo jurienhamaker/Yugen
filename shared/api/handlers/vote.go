@@ -8,7 +8,6 @@ import (
 	"github.com/bwmarrin/discordgo"
 	"github.com/gofiber/fiber/v2"
 	"github.com/sarulabs/di/v2"
-	"github.com/zekrotja/dgrs"
 	"jurien.dev/yugen/shared/static"
 )
 
@@ -78,11 +77,8 @@ func (handler *VoteHandler) handleTopGG(c *fiber.Ctx) error {
 		return c.Status(400).SendString("Missing user ID in body")
 	}
 
-	state := handler.container.Get(static.DiState).(*dgrs.State)
-	self, err := state.SelfUser()
-	if err != nil {
-		return err
-	}
+	bot := handler.container.Get(static.DiBot).(*disgolf.Bot)
+	self := bot.State.User
 
 	if body.BotID != self.ID {
 		return c.Status(400).SendString("Bot ID does not match bot user")

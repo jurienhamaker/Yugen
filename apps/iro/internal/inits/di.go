@@ -19,7 +19,7 @@ func InitDI() (container di.Container, err error) {
 		},
 	})
 
-	// Initialize redis client
+	// Initialize shared DI
 	inits.InitSharedDi(diBuilder)
 
 	diBuilder.Add(&di.Def{

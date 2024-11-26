@@ -15,7 +15,6 @@ import (
 	"github.com/zekroTJA/colorname"
 	"github.com/zekroTJA/shinpuru/pkg/colors"
 	"github.com/zekroTJA/timedmap"
-	"github.com/zekrotja/dgrs"
 	"jurien.dev/yugen/shared/static"
 	"jurien.dev/yugen/shared/utils"
 )
@@ -27,15 +26,14 @@ const (
 var rxColorHex = regexp.MustCompile(`^#?[\dA-Fa-f]{6,8}$`)
 
 type ColorListener struct {
-	state *dgrs.State
-
+	bot        *disgolf.Bot
 	emojiCache *timedmap.TimedMap
 }
 
 func GetColorListener(container *di.Container) *ColorListener {
 	utils.Logger.Info("Creating Color Listener")
 	return &ColorListener{
-		state:      container.Get(static.DiState).(*dgrs.State),
+		bot:        container.Get(static.DiBot).(*disgolf.Bot),
 		emojiCache: timedmap.New(1 * time.Minute),
 	}
 }
@@ -58,10 +56,7 @@ func (listener *ColorListener) MessageUpdateHandler(bot *discordgo.Session, even
 }
 
 func (listener *ColorListener) MessageReactionHandler(bot *discordgo.Session, event *discordgo.MessageReactionAdd) {
-	self, err := listener.state.SelfUser()
-	if err != nil {
-		return
-	}
+	self := listener.bot.State.User
 
 	if event.UserID == self.ID {
 		return
@@ -77,7 +72,7 @@ func (listener *ColorListener) MessageReactionHandler(bot *discordgo.Session, ev
 		return
 	}
 
-	user, err := listener.state.User(event.UserID)
+	user, err := listener.bot.User(event.UserID)
 	if err != nil {
 		return
 	}

@@ -31,5 +31,3 @@ services:
       - "POSTGRES_MULTIPLE_DATABASES=$DATABASE_NAME"
     ports:
       - "$DATABASE_PORT:5432"
-  redis:
-    image: redis
