@@ -23,9 +23,11 @@ const (
 	EnvApiHost = "API_LISTEN_HOST"
 	EnvApiPort = "API_LISTEN_PORT"
 
+	EnvTopGGSync     = "TOP_GG_SYNC"
 	EnvTopGGVoteLink = "TOP_GG_VOTE_LINK"
 	EnvTopGGToken    = "TOP_GG_TOKEN"
 
+	EnvDiscordBotListSync     = "DISCORDBOTLIST_SYNC"
 	EnvDiscordBotListToken    = "DISCORDBOTLIST_TOKEN"
 	EnvDiscordBotListVoteLink = "DISCORDBOTLIST_VOTE_LINK"
 

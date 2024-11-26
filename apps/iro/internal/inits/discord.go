@@ -31,6 +31,7 @@ func InitDiscordBot(container *di.Container) (release func()) {
 	// shared
 	sharedListeners.AddLogListeners(container)
 	sharedListeners.AddMetricsListeners(container)
+	sharedListeners.AddVoteListeners(container)
 
 	// internal
 	listeners.AddColorListeners(container)
