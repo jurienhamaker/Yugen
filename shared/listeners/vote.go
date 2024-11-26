@@ -95,12 +95,4 @@ func AddVoteListeners(container *di.Container) {
 	bot.AddHandler(func(session *discordgo.Session, event *discordgo.Ready) {
 		go postStats(bot)
 	})
-
-	bot.AddHandler(func(session *discordgo.Session, event *discordgo.GuildCreate) {
-		go postStats(bot)
-	})
-
-	bot.AddHandler(func(session *discordgo.Session, event *discordgo.GuildDelete) {
-		go postStats(bot)
-	})
 }
