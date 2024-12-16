@@ -124,7 +124,6 @@ func doLeaderboardResponse(ctx *disgolf.Ctx, container *di.Container, source lea
 	embedColor := container.Get(static.DiEmbedColor).(int)
 
 	maxPage := int(math.Ceil(float64(total) / 10))
-	maxPage = 3
 
 	footerParams := CreateEmbedFooterParams{
 		IsVote: false,
@@ -159,7 +158,7 @@ func doLeaderboardResponse(ctx *disgolf.Ctx, container *di.Container, source lea
 
 	embed := &discordgo.MessageEmbed{
 		Color:       embedColor,
-		Title:       fmt.Sprintf("Kazu points leaderboard for %s", guild.Name),
+		Title:       fmt.Sprintf("Points leaderboard for %s", guild.Name),
 		Description: description,
 		Thumbnail: &discordgo.MessageEmbedThumbnail{
 			URL: guild.IconURL("128"),
