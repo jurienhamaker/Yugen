@@ -305,6 +305,25 @@ Used **1 server** save, There are **%s/%s** server saves left.`,
 		return
 	}
 
+	usedInPastHundred, err := service.checkUsedInPastHundred(game.ID, word)
+	if err != nil && err != db.ErrNotFound {
+		utils.Logger.Error(err)
+		return
+	}
+
+	if usedInPastHundred {
+		go service.replyAndDelete(
+			message,
+			fmt.Sprintf(
+				"The word %s has already been used in the past 100 words, try another word!",
+				word,
+			),
+			true,
+			"❌",
+		)
+		return
+	}
+
 	cooldown, err := service.checkCooldown(
 		message.Author.ID,
 		game.ID,
@@ -485,6 +504,23 @@ func (service *GameService) checkStreak(settings *db.SettingsModel, game *db.Gam
 			).Exec(context.Background())
 		}
 	}
+
+	return
+}
+
+func (service *GameService) checkUsedInPastHundred(gameID int, word string) (used bool, err error) {
+	histories, err := service.database.History.FindMany(
+		db.History.Game.Where(db.Game.ID.Equals(gameID)),
+	).Take(100).OrderBy(
+		db.History.CreatedAt.Order(db.SortOrderDesc),
+	).Exec(context.Background())
+	if err != nil {
+		return
+	}
+
+	used = slices.ContainsFunc(histories, func(history db.HistoryModel) bool {
+		return history.Word == word
+	})
 
 	return
 }
