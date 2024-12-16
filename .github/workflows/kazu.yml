@@ -3,7 +3,14 @@ name: "Kazu: Build & Deploy docker image"
 on:
   push:
     branches: ["go"]
-    paths: ["apps/kazu/**", "shared/**", "external/**", "Dockerfile.kazu"]
+    paths:
+      [
+        "apps/kazu/**",
+        "shared/**",
+        "external/**",
+        "Dockerfile.kazu",
+        "Makefile",
+      ]
   workflow_dispatch:
 
 env:

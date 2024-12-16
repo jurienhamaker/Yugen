@@ -22,6 +22,8 @@ github.com/go-kit/log v0.2.1/go.mod h1:NwTd00d/i8cPZ3xOwwiv2PO5MOcx78fFErGNcVmBj
 github.com/go-logfmt/logfmt v0.5.1/go.mod h1:WYhtIu8zTZfxdn5+rREduYbwxfcBr/Vr6KEVveWlfTs=
 github.com/go-ozzo/ozzo-routing v2.1.4+incompatible/go.mod h1:hvoxy5M9SJaY0viZvcCsODidtUm5CzRbYKEWuQpr+2A=
 github.com/go-ping/ping v1.1.0/go.mod h1:xIFjORFzTxqIV/tDVGO4eDy/bLuSyawEeojSm3GfRGk=
+github.com/go-redis/redis/v8 v8.11.5 h1:AcZZR7igkdvfVmQTPnu9WE37LRrO/YrBH5zWyjDC0oI=
+github.com/go-redis/redis/v8 v8.11.5/go.mod h1:gREzHqY1hg6oD9ngVRbLStwAWKhA0FEgq8Jd4h5lpwo=
 github.com/go-sql-driver/mysql v1.7.1/go.mod h1:OXbVy3sEdcQ2Doequ6Z5BW6fXNQTmx+9S1MCJN5yJMI=
 github.com/golang-jwt/jwt/v4 v4.5.0/go.mod h1:m21LjoU+eqJr34lmDMbreY2eSTRJ1cv77w39/MY0Ch0=
 github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0/go.mod h1:E/TSTwGwJL78qG/PmXZO1EjYhfJinVAhrmmHX6Z8B9k=
@@ -63,11 +65,15 @@ github.com/robfig/cron/v3 v3.0.1/go.mod h1:eQICP3HwyT7UooqI/z+Ov+PtYAWygg1TEWWzG
 github.com/rogpeppe/go-internal v1.10.0/go.mod h1:UQnix2H7Ngw/k4C5ijL5+65zddjncjaFoBhdsK/akog=
 github.com/rs/xid v1.5.0/go.mod h1:trrq9SKmegXys3aeAKXMUTdJsYXVwGY3RLcfgqegfbg=
 github.com/sahilm/fuzzy v0.1.0/go.mod h1:VFvziUEIMCrT6A6tw2RFIXPXXmzXbOsSHF0DOI8ZK9Y=
+github.com/steebchen/prisma-client-go v0.44.0 h1:1p35CHnWmKDXHEJV5+nPfh+k8Nq/KzzUBkPWHTJsotw=
+github.com/steebchen/prisma-client-go v0.44.0/go.mod h1:FjDTO7dSYb7GCTnvnoIEFYDJGfD2rQ1h56ukDurbt1E=
 github.com/traefik/paerser v0.2.0 h1:zqCLGSXoNlcBd+mzqSCLjon/I6phqIjeJL2xFB2ysgQ=
 github.com/traefik/paerser v0.2.0/go.mod h1:afzaVcgF8A+MpTnPG4wBr4whjanCSYA6vK5RwaYVtRc=
 github.com/wcharczuk/go-chart v2.0.1+incompatible/go.mod h1:PF5tmL4EIx/7Wf+hEkpCqYi5He4u90sw+0+6FhrryuE=
 github.com/xhit/go-str2duration/v2 v2.1.0/go.mod h1:ohY8p+0f07DiV6Em5LKB0s2YpLtXVyJfNt1+BlmyAsU=
 github.com/zekroTJA/ratelimit v1.1.1/go.mod h1:vMj8LMv+KSN8vQASf1Y7f5Lxz12XTMXFhNVghnzOIgI=
+github.com/zekrotja/dgrs v0.5.7 h1:CEUMiDI60RU1gP9IjAcL3to2xp49GZmhN+UeklwOBXM=
+github.com/zekrotja/dgrs v0.5.7/go.mod h1:H2yDqIV052TN/1FDo+CKoJgcxxz/6r8MJcxFkxomVBs=
 github.com/zekrotja/jwt v1.0.0/go.mod h1:/RiMK5BoO+YaH/yqSJ72AYLLOfV9m0rvjfdbfA7AYig=
 github.com/zekrotja/ken v0.20.0/go.mod h1:7Y+H+C1XZPZrA4j7JKpVZoxg10k2Y+t3mDbTy2whcMQ=
 github.com/zekrotja/promtail v0.0.0-20230303162843-4e609d577b74 h1:rpswW7PqwNBGUA5w7h3d1EDgrpIdRZuofT4QSFpl5Mg=
@@ -75,6 +81,8 @@ github.com/zekrotja/promtail v0.0.0-20230303162843-4e609d577b74/go.mod h1:19bfcN
 github.com/zekrotja/safepool v1.1.0 h1:Fc9smZ5eI1TxVqAcRsLPl6rGiWybm4v8YxAqX6ECJEY=
 github.com/zekrotja/safepool v1.1.0/go.mod h1:TIeAz8hLF0HR9lv9VPS89M/UwYhnmbkbyQQ0quJ3t8k=
 github.com/zekrotja/sop v0.3.1/go.mod h1:GKiPMHHdPpoKb+C48M6SXqoQmC2c2fEtUznHNxhDnrQ=
+go.mongodb.org/mongo-driver/v2 v2.0.0-beta2 h1:PRtbRKwblE8ZfI8qOhofcjn9y8CmKZI7trS5vDMeJX0=
+go.mongodb.org/mongo-driver/v2 v2.0.0-beta2/go.mod h1:UGLb3ZgEzaY0cCbJpH9UFt9B6gEXiTPzsnJS38nBeoU=
 go.uber.org/goleak v1.3.0/go.mod h1:CoHD4mav9JJNrW/WLlf7HGZPjdw8EucARQHekz1X6bE=
 golang.org/x/crypto v0.19.0/go.mod h1:Iy9bg/ha4yyC70EfRS8jz+B6ybOBKMaSxLj6P6oBDfU=
 golang.org/x/crypto v0.23.0/go.mod h1:CKFgDieR+mRhux2Lsu27y0fO304Db0wZe70UKqHu0v8=

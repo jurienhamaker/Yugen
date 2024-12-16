@@ -20,4 +20,17 @@ build-kazu:
 	@echo "Building Kazu..."
 	cd apps/kazu && make build-prod
 
-.PHONY: iro kazu
+kusari:
+	@echo "Starting Kusari..."
+	cd apps/kusari && make watch 
+
+kusari-migrate:
+	@echo "Running Kusari migrations..."
+	cd apps/kusari && make migrate 
+
+build-kusari:
+	@echo "Building Kusari..."
+	cd apps/kusari && make build-prod
+
+
+.PHONY: iro kazu kusari

@@ -1,0 +1,26 @@
+FROM golang:1.23 AS build
+
+WORKDIR /opt/app
+
+COPY go.work.kusari ./go.work
+COPY external ./external
+COPY apps/kusari/go.mod apps/kusari/go.sum ./apps/kusari/
+COPY shared/go.mod shared/go.sum ./shared/
+
+RUN go mod download 
+
+COPY ./ ./
+
+RUN make build-kusari
+
+
+# Production
+FROM scratch
+
+WORKDIR /opt/app
+
+COPY --from=build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
+# We transport the binary to our deployable image
+COPY --from=build /opt/app/apps/kusari/dist/kusari /opt/app/
+
+CMD ["/opt/app/kusari"]

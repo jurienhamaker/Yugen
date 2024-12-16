@@ -1,15 +1,21 @@
-name: "Iro: Build & Deploy docker image"
+name: "Kusari: Build & Deploy docker image"
 
 on:
   push:
     branches: ["go"]
     paths:
-      ["apps/iro/**", "shared/**", "external/**", "Dockerfile.iro", "Makefile"]
+      [
+        "apps/kusari/**",
+        "shared/**",
+        "external/**",
+        "Dockerfile.kusari",
+        "Makefile",
+      ]
   workflow_dispatch:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: jurienhamaker/iro
+  IMAGE_NAME: jurienhamaker/kusari
 
 jobs:
   docker:
@@ -38,7 +44,7 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
         with:
-          file: ./Dockerfile.iro
+          file: ./Dockerfile.kusari
           context: .
           push: true
           tags: ${{ steps.meta.outputs.tags }}
