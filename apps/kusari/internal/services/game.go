@@ -141,10 +141,14 @@ func (service *GameService) ParseWord(message *discordgo.Message) (word string, 
 	}
 
 	words := localUtils.SplitWord(message.Content)
+	if len(words) > 1 {
+		return
+	}
+
 	word = words[0]
 
 	if len(word) > 0 && word == "!" {
-		word = words[1]
+		word = word[1:]
 	}
 
 	word = strings.ToLower(word)
@@ -153,6 +157,10 @@ func (service *GameService) ParseWord(message *discordgo.Message) (word string, 
 }
 
 func (service *GameService) AddWord(guildID string, word string, message *discordgo.Message, settings *db.SettingsModel) {
+	if len(word) == 0 {
+		return
+	}
+
 	game, exists, err := service.GetCurrentGame(guildID)
 	if err != nil {
 		utils.Logger.Error(err)
@@ -334,6 +342,12 @@ Used **1 server** save, There are **%s/%s** server saves left.`,
 	}
 	service.bot.MessageReactionAdd(message.ChannelID, message.ID, emoji)
 	service.checkSpecialReactions(message, word)
+
+	service.setNumber(message, count)
+
+	if service.isPalindrome(word) {
+		go service.bot.MessageReactionAdd(message.ChannelID, message.ID, "🪞")
+	}
 }
 
 func (service *GameService) IsEqualToLast(message *discordgo.Message, settings *db.SettingsModel, isDelete bool) (ok bool, word string) {
@@ -557,4 +571,41 @@ func (service *GameService) getRandomLetter() string {
 	})
 
 	return letters[index]
+}
+
+func (service *GameService) setNumber(message *discordgo.Message, count int) {
+	stringCount := strconv.Itoa(count)
+	usedEmojis := []string{}
+
+	for _, number := range stringCount {
+		i, err := strconv.Atoi(string(number))
+		if err != nil {
+			continue
+		}
+
+		availableEmojis := localStatic.NumberEmojis[i]
+		for _, emoji := range availableEmojis {
+			if slices.Contains(usedEmojis, emoji) {
+				continue
+			}
+
+			usedEmojis = append(usedEmojis, emoji)
+			service.bot.MessageReactionAdd(message.ChannelID, message.ID, emoji)
+			break
+		}
+	}
+}
+
+func (service *GameService) isPalindrome(word string) bool {
+	trimmedStr := strings.ReplaceAll(word, " ", "")
+	len := len(trimmedStr)
+	chars := []rune(trimmedStr)
+
+	for i := 0; i < len/2; i++ {
+		if chars[i] != chars[len-i-1] {
+			return false
+		}
+	}
+
+	return true
 }
