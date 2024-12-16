@@ -16,7 +16,6 @@ import (
 	"github.com/sarulabs/di/v2"
 	"github.com/zekroTJA/shinpuru/pkg/hammertime"
 	localStatic "jurien.dev/yugen/kusari/internal/static"
-	localUtils "jurien.dev/yugen/kusari/internal/utils"
 	"jurien.dev/yugen/kusari/prisma/db"
 	"jurien.dev/yugen/shared/static"
 	"jurien.dev/yugen/shared/utils"
@@ -140,14 +139,14 @@ func (service *GameService) ParseWord(message *discordgo.Message) (word string, 
 		return
 	}
 
-	words := localUtils.SplitWord(message.Content)
+	words := strings.Fields(message.Content)
 	if len(words) > 1 {
 		return
 	}
 
 	word = words[0]
 
-	if len(word) > 0 && word == "!" {
+	if len(word) > 0 && string(word[0]) == "!" {
 		word = word[1:]
 	}
 
