@@ -145,7 +145,6 @@ func (service *PointsService) getLeaderboardTotalByGuildID(guildID string, chann
 	count := 0
 	if len(res) > 0 {
 		count, err = strconv.Atoi(res[0].Count)
-		count = count - 1
 	}
 
 	result.Total = count
