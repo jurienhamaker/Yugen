@@ -28,7 +28,13 @@ func CreateVoteHandler(container *di.Container) func(userID string, source strin
 			"userID", userID,
 			"source", source,
 		).Infof("Processing vote for %s from %s", userID, source)
-		_, _, err = saves.AddSaveToPlayer(user.ID, 1)
+
+		amount := 0.25
+		weekday := time.Now().Weekday()
+		if weekday == time.Saturday || weekday == time.Sunday {
+			amount = 0.5
+		}
+		_, _, err = saves.AddSaveToPlayer(user.ID, amount)
 		return err
 	}
 }

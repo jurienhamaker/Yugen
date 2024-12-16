@@ -8,7 +8,7 @@ require (
 	github.com/joho/godotenv v1.5.1
 	github.com/sarulabs/di/v2 v2.5.1
 	github.com/shopspring/decimal v1.4.0
-	github.com/steebchen/prisma-client-go v0.43.0
+	github.com/steebchen/prisma-client-go v0.44.0
 	github.com/zekroTJA/shinpuru v0.0.0-20240828005211-d93172643d5f
 )
 
