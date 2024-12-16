@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"math/rand/v2"
 	"os"
+	"regexp"
 	"slices"
 	"strconv"
 	"strings"
@@ -145,6 +146,19 @@ func (service *GameService) ParseWord(message *discordgo.Message) (word string, 
 	}
 
 	word = words[0]
+
+	firstLetterRegex, _ := regexp.Compile("^[A-Za-z!]+$")
+	lastLetterRegex, _ := regexp.Compile("^[A-Za-z]+$")
+
+	if !firstLetterRegex.MatchString(string(word[0])) {
+		word = ""
+		return
+	}
+
+	if !lastLetterRegex.MatchString(string(word[len(word)-1])) {
+		word = ""
+		return
+	}
 
 	if len(word) > 0 && string(word[0]) == "!" {
 		word = word[1:]
