@@ -57,6 +57,10 @@ func (listener *GameListener) MessageUpdateHandler(bot *discordgo.Session, event
 		return
 	}
 
+	if event.Message == nil {
+		return
+	}
+
 	isEqual, word := listener.service.IsEqualToLast(event.Message, settings, false)
 	if isEqual {
 		return
@@ -72,6 +76,10 @@ Last word was **%s**!`, event.Author.ID, word),
 func (listener *GameListener) MessageDeleteHandler(bot *discordgo.Session, event *discordgo.MessageDelete) {
 	ok, settings := listener.getSettings(event.GuildID, event.ChannelID)
 	if !ok {
+		return
+	}
+
+	if event.BeforeDelete == nil {
 		return
 	}
 
