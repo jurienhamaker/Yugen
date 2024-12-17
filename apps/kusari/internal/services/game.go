@@ -385,6 +385,11 @@ Used **1 server** save, There are **%s/%s** server saves left.`,
 func (service *GameService) IsEqualToLast(message *discordgo.Message, settings *db.SettingsModel, isDelete bool) (ok bool, word string) {
 	ok = true
 
+	if message == nil {
+		ok = false
+		return
+	}
+
 	game, exists, err := service.GetCurrentGame(message.GuildID)
 	if err != nil || !exists {
 		utils.Logger.Info("Couldnt find game", err)
