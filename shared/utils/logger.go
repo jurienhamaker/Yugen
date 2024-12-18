@@ -40,7 +40,7 @@ func CreateLogger(appName string) *zap.SugaredLogger {
 		log.Panic(err)
 	}
 
-	logger.Info(cfg.Level.String())
+	logger.Sugar().Infof("Log level is set to %s", cfg.Level.String())
 	if err != nil {
 		log.Panic(err)
 	}
