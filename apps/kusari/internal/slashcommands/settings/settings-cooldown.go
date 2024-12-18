@@ -25,11 +25,11 @@ func GetSettingsCooldownModule(container *di.Container) *SettingsCooldownModule 
 }
 
 func (m *SettingsCooldownModule) set(ctx *disgolf.Ctx) {
+	utils.Logger.With("Options", ctx.Options, "GuildID", ctx.Interaction.GuildID).Debug("Cooldown command used")
 	utils.Defer(ctx, true)
 
-	utils.Logger.With("Options", ctx.Options["cooldown"], "GuildID", ctx.Interaction.GuildID).Debug("Cooldown command used")
-
 	cooldown := ctx.Options["cooldown"].IntValue()
+
 	settings, err := m.settings.GetByGuildId(ctx.Interaction.GuildID)
 	if err != nil {
 		utils.ErrorResponse(ctx, true)

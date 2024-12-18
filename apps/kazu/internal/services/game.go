@@ -169,11 +169,13 @@ func (service *GameService) ParseNumber(message *discordgo.Message, math bool) (
 		return
 	}
 
+	utils.Logger.With("Message", message.Content).Debug("Creating evaluation")
 	expression, err := govaluate.NewEvaluableExpression(message.Content)
 	if err != nil {
 		return
 	}
 
+	utils.Logger.With("Message", message.Content, "Expression", expression).Debug("Evaluating expression")
 	result, err := expression.Evaluate(nil)
 	if err != nil {
 		return
