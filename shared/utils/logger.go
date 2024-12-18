@@ -15,18 +15,32 @@ import (
 var Logger *zap.SugaredLogger
 
 func CreateLogger(appName string) *zap.SugaredLogger {
-	logger, err := zap.NewProduction()
+	lvl := zap.NewAtomicLevel()
+
+	switch os.Getenv(static.EnvLogLevel) {
+	case "DEBUG":
+		lvl.SetLevel(zap.DebugLevel)
+	case "WARN":
+		lvl.SetLevel(zap.WarnLevel)
+	case "ERROR":
+		lvl.SetLevel(zap.ErrorLevel)
+	}
+
+	cfg := zap.NewProductionConfig()
+	environment := "production"
+	if os.Getenv(static.Env) != "production" {
+		// cfg = zap.NewDevelopmentConfig()
+		cfg = prettyconsole.NewConfig()
+		environment = os.Getenv(static.Env)
+	}
+
+	cfg.Level = lvl
+	logger, err := cfg.Build()
 	if err != nil {
 		log.Panic(err)
 	}
 
-	environment := "production"
-	if os.Getenv(static.Env) != "production" {
-		logger = prettyconsole.NewLogger(zap.DebugLevel)
-
-		environment = os.Getenv(static.Env)
-	}
-
+	logger.Info(cfg.Level.String())
 	if err != nil {
 		log.Panic(err)
 	}

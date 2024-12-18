@@ -3,7 +3,8 @@ package static
 const (
 	Env = "ENV"
 
-	EnvDebug = "YUGEN_DEBUG"
+	EnvDebug    = "YUGEN_DEBUG"
+	EnvLogLevel = "YUGEN_LOG_LEVEL"
 
 	EnvLokiHost     = "LOKI_HOST"
 	EnvLokiUsername = "LOKI_USERNAME"
