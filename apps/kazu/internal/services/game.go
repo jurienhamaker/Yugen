@@ -181,7 +181,15 @@ func (service *GameService) ParseNumber(message *discordgo.Message, math bool) (
 		return
 	}
 
-	i = int(result.(float64))
+	utils.Logger.With("Message", message.Content, "result", result).Debug("Evaluation result")
+	parsedAsFloat, ok := result.(float64)
+	if !ok {
+		i = -1
+		err = errors.New("Couldn't parse to a valid number")
+		return
+	}
+
+	i = int(parsedAsFloat)
 
 	if i == 0 {
 		i = -1
