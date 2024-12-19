@@ -46,8 +46,6 @@ func CreateLogger(appName string) *zap.SugaredLogger {
 	}
 
 	if len(os.Getenv(static.EnvLokiHost)) > 0 && environment == "production" {
-		zapConfig := zap.NewProductionConfig()
-
 		logger.Info("Received loki endpoint, setting up hook...")
 		logger.Debug(os.Getenv(static.EnvLokiHost))
 
@@ -63,7 +61,7 @@ func CreateLogger(appName string) *zap.SugaredLogger {
 			Password: os.Getenv(static.EnvLokiPassword),
 		})
 
-		logger, err = loki.WithCreateLogger(zapConfig)
+		logger, err = loki.WithCreateLogger(cfg)
 	}
 
 	if err != nil {
