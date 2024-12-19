@@ -1,8 +1,6 @@
 package inits
 
 import (
-	"os"
-
 	"github.com/FedorLap2006/disgolf"
 	"github.com/sarulabs/di/v2"
 	"jurien.dev/yugen/shared/slashcommands"
@@ -26,9 +24,7 @@ func InitCommands(container *di.Container) (err error) {
 	bot.AddHandler(bot.Router.HandleInteraction)
 	bot.AddHandler(bot.Router.HandleInteractionMessageComponent)
 
-	if os.Getenv(static.EnvSyncCommands) == "true" {
-		utils.Logger.Infof("Syncing commands of %d modules", len(modules))
-		err = bot.Router.Sync(bot.Session, os.Getenv(static.EnvDiscordAppID), os.Getenv(static.EnvDiscordDevelopmentGuildID))
-	}
+	err = utils.SyncCommands(bot, len(modules))
+
 	return
 }

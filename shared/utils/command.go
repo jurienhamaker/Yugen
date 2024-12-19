@@ -2,9 +2,11 @@ package utils
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/FedorLap2006/disgolf"
 	"github.com/bwmarrin/discordgo"
+	"jurien.dev/yugen/shared/static"
 )
 
 func GetInteractionName(data *discordgo.ApplicationCommandInteractionData, delimeter ...string) string {
@@ -121,4 +123,19 @@ func MessageComponentError(ctx *disgolf.Ctx) {
 		Content: "Something wen't wrong, try again later.",
 		Flags:   discordgo.MessageFlagsEphemeral,
 	})
+}
+
+func SyncCommands(bot *disgolf.Bot, amount int) (err error) {
+	if os.Getenv(static.EnvSyncCommands) == "true" {
+		Logger.Infof("Syncing commands of %d modules", amount)
+
+		var developmentGuildId string
+		if os.Getenv(static.Env) != "production" {
+			developmentGuildId = os.Getenv(static.EnvDiscordDevelopmentGuildID)
+		}
+
+		err = bot.Router.Sync(bot.Session, os.Getenv(static.EnvDiscordAppID), developmentGuildId)
+	}
+
+	return
 }
