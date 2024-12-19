@@ -6,7 +6,10 @@ COPY external ./external
 COPY apps/kusari/go.mod apps/kusari/go.sum ./apps/kusari/
 COPY shared/go.mod shared/go.sum ./shared/
 
-RUN go mod download 
+RUN cd apps/kusari && \
+	go mod download && \
+	cd ../../shared && \
+	go mod download
 
 COPY ./ ./
 

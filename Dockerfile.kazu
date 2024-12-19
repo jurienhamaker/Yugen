@@ -6,7 +6,10 @@ COPY external ./external
 COPY apps/kazu/go.mod apps/kazu/go.sum ./apps/kazu/
 COPY shared/go.mod shared/go.sum ./shared/
 
-RUN go mod download 
+RUN cd apps/kazu && \
+	go mod download && \
+	cd ../../shared && \
+	go mod download
 
 COPY ./ ./
 

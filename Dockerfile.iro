@@ -6,7 +6,10 @@ COPY external ./external
 COPY apps/iro/go.mod apps/iro/go.sum ./apps/iro/
 COPY shared/go.mod shared/go.sum ./shared/
 
-RUN go mod download 
+RUN cd apps/iro && \
+	go mod download && \
+	cd ../../shared && \
+	go mod download
 
 COPY ./ ./
 
