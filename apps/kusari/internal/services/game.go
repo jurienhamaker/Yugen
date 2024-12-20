@@ -141,7 +141,7 @@ func (service *GameService) ParseWord(message *discordgo.Message) (word string, 
 	}
 
 	words := strings.Fields(message.Content)
-	if len(words) > 1 {
+	if len(words) == 0 || len(words) > 1 {
 		return
 	}
 
