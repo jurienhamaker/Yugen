@@ -88,7 +88,7 @@ func AddVoteListeners(container *di.Container) {
 	bot := container.Get(static.DiBot).(*disgolf.Bot)
 	cron := container.Get(static.DiCron).(*cron.Cron)
 
-	cron.AddFunc("@every 10m", func() {
+	cron.AddFunc("@every 3h", func() {
 		go postStats(bot)
 	})
 
