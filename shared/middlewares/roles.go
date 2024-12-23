@@ -1,6 +1,7 @@
 package middlewares
 
 import (
+	"errors"
 	"os"
 	"slices"
 	"strings"
@@ -11,59 +12,74 @@ import (
 	"jurien.dev/yugen/shared/utils"
 )
 
-func checkBase(ctx *disgolf.Ctx) bool {
+func checkBase(ctx *disgolf.Ctx) (bool, error) {
+	if ctx.Interaction == nil || ctx.Interaction.Member == nil {
+		return false, errors.New("Member not accessible")
+	}
+
 	interaction := ctx.Interaction
 
 	if interaction == nil {
-		return true
+		return true, nil
 	}
 
 	member := interaction.Member
 	if member == nil {
-		return false
+		return false, nil
 	}
 
 	ownerIds := strings.Split(os.Getenv(static.EnvOwnerIDs), ",")
 	if len(ownerIds) > 0 && slices.Contains(ownerIds, interaction.Member.User.ID) {
-		return true
+		return true, nil
 	}
 
-	return false
+	return false, nil
 }
 
-func checkAdmin(ctx *disgolf.Ctx) bool {
-	base := checkBase(ctx)
-	if base {
-		return base
+func checkAdmin(ctx *disgolf.Ctx) (bool, error) {
+	base, err := checkBase(ctx)
+	if base || err != nil {
+		return base, err
 	}
 
 	perms := ctx.Interaction.Member.Permissions
 
 	// admin check
 	if perms&discordgo.PermissionAdministrator != 0 {
-		return true
+		return true, nil
 	}
 
 	// guild manage check
 	if perms&discordgo.PermissionManageGuild != 0 {
-		return true
+		return true, nil
 	}
 
-	return false
+	return false, nil
 }
 
-func checkModerator(ctx *disgolf.Ctx) bool {
-	admin := checkAdmin(ctx)
-	if admin {
-		return admin
+func checkModerator(ctx *disgolf.Ctx) (bool, error) {
+	admin, err := checkAdmin(ctx)
+	if admin || err != nil {
+		return admin, err
 	}
 
 	// moderator check
 	perms := ctx.Interaction.Member.Permissions
-	return perms&discordgo.PermissionBanMembers != 0
+	return perms&discordgo.PermissionBanMembers != 0, nil
 }
 
-func checkResponse(ctx *disgolf.Ctx, pass bool) {
+func checkResponse(ctx *disgolf.Ctx, pass bool, err error) {
+	if err != nil {
+		utils.Logger.Error(err)
+
+		resErr := utils.ErrorResponse(ctx)
+		if resErr != nil {
+			utils.Logger.Error(err)
+		}
+
+		return
+	}
+
 	if !pass {
 		err := utils.ForbiddenResponse(ctx)
 		if err != nil {
@@ -76,16 +92,16 @@ func checkResponse(ctx *disgolf.Ctx, pass bool) {
 }
 
 func GuildOwnerMiddleware(ctx *disgolf.Ctx) {
-	pass := checkBase(ctx)
-	checkResponse(ctx, pass)
+	pass, err := checkBase(ctx)
+	checkResponse(ctx, pass, err)
 }
 
 func GuildAdminMiddleware(ctx *disgolf.Ctx) {
-	pass := checkAdmin(ctx)
-	checkResponse(ctx, pass)
+	pass, err := checkAdmin(ctx)
+	checkResponse(ctx, pass, err)
 }
 
 func GuildModeratorMiddleware(ctx *disgolf.Ctx) {
-	pass := checkModerator(ctx)
-	checkResponse(ctx, pass)
+	pass, err := checkModerator(ctx)
+	checkResponse(ctx, pass, err)
 }

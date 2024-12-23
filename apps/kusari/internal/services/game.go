@@ -377,7 +377,7 @@ Used **1 server** save, There are **%s/%s** server saves left.`,
 
 	service.setNumber(message, count)
 
-	if service.isPalindrome(word) {
+	if utils.IsPalindrome(word) {
 		go service.bot.MessageReactionAdd(message.ChannelID, message.ID, "🪞")
 	}
 }
@@ -648,18 +648,4 @@ func (service *GameService) setNumber(message *discordgo.Message, count int) {
 			break
 		}
 	}
-}
-
-func (service *GameService) isPalindrome(word string) bool {
-	trimmedStr := strings.ReplaceAll(word, " ", "")
-	len := len(trimmedStr)
-	chars := []rune(trimmedStr)
-
-	for i := 0; i < len/2; i++ {
-		if chars[i] != chars[len-i-1] {
-			return false
-		}
-	}
-
-	return true
 }

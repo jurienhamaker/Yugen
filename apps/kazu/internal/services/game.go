@@ -14,7 +14,6 @@ import (
 	"github.com/sarulabs/di/v2"
 	"github.com/zekroTJA/shinpuru/pkg/hammertime"
 	localStatic "jurien.dev/yugen/kazu/internal/static"
-	localUtils "jurien.dev/yugen/kazu/internal/utils"
 	"jurien.dev/yugen/kazu/prisma/db"
 	"jurien.dev/yugen/shared/static"
 	"jurien.dev/yugen/shared/utils"
@@ -550,7 +549,7 @@ func (service *GameService) replyAndDelete(message *discordgo.Message, messageTo
 }
 
 func (service *GameService) checkSpecialReactions(message *discordgo.Message, number int) {
-	if number > 10 && localUtils.IsPalindrome(strconv.Itoa(number)) {
+	if number > 10 && utils.IsPalindrome(strconv.Itoa(number)) {
 		go service.bot.MessageReactionAdd(message.ChannelID, message.ID, "🪞")
 	}
 
