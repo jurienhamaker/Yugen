@@ -34,6 +34,8 @@ model Settings {
   // timestamps
   createdAt                         DateTime    @default(now())
   updatedAt                         DateTime    @updatedAt
+
+  @@index([guildId, channelId])
 }
 
 model Game {
@@ -58,6 +60,8 @@ model Game {
   // timestamps
   createdAt         DateTime    @default(now())
   updatedAt         DateTime    @updatedAt
+
+  @@index([guildId])
 }
 
 model Guess {
@@ -75,6 +79,8 @@ model Guess {
   // timestamps
   createdAt         DateTime    @default(now())
   updatedAt         DateTime    @updatedAt
+
+  @@index([gameId])
 }
 
 model PlayerStats {
@@ -91,6 +97,8 @@ model PlayerStats {
   // timestamps
   createdAt         DateTime    @default(now())
   updatedAt         DateTime    @updatedAt
+
+  @@index([userId, guildId])
 }
 
 enum GameStatus {
