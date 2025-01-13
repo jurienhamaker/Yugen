@@ -46,6 +46,8 @@ model Game {
   word              String
   endingAt          DateTime
 
+  number			Int			@default(1)
+
   scheduleStarted   Boolean     @default(true)
 
   guesses           Guess[]

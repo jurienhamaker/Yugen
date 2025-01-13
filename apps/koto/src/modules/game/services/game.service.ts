@@ -56,12 +56,15 @@ export class GameService {
 			},
 			select: {
 				word: true,
+				number: true,
 			},
 			orderBy: {
 				createdAt: 'desc',
 			},
 			take: 50,
 		});
+
+		const lastGame = pastFiftyGames.at(0);
 
 		const ignoredWords = pastFiftyGames.map(g => g.word);
 		word = word ?? this._words.getRandom(ignoredWords);
@@ -80,6 +83,7 @@ export class GameService {
 					addMinutes(new Date(), settings.timeLimit)
 				),
 				meta: this._createBaseState(word) as never,
+				number: lastGame ? lastGame.number + 1 : 1,
 			},
 			include: {
 				guesses: true,
