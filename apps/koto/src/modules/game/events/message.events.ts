@@ -40,8 +40,14 @@ export class GameMessageEvents {
 			return;
 		}
 
+		// eslint-disable-next-line no-restricted-syntax
+		console.time(`game ${message.id}`);
 		const exists = this._words.exists(word);
+
+		console.timeLog(`game ${message.id}`, 'word exists checked', exists);
 		if (!exists) {
+			// eslint-disable-next-line no-restricted-syntax
+			console.timeEnd(`game ${message.id}`);
 			return message.reply({
 				content: `Sorry, I couldn't find "**${word}**" in my database.`,
 			});

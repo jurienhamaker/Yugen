@@ -22,19 +22,28 @@ export class GameMessageService {
 	) {}
 
 	async create(game: GameWithMetaAndGuesses, isNew = false) {
+		// eslint-disable-next-line no-restricted-syntax
+		console.time(`create game message ${game.id}`);
 		const settings = await this._settings.getSettings(game.guildId);
 
 		if (!settings.channelId) {
 			return;
 		}
 
-		this._logger.verbose(
-			`Creating message for game ${game.id}${isNew ? ' (new)' : ''}`
-		);
-
+		// this._logger.verbose(
+		// 	`Creating message for game ${game.id}${isNew ? ' (new)' : ''}`
+		// );
+		//
+		//
 		const channel = await this._client.channels.fetch(settings.channelId);
 		if (game.lastMessageId) {
-			await this._delete(channel, game.lastMessageId);
+			this._delete(channel, game.lastMessageId).catch(error =>
+				this._logger.error(error)
+			);
+			console.timeLog(
+				`create game message ${game.id}`,
+				'deleted previous message'
+			);
 		}
 
 		if (!channel || channel.type !== ChannelType.GuildText) {
@@ -42,6 +51,7 @@ export class GameMessageService {
 		}
 
 		const embed = await this._createEmbed(game);
+		console.timeLog(`create game message ${game.id}`, 'created embed');
 		const message = await channel
 			.send({
 				content:
@@ -62,11 +72,13 @@ export class GameMessageService {
 				throw error;
 			});
 
+		console.timeLog(`create game message ${game.id}`, 'send message');
+
 		if (!message) {
 			return;
 		}
 
-		return await this._prisma.game.update({
+		const updatedGame = await this._prisma.game.update({
 			where: {
 				id: game.id,
 			},
@@ -74,6 +86,10 @@ export class GameMessageService {
 				lastMessageId: message.id,
 			},
 		});
+		// eslint-disable-next-line no-restricted-syntax
+		console.timeEnd(`create game message ${game.id}`);
+
+		return updatedGame;
 	}
 
 	private async _delete(channel: Channel, messageId: string) {
