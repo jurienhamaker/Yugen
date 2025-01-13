@@ -22,8 +22,6 @@ export class GameMessageService {
 	) {}
 
 	async create(game: GameWithMetaAndGuesses, isNew = false) {
-		// eslint-disable-next-line no-restricted-syntax
-		console.time(`create game message ${game.id}`);
 		const settings = await this._settings.getSettings(game.guildId);
 
 		if (!settings.channelId) {
@@ -40,10 +38,6 @@ export class GameMessageService {
 			this._delete(channel, game.lastMessageId).catch(error =>
 				this._logger.error(error)
 			);
-			console.timeLog(
-				`create game message ${game.id}`,
-				'deleted previous message'
-			);
 		}
 
 		if (!channel || channel.type !== ChannelType.GuildText) {
@@ -51,7 +45,6 @@ export class GameMessageService {
 		}
 
 		const embed = await this._createEmbed(game);
-		console.timeLog(`create game message ${game.id}`, 'created embed');
 		const message = await channel
 			.send({
 				content:
@@ -72,8 +65,6 @@ export class GameMessageService {
 				throw error;
 			});
 
-		console.timeLog(`create game message ${game.id}`, 'send message');
-
 		if (!message) {
 			return;
 		}
@@ -86,8 +77,6 @@ export class GameMessageService {
 				lastMessageId: message.id,
 			},
 		});
-		// eslint-disable-next-line no-restricted-syntax
-		console.timeEnd(`create game message ${game.id}`);
 
 		return updatedGame;
 	}
@@ -108,22 +97,10 @@ export class GameMessageService {
 	private async _createEmbed(
 		game: Game & { guesses: Guess[]; meta: GameMeta }
 	) {
-		// eslint-disable-next-line no-restricted-syntax
-		console.time(`create embed ${game.id}`);
 		const footer = await getEmbedFooter(this._client);
-		console.timeLog(`create embed ${game.id}`, 'created footer');
-		const gamesCount = await this._prisma.game.count({
-			where: {
-				guildId: game.guildId,
-				id: {
-					not: game.id,
-				},
-			},
-		});
-		console.timeLog(`create embed ${game.id}`, 'got game count', gamesCount);
 
-		const embed = new EmbedBuilder()
-			.setTitle(`Koto #${gamesCount + 1}`)
+		return new EmbedBuilder()
+			.setTitle(`Koto #${game.number}`)
 			.setColor(this._getEmbedColor(game.status))
 			.setDescription(
 				`${this._getMessageRows(game.guesses, game.status)}
@@ -131,10 +108,6 @@ ${this._getMessageKeyboard(game)}
 ${this._getGameInformation(game)}`
 			)
 			.setFooter(footer);
-		// eslint-disable-next-line no-restricted-syntax
-		console.timeEnd(`create embed ${game.id}`);
-
-		return embed;
 	}
 
 	private _getEmbedColor(status: GameStatus) {

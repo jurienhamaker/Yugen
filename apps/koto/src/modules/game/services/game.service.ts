@@ -102,10 +102,8 @@ export class GameService {
 	) {
 		let game = await this.getCurrentGame(guildId);
 
-		console.timeLog(`game ${message.id}`, 'got current game', game.id);
 		await this._points.getPlayer(guildId, message.author.id);
 
-		console.timeLog(`game ${message.id}`, 'checked player', game.id);
 		if (!game) {
 			return;
 		}
@@ -113,18 +111,9 @@ export class GameService {
 		const alreadyGuessedIndex = game.guesses.findIndex(
 			(g: Guess) => g.word === word
 		);
-		console.timeLog(
-			`game ${message.id}`,
-			'checked already guessed',
-			game.id,
-			alreadyGuessedIndex
-		);
 
 		if (alreadyGuessedIndex >= 0 && process.env['NODE_ENV'] === 'production') {
 			await message.react('❌');
-
-			// eslint-disable-next-line no-restricted-syntax
-			console.timeEnd(`game ${message.id}`);
 			return;
 		}
 
@@ -134,12 +123,6 @@ export class GameService {
 			settings.cooldown
 		);
 
-		console.timeLog(
-			`game ${message.id}`,
-			'checked cooldown',
-			game.id,
-			cooldown
-		);
 		if (cooldown) {
 			message.react('🕒');
 			message.reply(
@@ -147,8 +130,6 @@ export class GameService {
 					cooldown
 				)}:R>`
 			);
-			// eslint-disable-next-line no-restricted-syntax
-			console.timeEnd(`game ${message.id}`);
 			return;
 		}
 
@@ -157,8 +138,6 @@ export class GameService {
 			word,
 			game.meta as never
 		);
-
-		console.timeLog(`game ${message.id}`, 'checked word', game.id, guessed);
 
 		await this._prisma.guess.create({
 			data: {
@@ -171,8 +150,6 @@ export class GameService {
 				meta: meta as never,
 			},
 		});
-
-		console.timeLog(`game ${message.id}`, 'created guess', game.id);
 
 		let status = guessed ? GameStatus.COMPLETED : game.status;
 		if (game.guesses.length + 1 === 9 && !guessed) {
@@ -191,17 +168,10 @@ export class GameService {
 				guesses: true,
 			},
 		});
-		console.timeLog(
-			`game ${message.id}`,
-			'updated game status',
-			game.id,
-			game.status
-		);
 
 		message
 			.react(guessed ? '🎉' : '✅')
 			.catch(error => this._logger.error(error));
-		console.timeLog(`game ${message.id}`, 'reacted to game status', game.id);
 
 		const promises = [];
 		if (guessed) {
@@ -226,17 +196,7 @@ export class GameService {
 		}
 
 		this._message.create(game as GameWithMetaAndGuesses, false);
-
-		console.timeLog(
-			`game ${message.id}`,
-			'created points promises',
-			game.id,
-			promises.length
-		);
-
 		await Promise.allSettled(promises);
-
-		console.timeLog(`game ${message.id}`, 'finished points promises', game.id);
 
 		if (status !== GameStatus.IN_PROGRESS) {
 			// after the message has been send, we can delete the guesses so we don't keep any message content ever.
@@ -246,24 +206,11 @@ export class GameService {
 				},
 			});
 
-			console.timeLog(`game ${message.id}`, 'deleted guesses', game.id);
-
 			if (settings.autoStart) {
-				console.timeLog(
-					`game ${message.id}`,
-					'pre delay to start new game',
-					game.id
-				);
 				await delay(500);
-
-				// eslint-disable-next-line no-restricted-syntax
-				console.timeEnd(`game ${message.id}`);
 				return this.start(guildId);
 			}
 		}
-
-		// eslint-disable-next-line no-restricted-syntax
-		console.timeEnd(`game ${message.id}`);
 	}
 
 	async endGame(gameId: number, status: GameStatus = GameStatus.OUT_OF_TIME) {
