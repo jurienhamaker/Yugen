@@ -108,7 +108,10 @@ export class GameMessageService {
 	private async _createEmbed(
 		game: Game & { guesses: Guess[]; meta: GameMeta }
 	) {
+		// eslint-disable-next-line no-restricted-syntax
+		console.time(`create embed ${game.id}`);
 		const footer = await getEmbedFooter(this._client);
+		console.timeLog(`create embed ${game.id}`, 'created footer');
 		const gamesCount = await this._prisma.game.count({
 			where: {
 				guildId: game.guildId,
@@ -117,8 +120,9 @@ export class GameMessageService {
 				},
 			},
 		});
+		console.timeLog(`create embed ${game.id}`, 'got game count', gamesCount);
 
-		return new EmbedBuilder()
+		const embed = new EmbedBuilder()
 			.setTitle(`Koto #${gamesCount + 1}`)
 			.setColor(this._getEmbedColor(game.status))
 			.setDescription(
@@ -127,6 +131,10 @@ ${this._getMessageKeyboard(game)}
 ${this._getGameInformation(game)}`
 			)
 			.setFooter(footer);
+		// eslint-disable-next-line no-restricted-syntax
+		console.timeEnd(`create embed ${game.id}`);
+
+		return embed;
 	}
 
 	private _getEmbedColor(status: GameStatus) {
