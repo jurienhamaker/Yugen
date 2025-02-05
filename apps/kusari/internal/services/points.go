@@ -70,9 +70,20 @@ func (service *PointsService) AddGamePoints(guildID string, userID string) (err 
 func (service *PointsService) ResetLeaderboardByGuildID(guildID string) (err error) {
 	_, err = service.database.PlayerStats.FindMany(
 		db.PlayerStats.GuildID.Equals(guildID),
-	).Update(
-		db.PlayerStats.Points.Set(0),
-	).Exec(context.Background())
+	).Delete().Exec(context.Background())
+
+	if err == db.ErrNotFound {
+		err = nil
+	}
+
+	return
+}
+
+func (service *PointsService) ResetLeaderboardByGuildIDAndUserID(guildID string, userID string) (err error) {
+	_, err = service.database.PlayerStats.FindMany(
+		db.PlayerStats.GuildID.Equals(guildID),
+		db.PlayerStats.UserID.Equals(userID),
+	).Delete().Exec(context.Background())
 
 	if err == db.ErrNotFound {
 		err = nil
