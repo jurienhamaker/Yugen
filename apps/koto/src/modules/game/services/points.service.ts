@@ -54,10 +54,11 @@ export class GamePointsService {
 		});
 	}
 
-	resetLeaderboard(guildId: string) {
+	resetLeaderboard(guildId: string, userId: string) {
 		return this._prisma.playerStats.updateMany({
 			where: {
 				guildId,
+				...(userId ? { userId } : {}),
 			},
 			data: {
 				points: 0,

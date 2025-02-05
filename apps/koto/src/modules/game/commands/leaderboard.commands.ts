@@ -7,6 +7,7 @@ import {
 	Client,
 	CommandInteraction,
 	EmbedBuilder,
+	User,
 } from 'discord.js';
 import {
 	Button,
@@ -18,6 +19,7 @@ import {
 	SlashCommand,
 	SlashCommandContext,
 	StringOption,
+	UserOption,
 } from 'necord';
 
 import { GamePointsService } from '../services/points.service';
@@ -56,6 +58,15 @@ class GameLeaderboardOptions {
 	page: number | undefined;
 }
 
+class GameLeaderboardResetOptions {
+	@UserOption({
+		name: 'member',
+		description: 'The member to reset from the leaderboard',
+		required: false,
+	})
+	user: User;
+}
+
 @Injectable()
 export class GameLeaderboardCommands {
 	constructor(private _points: GamePointsService, private _client: Client) {}
@@ -77,12 +88,17 @@ export class GameLeaderboardCommands {
 		name: 'reset-leaderboard',
 		description: 'Reset all player points and completely reset the leaderboard',
 	})
-	public async reset(@Context() [interaction]: SlashCommandContext) {
+	public async reset(
+		@Context() [interaction]: SlashCommandContext,
+		@Options() { user }: GameLeaderboardResetOptions
+	) {
 		const footer = await getEmbedFooter(this._client);
 		const embed = new EmbedBuilder()
 			.setTitle(`Reset leaderboard`)
 			.setDescription(
-				`Are you sure you want to reset the leaderboard of **${interaction.guild.name}**
+				`Are you sure you want to reset the leaderboard points of **${
+					user ? `<@${user.id}>` : interaction.guild.name
+				}**
 **This action is irreversible**`
 			)
 			.setFooter(footer);
@@ -92,11 +108,11 @@ export class GameLeaderboardCommands {
 			components: [
 				new ActionRowBuilder<ButtonBuilder>().addComponents([
 					new ButtonBuilder()
-						.setCustomId(`RESET_LEADERBOARD/yes`)
+						.setCustomId(`RESET_LEADERBOARD/yes/${user?.id ?? 'none'}`)
 						.setLabel('Reset leaderboard')
 						.setStyle(ButtonStyle.Success),
 					new ButtonBuilder()
-						.setCustomId(`RESET_LEADERBOARD/no`)
+						.setCustomId(`RESET_LEADERBOARD/no/${user?.id ?? 'none'}`)
 						.setLabel('Cancel')
 						.setStyle(ButtonStyle.Danger),
 				]),
@@ -107,23 +123,30 @@ export class GameLeaderboardCommands {
 
 	@UseGuards(ManageServerGuard)
 	@UseFilters(ForbiddenExceptionFilter)
-	@Button('RESET_LEADERBOARD/:type')
+	@Button('RESET_LEADERBOARD/:type/:userId')
 	public async resetButton(
 		@Context()
 		[interaction]: ButtonContext,
-		@ComponentParam('type') type: 'yes' | 'no'
+		@ComponentParam('type') type: 'yes' | 'no',
+		@ComponentParam('userId') userId: string
 	) {
+		userId = userId === 'none' ? null : userId;
+
 		if (type !== 'yes') {
 			return interaction.update({
-				content: `I have not reset the leaderboard`,
+				content: `I have not reset the leaderboard points${
+					userId ? ` for <@${userId}>` : ''
+				}.`,
 				components: [],
 				embeds: [],
 			});
 		}
 
-		await this._points.resetLeaderboard(interaction.guildId);
+		await this._points.resetLeaderboard(interaction.guildId, userId);
 		return interaction.update({
-			content: `The leaderboard has been reset.`,
+			content: `The leaderboard points have been reset${
+				userId ? ` for <@${userId}>` : ''
+			}.`,
 			components: [],
 			embeds: [],
 		});
@@ -199,7 +222,7 @@ export class GameLeaderboardCommands {
 		const components = [];
 
 		const title = `Koto ${
-			type === 'points' ? 'Points' : (type === 'wins' ? 'Wins' : 'Participation')
+			type === 'points' ? 'Points' : type === 'wins' ? 'Wins' : 'Participation'
 		} leaderboard for ${interaction.guild.name}`;
 
 		const embed = new EmbedBuilder()
