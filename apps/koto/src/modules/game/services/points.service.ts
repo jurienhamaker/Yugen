@@ -55,13 +55,10 @@ export class GamePointsService {
 	}
 
 	resetLeaderboard(guildId: string, userId: string) {
-		return this._prisma.playerStats.updateMany({
+		return this._prisma.playerStats.deleteMany({
 			where: {
 				guildId,
 				...(userId ? { userId } : {}),
-			},
-			data: {
-				points: 0,
 			},
 		});
 	}
