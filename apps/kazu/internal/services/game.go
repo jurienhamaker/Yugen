@@ -279,13 +279,7 @@ Used **1 server** save, There are **%s/%s** server saves left.`,
 			return
 		}
 
-		count, err := service.getCount(game.ID)
-		if err != nil {
-			utils.Logger.Error(err)
-			return
-		}
-
-		isHighscore, _, err := service.checkStreak(settings, game, count)
+		isHighscore, _, err := service.checkStreak(settings, game, number)
 		if err != nil {
 			utils.Logger.Error(err)
 			return
@@ -304,7 +298,7 @@ Used **1 server** save, There are **%s/%s** server saves left.`,
 
 **Want to save the game?** Make sure to **/vote** for Kazu and earn yourself saves to save the game!`,
 				failReason,
-				count,
+				number,
 				highScoreText,
 			),
 			message.Reference(),
@@ -350,13 +344,7 @@ Used **1 server** save, There are **%s/%s** server saves left.`,
 		return
 	}
 
-	count, err := service.getCount(game.ID)
-	if err != nil {
-		utils.Logger.Error(err)
-		return
-	}
-
-	isHighscore, isGameHighscored, err := service.checkStreak(settings, game, count)
+	isHighscore, isGameHighscored, err := service.checkStreak(settings, game, number)
 
 	if isGameHighscored {
 		service.bot.MessageReactionAdd(message.ChannelID, message.ID, "🎉")
@@ -455,34 +443,13 @@ func (service *GameService) GetLastHistory(game *db.GameModel) (history *db.Hist
 	return
 }
 
-func (service *GameService) getCount(gameID int) (count int, err error) {
-	var res []struct {
-		Count string `json:"count"`
-	}
-
-	err = service.database.Prisma.QueryRaw(
-		`SELECT count(*) as count FROM "History" WHERE "gameId" = $1`,
-		gameID,
-	).Exec(context.Background(), &res)
-	if err != nil {
-		return
-	}
-
-	if len(res) > 0 {
-		count, err = strconv.Atoi(res[0].Count)
-		count = count - 1
-	}
-
-	return
-}
-
-func (service *GameService) checkStreak(settings *db.SettingsModel, game *db.GameModel, count int) (isHighscore bool, isGameHighscored bool, err error) {
+func (service *GameService) checkStreak(settings *db.SettingsModel, game *db.GameModel, number int) (isHighscore bool, isGameHighscored bool, err error) {
 	isHighscore = false
 	isGameHighscored = false
 
-	if count > settings.Highscore {
+	if number > settings.Highscore {
 		isHighscore = true
-		go service.settings.SetHighscoreByGuildID(settings.GuildID, count)
+		go service.settings.SetHighscoreByGuildID(settings.GuildID, number)
 
 		if !game.IsHighscored {
 			isGameHighscored = true
