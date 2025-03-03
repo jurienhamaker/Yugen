@@ -175,7 +175,8 @@ func (service *GameService) ParseNumber(message *discordgo.Message, math bool) (
 	}
 
 	utils.Logger.With("Message", message.Content, "Expression", expression).Debug("Evaluating expression")
-	result, err := expression.Evaluate(nil)
+	params := make(map[string]interface{})
+	result, err := expression.Evaluate(params)
 	if err != nil {
 		return
 	}
