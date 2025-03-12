@@ -8,6 +8,8 @@ import (
 	"slices"
 	"strings"
 
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 	"jurien.dev/yugen/shared/utils"
 )
 
@@ -53,6 +55,11 @@ func (service *DictionaryService) Check(word string) (found bool, err error) {
 	}
 
 	found = slices.Contains(words, word)
+
+	if found == false {
+		caser := cases.Title(language.English)
+		found = slices.Contains(words, caser.String(word))
+	}
 
 	return
 }
