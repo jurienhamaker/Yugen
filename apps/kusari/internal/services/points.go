@@ -52,7 +52,7 @@ func (service *PointsService) GetPlayer(guildID string, userID string, setInGuil
 	return
 }
 
-func (service *PointsService) AddGamePoints(guildID string, userID string) (err error) {
+func (service *PointsService) AddGamePoints(guildID string, userID string, amount int) (err error) {
 	player, err := service.GetPlayer(guildID, userID, true)
 	if err != nil {
 		return
@@ -61,7 +61,22 @@ func (service *PointsService) AddGamePoints(guildID string, userID string) (err 
 	_, err = service.database.PlayerStats.FindUnique(
 		db.PlayerStats.ID.Equals(player.ID),
 	).Update(
-		db.PlayerStats.Points.Increment(1),
+		db.PlayerStats.Points.Increment(amount),
+	).Exec(context.Background())
+
+	return
+}
+
+func (service *PointsService) RemoveGamePoints(guildID string, userID string, amount int) (err error) {
+	player, err := service.GetPlayer(guildID, userID, true)
+	if err != nil {
+		return
+	}
+
+	_, err = service.database.PlayerStats.FindUnique(
+		db.PlayerStats.ID.Equals(player.ID),
+	).Update(
+		db.PlayerStats.Points.Decrement(amount),
 	).Exec(context.Background())
 
 	return
