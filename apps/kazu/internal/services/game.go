@@ -291,16 +291,32 @@ Used **1 server** save, There are **%s/%s** server saves left.`,
 			highScoreText = "\n**A new highscore has been set! 🎉**"
 		}
 
+		pointsRemoved := int(history.Number / 10)
+		go service.points.RemoveGamePoints(guildID, message.Author.ID, pointsRemoved)
+
+		if pointsRemoved == 0 {
+			pointsRemoved = 1
+		}
+
+		pointsRemovedText := ""
+		pointText := "Points have"
+		if pointsRemoved == 1 {
+			pointText = "Point has"
+		}
+
+		pointsRemovedText = fmt.Sprintf("\n\n**%d %s been removed from your account.**", pointsRemoved, pointText)
+
 		go service.bot.ChannelMessageSendReply(
 			message.ChannelID,
 			fmt.Sprintf(
 				`%s
-**The game has ended on a streak of %d!**%s
+**The game has ended on a streak of %d!**%s%s
 
 **Want to save the game?** Make sure to **/vote** for Kazu and earn yourself saves to save the game!`,
 				failReason,
 				number,
 				highScoreText,
+				pointsRemovedText,
 			),
 			message.Reference(),
 		)
@@ -333,7 +349,7 @@ Used **1 server** save, There are **%s/%s** server saves left.`,
 		return
 	}
 
-	go service.points.AddGamePoints(guildID, message.Author.ID)
+	go service.points.AddGamePoints(guildID, message.Author.ID, 1)
 	_, err = service.database.History.CreateOne(
 		db.History.UserID.Set(message.Author.ID),
 		db.History.Game.Link(db.Game.ID.Equals(game.ID)),
