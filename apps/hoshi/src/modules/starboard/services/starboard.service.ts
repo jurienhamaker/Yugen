@@ -3,6 +3,7 @@ import { Log } from '@prisma/hoshi';
 import {
 	ChannelType,
 	Client,
+	DiscordAPIError,
 	EmbedBuilder,
 	GuildEmoji,
 	Message,
@@ -224,10 +225,18 @@ export class StarboardService {
 	) {
 		const channel = await this._getStarboardChannel(starboardChannelId);
 
-		const starboardMessage = await channel.send({
-			content: this._createContentString(count, emoji, message),
-			embeds: [embed],
-		});
+		const starboardMessage = await channel
+			.send({
+				content: this._createContentString(count, emoji, message),
+				embeds: [embed],
+			})
+			.catch((error: DiscordAPIError) => {
+				this._logger.error(
+					`Couldn't create starboard message for ${message.guildId}/${message.channelId}/${message.id}: ${error.message}`,
+					error.stack
+				);
+				return null;
+			});
 
 		await this._prisma.log.create({
 			data: {
@@ -250,16 +259,32 @@ export class StarboardService {
 		log: Log
 	) {
 		const channel = await this._getStarboardChannel(log.channelId);
-		const starboardMessage = await channel.messages.fetch(log.messageId);
+		const starboardMessage = await channel.messages
+			.fetch(log.messageId)
+			.catch((error: DiscordAPIError) => {
+				this._logger.error(
+					`Couldn't fetch starboard message for ${message.guildId}/${message.channelId}/${message.id} with target ${log.messageId}: ${error.message}`,
+					error.stack
+				);
+				return null;
+			});
 
 		if (!starboardMessage) {
 			return;
 		}
 
-		starboardMessage.edit({
-			content: this._createContentString(count, emoji, message),
-			embeds: [embed],
-		});
+		starboardMessage
+			.edit({
+				content: this._createContentString(count, emoji, message),
+				embeds: [embed],
+			})
+			.catch((error: DiscordAPIError) => {
+				this._logger.error(
+					`Couldn't edit starboard message for ${message.guildId}/${message.channelId}/${message.id}: ${error.message}`,
+					error.stack
+				);
+				return null;
+			});
 	}
 
 	private async _deleteStarboard(log: Log) {
