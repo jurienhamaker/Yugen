@@ -101,7 +101,7 @@
 		"@nx/node": "17.2.6",
 		"@nx/webpack": "17.2.6",
 		"@nx/workspace": "17.2.6",
-		"@paperless/conventions": "^1.52.0",
+		"@paperless/conventions": "2.0.1-beta.222",
 		"@pmmmwh/react-refresh-webpack-plugin": "^0.5.7",
 		"@svgr/webpack": "^8.0.1",
 		"@swc-node/register": "~1.6.7",

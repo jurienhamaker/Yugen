@@ -2170,10 +2170,10 @@
   resolved "https://registry.yarnpkg.com/@opentelemetry/api/-/api-1.7.0.tgz#b139c81999c23e3c8d3c0a7234480e945920fc40"
   integrity sha512-AdY5wvN0P2vXBi3b29hxZgSFvdhdxPB9+f0B6s//P9Q8nibRWeA3cHm8UmLpio9ABigkVHJ5NMPk+Mz8VCCyrw==
 
-"@paperless/conventions@^1.52.0":
-  version "1.52.0"
-  resolved "https://registry.yarnpkg.com/@paperless/conventions/-/conventions-1.52.0.tgz#547e5522fbd7859192f0d09be558e5cda2948766"
-  integrity sha512-uGR0PWozWnNbrTSppSzYHV3T3dpsij8lQBQYFfTSQmHoB6i4UKKZi8l7C1geo29jGWStjv2zsk5CqhdneYs+Ww==
+"@paperless/conventions@2.0.1-beta.222":
+  version "2.0.1-beta.222"
+  resolved "https://registry.yarnpkg.com/@paperless/conventions/-/conventions-2.0.1-beta.222.tgz#86b68c6d3c8acd405db935466af96e3c1e7655f3"
+  integrity sha512-C63ih0QazJGbu/8Any4qiB7jjI1zW4Z1s3PVYhDltTyCFhPB7EQKBmr+5MDaATQFMz6qooO4IVc+d9gULdSJhQ==
 
 "@phenomnomnominal/tsquery@~5.0.1":
   version "5.0.1"
