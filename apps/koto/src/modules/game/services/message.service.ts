@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Game, GameStatus, Guess } from '@prisma/koto';
+import { getYear } from 'date-fns';
 import { Channel, ChannelType, Client, EmbedBuilder } from 'discord.js';
 
 import { GameTypeEmojiColorMap, getEmoji } from '../../../util/get-emoji';
@@ -253,7 +254,11 @@ ${footer}`;
 			default: {
 				return `
 ${9 - game.guesses.length} guesses remaining
-Time runs out <t:${getTimestamp(game.endingAt)}:R>
+${
+	getYear(game.endingAt) === 3000 // don't show it yet
+		? `Timer will start after first guess`
+		: `Time runs out <t:${getTimestamp(game.endingAt)}:R>`
+}
 
 ${footer}`;
 			}

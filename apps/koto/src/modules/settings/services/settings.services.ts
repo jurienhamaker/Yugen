@@ -80,6 +80,7 @@ export class SettingsService {
 			timeLimit,
 			autoStart,
 			membersCanStart,
+			startAfterFirstGuess,
 		} = settings;
 
 		const frequencyFormatted = formatMinutes(frequency);
@@ -175,8 +176,8 @@ export class SettingsService {
 					inline: true,
 				},
 				{
-					name: ' ',
-					value: ' ',
+					name: 'Timer after first guess',
+					value: startAfterFirstGuess ? 'Yes' : 'No',
 					inline: true,
 				}
 			);

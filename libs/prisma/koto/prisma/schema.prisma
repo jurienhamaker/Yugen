@@ -28,6 +28,7 @@ model Settings {
   frequency                         Int         @default(60)
   timeLimit                         Int         @default(60)
   autoStart                         Boolean     @default(false)
+  startAfterFirstGuess              Boolean     @default(false)
 
   games                             Game[]
 

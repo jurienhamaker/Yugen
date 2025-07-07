@@ -94,6 +94,15 @@ class SettingsSetMembersPrivilegeOptions {
 	membersCanStart: boolean;
 }
 
+class SettingsSetStartAfterFirstGuessOptions {
+	@BooleanOption({
+		name: 'value',
+		description: 'Whether to start the timer after the first guess',
+		required: true,
+	})
+	startAfterFirstGuess: boolean;
+}
+
 const settingsResetOptionsChoices = [
 	{
 		name: 'Channel',
@@ -503,6 +512,30 @@ export class SettingsCommands {
 			content: `Members are **${
 				membersCanStart ? '' : 'not '
 			}allowed** to start games themselves.`,
+			ephemeral: true,
+		});
+	}
+
+	@Subcommand({
+		name: 'start-after-first-guess',
+		description:
+			'Enable/Disable wether the timer should start after the first guess.',
+	})
+	public async setStartAfterFirstGuess(
+		@Options()
+		{ startAfterFirstGuess }: SettingsSetStartAfterFirstGuessOptions,
+		@Context() [interaction]: SlashCommandContext
+	) {
+		await this._settings.set(
+			interaction.guildId,
+			'startAfterFirstGuess',
+			startAfterFirstGuess
+		);
+
+		return interaction.reply({
+			content: startAfterFirstGuess
+				? 'I will start the timer **after** the first guess.'
+				: 'I will start the timer immediately.',
 			ephemeral: true,
 		});
 	}

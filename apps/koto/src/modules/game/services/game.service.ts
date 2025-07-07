@@ -1,6 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Game, GameStatus, Guess, Settings } from '@prisma/koto';
-import { addMinutes, roundToNearestMinutes, subMinutes } from 'date-fns';
+import {
+	addMinutes,
+	roundToNearestMinutes,
+	setYear,
+	subMinutes,
+} from 'date-fns';
 import { Message } from 'discord.js';
 
 import { SettingsService } from '../../settings';
@@ -79,9 +84,9 @@ export class GameService {
 				guildId,
 				word,
 				scheduleStarted: schedule,
-				endingAt: roundToNearestMinutes(
-					addMinutes(new Date(), settings.timeLimit)
-				),
+				endingAt: settings.startAfterFirstGuess
+					? setYear(new Date(), 3000)
+					: roundToNearestMinutes(addMinutes(new Date(), settings.timeLimit)),
 				meta: this._createBaseState(word) as never,
 				number: lastGame ? lastGame.number + 1 : 1,
 			},
@@ -163,6 +168,10 @@ export class GameService {
 			data: {
 				status,
 				meta: gameMeta as never,
+				endingAt:
+					settings.startAfterFirstGuess && game.guesses.length === 0
+						? roundToNearestMinutes(addMinutes(new Date(), settings.timeLimit))
+						: game.endingAt,
 			},
 			include: {
 				guesses: true,
