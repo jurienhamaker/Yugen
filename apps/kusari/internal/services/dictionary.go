@@ -3,6 +3,7 @@ package services
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"net/url"
 	"slices"
@@ -22,16 +23,29 @@ func CreateDictionaryService() *DictionaryService {
 
 func (service *DictionaryService) Check(word string) (found bool, err error) {
 	word = strings.ToLower(word)
-	wiktionaryUrl := fmt.Sprintf("https://en.wiktionary.org/w/api.php?action=opensearch&format=json&formatversion=2&search=%s&namespace=0&limit=2", url.QueryEscape(word))
 
-	resp, err := http.Get(wiktionaryUrl)
+	log.Println(word)
+	replacer := strings.NewReplacer(
+		"‘", "'",
+		"’", "'",
+		"“", `"`,
+		"”", `"`,
+	)
+	log.Println(word)
+	word = replacer.Replace(word)
+	wiktionaryURL := fmt.Sprintf(
+		"https://en.wiktionary.org/w/api.php?action=opensearch&format=json&formatversion=2&search=%s&namespace=0&limit=2",
+		url.QueryEscape(word),
+	)
+
+	resp, err := http.Get(wiktionaryURL)
 	if err != nil {
 		utils.Logger.Fatal(err)
 		return
 	}
 	defer resp.Body.Close()
 
-	var respBody []interface{}
+	var respBody []any
 	err = json.NewDecoder(resp.Body).Decode(&respBody)
 	if err != nil {
 		utils.Logger.Fatal(err)
@@ -56,7 +70,7 @@ func (service *DictionaryService) Check(word string) (found bool, err error) {
 
 	found = slices.Contains(words, word)
 
-	if found == false {
+	if !found {
 		caser := cases.Title(language.English)
 		found = slices.Contains(words, caser.String(word))
 	}
