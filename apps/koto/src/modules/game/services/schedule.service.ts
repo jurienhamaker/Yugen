@@ -120,12 +120,27 @@ export class GameScheduleService {
 			orderBy: {
 				createdAt: 'desc',
 			},
+			include: {
+				guesses: settings.startAfterFirstGuess
+					? {
+							orderBy: {
+								createdAt: 'asc',
+							},
+							take: 1,
+					  }
+					: false,
+			},
 		});
 
 		if (
 			!lastGame ||
 			isAfter(
-				addMinutes(lastGame.createdAt, settings.frequency),
+				addMinutes(
+					settings.startAfterFirstGuess && lastGame.guesses?.[0]?.createdAt
+						? lastGame.guesses[0].createdAt
+						: lastGame.createdAt,
+					settings.frequency
+				),
 				addSeconds(new Date(), 30)
 			)
 		) {
