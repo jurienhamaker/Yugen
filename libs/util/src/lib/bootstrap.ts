@@ -1,3 +1,4 @@
+import { LogLevel } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 
 export async function bootstrap(module: unknown) {
@@ -5,7 +6,12 @@ export async function bootstrap(module: unknown) {
 		cors: true,
 		...(process.env['NODE_ENV'] === 'production'
 			? {
-					logger: ['error', 'warn', 'log'],
+					logger: [
+						'error',
+						'warn',
+						'log',
+						...((process.env['DEBUG'] ? ['debug'] : []) as LogLevel[]),
+					],
 			  }
 			: {}),
 	});
