@@ -47,6 +47,9 @@ export class GameService {
 		const currentGame = await this.getCurrentGame(guildId);
 
 		if (currentGame && !recreate) {
+			this._logger.debug(
+				`Already a current game with id ${currentGame.id} (no recreate) for ${guildId}`
+			);
 			return;
 		}
 

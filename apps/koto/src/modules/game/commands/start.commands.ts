@@ -1,4 +1,4 @@
-import { Injectable, UseFilters, UseGuards } from '@nestjs/common';
+import { Injectable, Logger, UseFilters, UseGuards } from '@nestjs/common';
 import { Client, CommandInteraction } from 'discord.js';
 import { Context, SlashCommandContext, Subcommand } from 'necord';
 
@@ -15,6 +15,8 @@ import { ForbiddenExceptionFilter } from '@yugen/shared';
 @GameCommandDecorator()
 @Injectable()
 export class GameStartCommands {
+	private readonly _logger = new Logger(GameStartCommands.name);
+
 	constructor(
 		private _game: GameService,
 		private _settings: SettingsService,
@@ -44,6 +46,7 @@ export class GameStartCommands {
 		const settings = await this._settings.getSettings(interaction.guildId);
 
 		if (!settings.channelId) {
+			this._logger.debug(`No channel ID for for guild ${interaction.guildId}`);
 			return noSettingsReply(interaction, this._client);
 		}
 

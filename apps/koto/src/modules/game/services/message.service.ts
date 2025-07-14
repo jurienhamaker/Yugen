@@ -29,11 +29,9 @@ export class GameMessageService {
 			return;
 		}
 
-		// this._logger.verbose(
-		// 	`Creating message for game ${game.id}${isNew ? ' (new)' : ''}`
-		// );
-		//
-		//
+		this._logger.debug(
+			`Creating message for game ${game.id}${isNew ? ' (new)' : ''}`
+		);
 		const channel = await this._client.channels.fetch(settings.channelId);
 		if (game.lastMessageId) {
 			this._delete(channel, game.lastMessageId).catch(error =>
@@ -42,6 +40,9 @@ export class GameMessageService {
 		}
 
 		if (!channel || channel.type !== ChannelType.GuildText) {
+			this._logger.debug(
+				`Channel is not of type text for guild ${game.guildId}`
+			);
 			return;
 		}
 
@@ -60,8 +61,18 @@ export class GameMessageService {
 			})
 			.catch((error: Error) => {
 				if (error.message?.includes('Missing Permissions')) {
+					this._logger.debug(
+						`No permissions to send message in guild ${game.guildId} on channel ${settings.channelId}`
+					);
 					return;
 				}
+
+				this._logger.debug(
+					`Something wen't wrong while creating the message for game ${
+						game.id
+					}${isNew ? ' (new)' : ''}: ${error.message}`,
+					error
+				);
 
 				throw error;
 			});
