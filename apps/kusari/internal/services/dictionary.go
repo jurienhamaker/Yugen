@@ -31,7 +31,6 @@ func (service *DictionaryService) Check(word string) (found bool, err error) {
 		"“", `"`,
 		"”", `"`,
 	)
-	log.Println(word)
 	word = replacer.Replace(word)
 	wiktionaryURL := fmt.Sprintf(
 		"https://en.wiktionary.org/w/api.php?action=opensearch&format=json&formatversion=2&search=%s&namespace=0&limit=2",

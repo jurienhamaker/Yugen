@@ -4,7 +4,7 @@ go 1.23.3
 
 require (
 	github.com/FedorLap2006/disgolf v0.0.0-20221004200601-99cfc3d9a0e1
-	github.com/bwmarrin/discordgo v0.28.2-0.20241006165315-247b6f7a76f9
+	github.com/bwmarrin/discordgo v0.29.0
 	github.com/joho/godotenv v1.5.1
 	github.com/sarulabs/di/v2 v2.5.1
 	github.com/zekroTJA/colorname v1.0.0
