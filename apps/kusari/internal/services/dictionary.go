@@ -3,7 +3,6 @@ package services
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"net/url"
 	"slices"
@@ -24,7 +23,6 @@ func CreateDictionaryService() *DictionaryService {
 func (service *DictionaryService) Check(word string) (found bool, err error) {
 	word = strings.ToLower(word)
 
-	log.Println(word)
 	replacer := strings.NewReplacer(
 		"‘", "'",
 		"’", "'",
