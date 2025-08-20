@@ -10,6 +10,7 @@ import {
 	User,
 } from 'discord.js';
 import {
+	BooleanOption,
 	Button,
 	ButtonContext,
 	ComponentParam,
@@ -56,6 +57,14 @@ class GameLeaderboardOptions {
 		required: false,
 	})
 	page: number | undefined;
+
+	@BooleanOption({
+		name: 'ephemeral',
+		description:
+			'Wether to keep the leaderboard to yourself or share it with others.',
+		required: false,
+	})
+	ephemeral: boolean | undefined;
 }
 
 class GameLeaderboardResetOptions {
@@ -69,7 +78,10 @@ class GameLeaderboardResetOptions {
 
 @Injectable()
 export class GameLeaderboardCommands {
-	constructor(private _points: GamePointsService, private _client: Client) {}
+	constructor(
+		private _points: GamePointsService,
+		private _client: Client
+	) {}
 
 	@SlashCommand({
 		name: 'leaderboard',
@@ -77,9 +89,14 @@ export class GameLeaderboardCommands {
 	})
 	public async leaderboard(
 		@Context() [interaction]: SlashCommandContext,
-		@Options() { page, type }: GameLeaderboardOptions
+		@Options() { page, type, ephemeral }: GameLeaderboardOptions
 	) {
-		return this._listLeaderboard(interaction, type ?? 'points', page);
+		return this._listLeaderboard(
+			interaction,
+			type ?? 'points',
+			ephemeral ?? true,
+			page
+		);
 	}
 
 	@UseGuards(ManageServerGuard)
@@ -152,20 +169,27 @@ export class GameLeaderboardCommands {
 		});
 	}
 
-	@Button('LEADERBOARD_LIST/:type/:page')
+	@Button('LEADERBOARD_LIST/:type/:ephemeral/:page')
 	public leaderboardButton(
 		@Context()
 		[interaction]: ButtonContext,
 		@ComponentParam('type') type: 'points' | 'participated' | 'wins',
-		@ComponentParam('page') page: string
+		@ComponentParam('page') page: string,
+		@ComponentParam('ephemeral') ephemeral: string
 	) {
 		const pageInt = Number.parseInt(page, 10);
-		return this._listLeaderboard(interaction, type, pageInt);
+		return this._listLeaderboard(
+			interaction,
+			type,
+			ephemeral === 'true',
+			pageInt
+		);
 	}
 
 	private async _listLeaderboard(
 		interaction: CommandInteraction | ButtonInteraction,
 		type: 'points' | 'participated' | 'wins' = 'points',
+		ephemeral: boolean = false,
 		page: number = 1
 	) {
 		page = page ?? 1;
@@ -245,7 +269,7 @@ export class GameLeaderboardCommands {
 		if (page > 1) {
 			buttons.push(
 				new ButtonBuilder()
-					.setCustomId(`LEADERBOARD_LIST/${type}/${page - 1}`)
+					.setCustomId(`LEADERBOARD_LIST/${type}/${ephemeral}/${page - 1}`)
 					.setLabel('◀️')
 					.setStyle(ButtonStyle.Primary)
 			);
@@ -254,7 +278,7 @@ export class GameLeaderboardCommands {
 		if (page < maxPage) {
 			buttons.push(
 				new ButtonBuilder()
-					.setCustomId(`LEADERBOARD_LIST/${type}/${page + 1}`)
+					.setCustomId(`LEADERBOARD_LIST/${type}/${ephemeral}/${page + 1}`)
 					.setLabel('▶️')
 					.setStyle(ButtonStyle.Primary)
 			);
@@ -276,7 +300,7 @@ export class GameLeaderboardCommands {
 		return interaction.reply({
 			embeds: [embed],
 			components,
-			ephemeral: true,
+			ephemeral,
 		});
 	}
 }
