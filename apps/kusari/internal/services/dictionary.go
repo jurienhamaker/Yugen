@@ -35,6 +35,7 @@ func (service *DictionaryService) Check(word string) (found bool, err error) {
 		url.QueryEscape(word),
 	)
 
+	utils.Logger.Debug(wiktionaryURL)
 	resp, err := http.Get(wiktionaryURL)
 	if err != nil {
 		utils.Logger.Fatal(err)
@@ -42,6 +43,8 @@ func (service *DictionaryService) Check(word string) (found bool, err error) {
 	}
 	defer resp.Body.Close()
 
+	utils.Logger.Debug(resp.Status)
+	utils.Logger.Debug(resp.Body)
 	var respBody []any
 	err = json.NewDecoder(resp.Body).Decode(&respBody)
 	if err != nil {
