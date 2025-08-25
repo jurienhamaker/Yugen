@@ -5,11 +5,13 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"os"
 	"slices"
 	"strings"
 
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
+	"jurien.dev/yugen/shared/static"
 	"jurien.dev/yugen/shared/utils"
 )
 
@@ -35,8 +37,21 @@ func (service *DictionaryService) Check(word string) (found bool, err error) {
 		url.QueryEscape(word),
 	)
 
+	client := &http.Client{
+		Transport: &http.Transport{},
+	}
+
 	utils.Logger.Debug(wiktionaryURL)
-	resp, err := http.Get(wiktionaryURL)
+	req, err := http.NewRequest("GET", wiktionaryURL, nil)
+	if err != nil {
+		utils.Logger.Fatal(err)
+		return
+	}
+
+	req.Header.Set("User-Agent", "YugenKusari/1.0 (https://github.com/jurienhamaker/yugen;info@jurien.dev) Go-http-client/1.1")
+	req.SetBasicAuth(os.Getenv(static.EnvWiktionaryUsername), os.Getenv(static.EnvWiktionaryPassword))
+
+	resp, err := client.Do(req)
 	if err != nil {
 		utils.Logger.Fatal(err)
 		return
@@ -45,6 +60,7 @@ func (service *DictionaryService) Check(word string) (found bool, err error) {
 
 	utils.Logger.Debug(resp.Status)
 	utils.Logger.Debug(resp.Body)
+
 	var respBody []any
 	err = json.NewDecoder(resp.Body).Decode(&respBody)
 	if err != nil {

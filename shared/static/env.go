@@ -33,4 +33,7 @@ const (
 	EnvDiscordBotListVoteLink = "DISCORDBOTLIST_VOTE_LINK"
 
 	EnvWebhookAuthorizationToken = "WEBHOOK_AUTHORIZATION_TOKEN"
+
+	EnvWiktionaryUsername = "WIKTIONARY_USERNAME"
+	EnvWiktionaryPassword = "WIKTIONARY_PASSWORD"
 )
