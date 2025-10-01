@@ -366,7 +366,7 @@ export class GameService {
 	private async _checkCooldown(
 		userId: string,
 		{ guesses }: Game & { guesses: Guess[] },
-		{ cooldown, repeatCooldown }: Settings
+		{ enableRepeatCooldown, cooldown, repeatCooldown }: Settings
 	): Promise<{ hit: boolean; type?: 'cooldown' | 'repeat'; result?: Date }> {
 		// if (process.env['NODE_ENV'] !== 'production') {
 		// 	return { hit: false };
@@ -394,6 +394,7 @@ export class GameService {
 		);
 
 		if (
+			enableRepeatCooldown &&
 			repeatCooldownHit &&
 			repeatCooldown > cooldown &&
 			userId === lastGuess.userId

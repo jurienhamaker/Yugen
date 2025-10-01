@@ -67,10 +67,18 @@ class SettingsSetCooldownOptions {
 }
 
 class SettingsSetRepeatCooldownOptions {
+	@BooleanOption({
+		name: 'enabled',
+		description:
+			'Whether to enable the repeat cooldown for repeated guesses by a single user.',
+		required: true,
+	})
+	enabled: boolean;
+
 	@NumberOption({
 		name: 'minutes',
 		description: 'The amount of minutes between repeated answers.',
-		required: true,
+		required: false,
 		min_value: 0,
 		max_value: 60,
 	})
@@ -467,10 +475,13 @@ export class SettingsCommands {
 		description: 'Set the cooldown between answers of the same user.',
 	})
 	public async setRepeatCooldown(
-		@Options() { minutes }: SettingsSetRepeatCooldownOptions,
+		@Options() { enabled, minutes }: SettingsSetRepeatCooldownOptions,
 		@Context() [interaction]: SlashCommandContext
 	) {
-		if (Number.isNaN(minutes) || minutes === undefined || minutes === null) {
+		if (
+			enabled &&
+			(Number.isNaN(minutes) || minutes === undefined || minutes === null)
+		) {
 			return interaction.reply({
 				content: 'A valid number for minutes must be provided.',
 				ephemeral: true,
@@ -484,12 +495,22 @@ export class SettingsCommands {
 			});
 		}
 
-		await this._settings.set(interaction.guildId, 'repeatCooldown', minutes);
+		await this._settings.set(
+			interaction.guildId,
+			'enableRepeatCooldown',
+			enabled
+		);
+
+		if (enabled) {
+			await this._settings.set(interaction.guildId, 'repeatCooldown', minutes);
+		}
 
 		return interaction.reply({
-			content: `Members will now be able to provide an answer every ${minutes} minute${
-				minutes === 1 ? '' : 's'
-			} if they are the same user as the last guess.`,
+			content: enabled
+				? `Members will now be able to provide an answer every ${minutes} minute${
+						minutes === 1 ? '' : 's'
+				  } if they are the same user as the last guess.`
+				: 'Repeat cooldown has been disabled',
 			ephemeral: true,
 		});
 	}

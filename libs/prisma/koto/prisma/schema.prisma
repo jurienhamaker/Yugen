@@ -24,6 +24,7 @@ model Settings {
   membersCanStart                   Boolean     @default(false)
 
   cooldown                          Int         @default(10)
+  enableRepeatCooldown              Boolean     @default(false)
   repeatCooldown                    Int         @default(10)
   informCooldownAfterGuess          Boolean     @default(false)
   frequency                         Int         @default(60)

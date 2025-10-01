@@ -75,6 +75,7 @@ export class SettingsService {
 			pingRoleId,
 			pingOnlyNew,
 			cooldown,
+			enableRepeatCooldown,
 			repeatCooldown,
 			informCooldownAfterGuess,
 			frequency,
@@ -130,7 +131,9 @@ export class SettingsService {
 				},
 				{
 					name: 'Repeat answer cooldown',
-					value: `${repeatCooldown} minute${repeatCooldown === 1 ? '' : 's'}`,
+					value: enableRepeatCooldown
+						? `${repeatCooldown} minute${repeatCooldown === 1 ? '' : 's'}`
+						: 'Disabled',
 					inline: true,
 				},
 				{
