@@ -128,7 +128,7 @@ export class GameService {
 
 		const cooldown = await this._checkCooldown(
 			message.author.id,
-			game.id,
+			game,
 			settings
 		);
 
@@ -365,26 +365,20 @@ export class GameService {
 
 	private async _checkCooldown(
 		userId: string,
-		gameId: number,
+		{ guesses }: Game & { guesses: Guess[] },
 		{ cooldown, repeatCooldown }: Settings
 	): Promise<{ hit: boolean; type?: 'cooldown' | 'repeat'; result?: Date }> {
-		if (process.env['NODE_ENV'] !== 'production') {
+		// if (process.env['NODE_ENV'] !== 'production') {
+		// 	return { hit: false };
+		// }
+		//
+		if (guesses.length === 0) {
 			return { hit: false };
 		}
 
-		const lastGuess = await this._prisma.guess.findFirst({
-			where: {
-				userId,
-				gameId,
-			},
-			select: {
-				createdAt: true,
-				userId: true,
-			},
-			orderBy: {
-				createdAt: 'desc',
-			},
-		});
+		const lastGuess = guesses.sort(
+			(a, b) => a.createdAt.getTime() - b.createdAt.getTime()
+		)[guesses.length - 1];
 
 		if (!lastGuess) {
 			return { hit: false };
