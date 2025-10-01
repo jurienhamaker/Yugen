@@ -368,28 +368,30 @@ export class GameService {
 		{ guesses }: Game & { guesses: Guess[] },
 		{ enableRepeatCooldown, cooldown, repeatCooldown }: Settings
 	): Promise<{ hit: boolean; type?: 'cooldown' | 'repeat'; result?: Date }> {
-		// if (process.env['NODE_ENV'] !== 'production') {
-		// 	return { hit: false };
-		// }
-		//
+		if (process.env['NODE_ENV'] !== 'production') {
+			return { hit: false };
+		}
+
 		if (guesses.length === 0) {
 			return { hit: false };
 		}
 
-		const lastGuess = guesses.sort(
-			(a, b) => a.createdAt.getTime() - b.createdAt.getTime()
-		)[guesses.length - 1];
+		const guessesSorted = guesses.sort(
+			(a, b) => b.createdAt.getTime() - a.createdAt.getTime()
+		);
+		const lastGuessByUser = guessesSorted.find(g => g.userId === userId);
+		const lastGuess = guessesSorted[0];
 
-		if (!lastGuess) {
+		if (!lastGuess || !lastGuessByUser) {
 			return { hit: false };
 		}
 
 		const repeatCooldownHit = isAfter(
-			lastGuess.createdAt,
+			lastGuessByUser.createdAt,
 			subMinutes(new Date(), repeatCooldown)
 		);
 		const cooldownHit = isAfter(
-			lastGuess.createdAt,
+			lastGuessByUser.createdAt,
 			subMinutes(new Date(), cooldown)
 		);
 
