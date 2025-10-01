@@ -66,6 +66,17 @@ class SettingsSetCooldownOptions {
 	minutes: number | undefined;
 }
 
+class SettingsSetRepeatCooldownOptions {
+	@NumberOption({
+		name: 'minutes',
+		description: 'The amount of minutes between repeated answers.',
+		required: true,
+		min_value: 0,
+		max_value: 60,
+	})
+	minutes: number | undefined;
+}
+
 class SettingsSetInformCooldownAfterGuessOptions {
 	@BooleanOption({
 		name: 'value',
@@ -447,6 +458,38 @@ export class SettingsCommands {
 			content: `Members will now be able to provide an answer every ${minutes} minute${
 				minutes === 1 ? '' : 's'
 			}.`,
+			ephemeral: true,
+		});
+	}
+
+	@Subcommand({
+		name: 'repeat-cooldown',
+		description: 'Set the cooldown between answers of the same user.',
+	})
+	public async setRepeatCooldown(
+		@Options() { minutes }: SettingsSetRepeatCooldownOptions,
+		@Context() [interaction]: SlashCommandContext
+	) {
+		if (Number.isNaN(minutes) || minutes === undefined || minutes === null) {
+			return interaction.reply({
+				content: 'A valid number for minutes must be provided.',
+				ephemeral: true,
+			});
+		}
+
+		if (minutes < 0 || minutes > 60) {
+			return interaction.reply({
+				content: 'A minimum of 0 & a maximum of 60 minutes must be provided.',
+				ephemeral: true,
+			});
+		}
+
+		await this._settings.set(interaction.guildId, 'repeatCooldown', minutes);
+
+		return interaction.reply({
+			content: `Members will now be able to provide an answer every ${minutes} minute${
+				minutes === 1 ? '' : 's'
+			} if they are the same user as the last guess.`,
 			ephemeral: true,
 		});
 	}

@@ -75,6 +75,7 @@ export class SettingsService {
 			pingRoleId,
 			pingOnlyNew,
 			cooldown,
+			repeatCooldown,
 			informCooldownAfterGuess,
 			frequency,
 			timeLimit,
@@ -118,11 +119,6 @@ export class SettingsService {
 					inline: true,
 				},
 				{
-					name: ' ',
-					value: ' ',
-					inline: true,
-				},
-				{
 					name: 'Auto start games',
 					value: autoStart ? 'Yes' : 'No',
 					inline: true,
@@ -130,6 +126,11 @@ export class SettingsService {
 				{
 					name: 'Answer cooldown',
 					value: `${cooldown} minute${cooldown === 1 ? '' : 's'}`,
+					inline: true,
+				},
+				{
+					name: 'Repeat answer cooldown',
+					value: `${repeatCooldown} minute${repeatCooldown === 1 ? '' : 's'}`,
 					inline: true,
 				},
 				{

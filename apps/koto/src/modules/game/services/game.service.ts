@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Game, GameStatus, Guess, Settings } from '@prisma/koto';
 import {
 	addMinutes,
+	isAfter,
 	roundToNearestMinutes,
 	setYear,
 	subMinutes,
@@ -128,15 +129,17 @@ export class GameService {
 		const cooldown = await this._checkCooldown(
 			message.author.id,
 			game.id,
-			settings.cooldown
+			settings
 		);
 
-		if (cooldown) {
+		if (cooldown.hit) {
 			message.react('🕒');
 			message.reply(
-				`You're on a cooldown, you can guess again <t:${getTimestamp(
-					cooldown
-				)}:R>`
+				`${
+					cooldown.type === 'cooldown'
+						? "You're on a cooldown"
+						: "You're on a repeated guess cooldown"
+				}, you can guess again <t:${getTimestamp(cooldown.result)}:R>`
 			);
 			return;
 		}
@@ -147,7 +150,7 @@ export class GameService {
 			game.meta as never
 		);
 
-		await this._prisma.guess.create({
+		const createdGuess = await this._prisma.guess.create({
 			data: {
 				game: {
 					connect: { id: game.id },
@@ -191,20 +194,15 @@ export class GameService {
 		}
 
 		if (status !== GameStatus.COMPLETED && settings.informCooldownAfterGuess) {
-			const cooldown = await this._checkCooldown(
-				message.author.id,
-				game.id,
-				settings.cooldown
+			const cooldownReply = message.reply(
+				`Thank you for your guess, you are now on a cooldown. You can guess again <t:${getTimestamp(
+					addMinutes(
+						createdGuess.createdAt,
+						settings.repeatCooldown ?? settings.cooldown
+					)
+				)}:R>`
 			);
-
-			if (cooldown) {
-				const cooldownReply = message.reply(
-					`Thank you for your guess, you are now on a cooldown. You can guess again <t:${getTimestamp(
-						cooldown
-					)}:R>`
-				);
-				promises.push(cooldownReply);
-			}
+			promises.push(cooldownReply);
 		}
 
 		this._message.create(game as GameWithMetaAndGuesses, false);
@@ -368,30 +366,60 @@ export class GameService {
 	private async _checkCooldown(
 		userId: string,
 		gameId: number,
-		cooldown: number
-	): Promise<Date | undefined | void> {
+		{ cooldown, repeatCooldown }: Settings
+	): Promise<{ hit: boolean; type?: 'cooldown' | 'repeat'; result?: Date }> {
 		if (process.env['NODE_ENV'] !== 'production') {
-			return;
+			return { hit: false };
 		}
 
-		const lastGuessWithinCooldown = await this._prisma.guess.findFirst({
+		const lastGuess = await this._prisma.guess.findFirst({
 			where: {
 				userId,
 				gameId,
-				createdAt: {
-					gt: subMinutes(new Date(), cooldown),
-				},
 			},
 			select: {
 				createdAt: true,
+				userId: true,
+			},
+			orderBy: {
+				createdAt: 'desc',
 			},
 		});
 
-		if (!lastGuessWithinCooldown) {
-			return;
+		if (!lastGuess) {
+			return { hit: false };
 		}
 
-		return addMinutes(lastGuessWithinCooldown.createdAt, cooldown);
+		const repeatCooldownHit = isAfter(
+			lastGuess.createdAt,
+			subMinutes(new Date(), repeatCooldown)
+		);
+		const cooldownHit = isAfter(
+			lastGuess.createdAt,
+			subMinutes(new Date(), cooldown)
+		);
+
+		if (
+			repeatCooldownHit &&
+			repeatCooldown > cooldown &&
+			userId === lastGuess.userId
+		) {
+			return {
+				hit: true,
+				type: 'repeat',
+				result: addMinutes(lastGuess.createdAt, repeatCooldown),
+			};
+		}
+
+		if (cooldownHit) {
+			return {
+				hit: true,
+				type: 'cooldown',
+				result: addMinutes(lastGuess.createdAt, cooldown),
+			};
+		}
+
+		return { hit: false };
 	}
 
 	private _createBaseState(word: string): GameMeta {
