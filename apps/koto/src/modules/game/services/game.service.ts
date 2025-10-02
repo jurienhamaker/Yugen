@@ -132,15 +132,25 @@ export class GameService {
 			settings
 		);
 
-		if (cooldown.hit) {
+		if (cooldown.hit || cooldown.repeatHit) {
 			message.react('🕒');
-			message.reply(
-				`${
-					cooldown.type === 'cooldown'
-						? "You're on a cooldown"
-						: "You're on a repeated guess cooldown"
-				}, you can guess again <t:${getTimestamp(cooldown.result)}:R>`
-			);
+			let suffix = `you can guess again <t:${getTimestamp(cooldown.result)}:R>`;
+
+			if (cooldown.hit && cooldown.repeatHit) {
+				suffix = `you can guess again <t:${getTimestamp(
+					cooldown.repeatResult
+				)}:R> on your own or <t:${getTimestamp(
+					cooldown.result
+				)}:R> after a guess from another player.`;
+			}
+
+			if (!cooldown.hit && cooldown.repeatHit) {
+				suffix = `you can guess again <t:${getTimestamp(
+					cooldown.repeatResult
+				)}:R> or immediatly after a guess from another player.`;
+			}
+
+			message.reply(`You're on a cooldown, ${suffix}`);
 			return;
 		}
 
@@ -195,12 +205,19 @@ export class GameService {
 
 		if (status !== GameStatus.COMPLETED && settings.informCooldownAfterGuess) {
 			const cooldownReply = message.reply(
-				`Thank you for your guess, you are now on a cooldown. You can guess again <t:${getTimestamp(
-					addMinutes(
-						createdGuess.createdAt,
-						settings.repeatCooldown ?? settings.cooldown
-					)
-				)}:R>`
+				`You are now on a cooldown. You can guess again ${
+					settings.enableBackToBackCooldown
+						? `<t:${getTimestamp(
+								addMinutes(createdGuess.createdAt, settings.backToBackCooldown)
+						  )}:R> on your own or `
+						: ''
+				}<t:${getTimestamp(
+					addMinutes(createdGuess.createdAt, settings.cooldown)
+				)}:R>${
+					settings.enableBackToBackCooldown
+						? '  after a guess from another player'
+						: ''
+				}.`
 			);
 			promises.push(cooldownReply);
 		}
@@ -366,14 +383,19 @@ export class GameService {
 	private async _checkCooldown(
 		userId: string,
 		{ guesses }: Game & { guesses: Guess[] },
-		{ enableRepeatCooldown, cooldown, repeatCooldown }: Settings
-	): Promise<{ hit: boolean; type?: 'cooldown' | 'repeat'; result?: Date }> {
-		if (process.env['NODE_ENV'] !== 'production') {
-			return { hit: false };
-		}
-
+		{ enableBackToBackCooldown, cooldown, backToBackCooldown }: Settings
+	): Promise<{
+		hit: boolean;
+		repeatHit: boolean;
+		result?: Date;
+		repeatResult?: Date;
+	}> {
+		// if (process.env['NODE_ENV'] !== 'production') {
+		// 	return { hit: false, repeatHit: false };
+		// }
+		//
 		if (guesses.length === 0) {
-			return { hit: false };
+			return { hit: false, repeatHit: false };
 		}
 
 		const guessesSorted = guesses.sort(
@@ -383,40 +405,31 @@ export class GameService {
 		const lastGuess = guessesSorted[0];
 
 		if (!lastGuess || !lastGuessByUser) {
-			return { hit: false };
+			return { hit: false, repeatHit: false };
 		}
 
-		const repeatCooldownHit = isAfter(
-			lastGuessByUser.createdAt,
-			subMinutes(new Date(), repeatCooldown)
-		);
+		const backToBackCooldownHit =
+			enableBackToBackCooldown &&
+			isAfter(
+				lastGuessByUser.createdAt,
+				subMinutes(new Date(), backToBackCooldown)
+			) &&
+			userId === lastGuess.userId;
 		const cooldownHit = isAfter(
 			lastGuessByUser.createdAt,
 			subMinutes(new Date(), cooldown)
 		);
 
-		if (
-			enableRepeatCooldown &&
-			repeatCooldownHit &&
-			repeatCooldown > cooldown &&
-			userId === lastGuess.userId
-		) {
+		if (backToBackCooldownHit || cooldownHit) {
 			return {
-				hit: true,
-				type: 'repeat',
-				result: addMinutes(lastGuess.createdAt, repeatCooldown),
+				hit: cooldownHit,
+				repeatHit: backToBackCooldownHit,
+				result: addMinutes(lastGuessByUser.createdAt, cooldown),
+				repeatResult: addMinutes(lastGuessByUser.createdAt, backToBackCooldown),
 			};
 		}
 
-		if (cooldownHit) {
-			return {
-				hit: true,
-				type: 'cooldown',
-				result: addMinutes(lastGuess.createdAt, cooldown),
-			};
-		}
-
-		return { hit: false };
+		return { hit: false, repeatHit: false };
 	}
 
 	private _createBaseState(word: string): GameMeta {
