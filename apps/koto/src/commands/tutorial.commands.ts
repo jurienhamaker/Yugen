@@ -8,7 +8,6 @@ import { noSettingsReply } from '../util/no-settings-reply';
 
 import { formatMinutes, getEmbedFooter } from '@yugen/util';
 
-
 @Injectable()
 export class TutorialCommands {
 	constructor(private _client: Client, private _settings: SettingsService) {}
@@ -38,7 +37,7 @@ export class TutorialCommands {
 - You only have 9 guesses per Koto game, so be careful!
 
 **Server Settings:**
-- There is a cooldown of **${settings.cooldown}** minutes between guesses
+- There is a cooldown of **${settings.cooldown}** seconds between guesses
 - A new game is posted every **${
 					frequencyFormatted.hours
 						? `${frequencyFormatted.hours} hour${

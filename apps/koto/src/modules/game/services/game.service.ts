@@ -2,10 +2,11 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Game, GameStatus, Guess, Settings } from '@prisma/koto';
 import {
 	addMinutes,
+	addSeconds,
 	isAfter,
 	roundToNearestMinutes,
 	setYear,
-	subMinutes,
+	subSeconds,
 } from 'date-fns';
 import { Message } from 'discord.js';
 
@@ -412,20 +413,20 @@ export class GameService {
 			enableBackToBackCooldown &&
 			isAfter(
 				lastGuessByUser.createdAt,
-				subMinutes(new Date(), backToBackCooldown)
+				subSeconds(new Date(), backToBackCooldown)
 			) &&
 			userId === lastGuess.userId;
 		const cooldownHit = isAfter(
 			lastGuessByUser.createdAt,
-			subMinutes(new Date(), cooldown)
+			subSeconds(new Date(), cooldown)
 		);
 
 		if (backToBackCooldownHit || cooldownHit) {
 			return {
 				hit: cooldownHit,
 				repeatHit: backToBackCooldownHit,
-				result: addMinutes(lastGuessByUser.createdAt, cooldown),
-				repeatResult: addMinutes(lastGuessByUser.createdAt, backToBackCooldown),
+				result: addSeconds(lastGuessByUser.createdAt, cooldown),
+				repeatResult: addSeconds(lastGuessByUser.createdAt, backToBackCooldown),
 			};
 		}
 

@@ -126,13 +126,13 @@ export class SettingsService {
 				},
 				{
 					name: 'Answer cooldown',
-					value: `${cooldown} minute${cooldown === 1 ? '' : 's'}`,
+					value: `${cooldown} second${cooldown === 1 ? '' : 's'}`,
 					inline: true,
 				},
 				{
 					name: 'Back-to-back cooldown',
 					value: enableBackToBackCooldown
-						? `${backToBackCooldown} minute${
+						? `${backToBackCooldown} second${
 								backToBackCooldown === 1 ? '' : 's'
 						  }`
 						: 'Disabled',

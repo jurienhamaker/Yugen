@@ -57,13 +57,13 @@ class SettingsSetFrequencyOrTimeLimitOptions {
 
 class SettingsSetCooldownOptions {
 	@NumberOption({
-		name: 'minutes',
-		description: 'The amount of minutes between answers.',
+		name: 'seconds',
+		description: 'The amount of seconds between answers.',
 		required: true,
 		min_value: 0,
-		max_value: 60,
+		max_value: 3600,
 	})
-	minutes: number | undefined;
+	seconds: number | undefined;
 }
 
 class SettingsSetBackToBackCooldownOptions {
@@ -75,13 +75,13 @@ class SettingsSetBackToBackCooldownOptions {
 	enabled: boolean;
 
 	@NumberOption({
-		name: 'minutes',
-		description: 'The amount of minutes between back to back answers.',
+		name: 'seconds',
+		description: 'The amount of seconds between back to back answers.',
 		required: false,
 		min_value: 0,
 		max_value: 60,
 	})
-	minutes: number | undefined;
+	seconds: number | undefined;
 }
 
 class SettingsSetInformCooldownAfterGuessOptions {
@@ -442,28 +442,28 @@ export class SettingsCommands {
 		description: 'Set the cooldown between answers.',
 	})
 	public async setCooldown(
-		@Options() { minutes }: SettingsSetCooldownOptions,
+		@Options() { seconds }: SettingsSetCooldownOptions,
 		@Context() [interaction]: SlashCommandContext
 	) {
-		if (Number.isNaN(minutes) || minutes === undefined || minutes === null) {
+		if (Number.isNaN(seconds) || seconds === undefined || seconds === null) {
 			return interaction.reply({
-				content: 'A valid number for minutes must be provided.',
+				content: 'A valid number for seconds must be provided.',
 				ephemeral: true,
 			});
 		}
 
-		if (minutes < 0 || minutes > 60) {
+		if (seconds < 0 || seconds > 3600) {
 			return interaction.reply({
-				content: 'A minimum of 0 & a maximum of 60 minutes must be provided.',
+				content: 'A minimum of 0 & a maximum of 3600 seconds must be provided.',
 				ephemeral: true,
 			});
 		}
 
-		await this._settings.set(interaction.guildId, 'cooldown', minutes);
+		await this._settings.set(interaction.guildId, 'cooldown', seconds);
 
 		return interaction.reply({
-			content: `Members will now be able to provide an answer every ${minutes} minute${
-				minutes === 1 ? '' : 's'
+			content: `Members will now be able to provide an answer every ${seconds} second${
+				seconds === 1 ? '' : 's'
 			}.`,
 			ephemeral: true,
 		});
@@ -474,22 +474,22 @@ export class SettingsCommands {
 		description: 'Set the cooldown between answers of the same user.',
 	})
 	public async setBackToBackCooldown(
-		@Options() { enabled, minutes }: SettingsSetBackToBackCooldownOptions,
+		@Options() { enabled, seconds }: SettingsSetBackToBackCooldownOptions,
 		@Context() [interaction]: SlashCommandContext
 	) {
 		if (
 			enabled &&
-			(Number.isNaN(minutes) || minutes === undefined || minutes === null)
+			(Number.isNaN(seconds) || seconds === undefined || seconds === null)
 		) {
 			return interaction.reply({
-				content: 'A valid number for minutes must be provided.',
+				content: 'A valid number for seconds must be provided.',
 				ephemeral: true,
 			});
 		}
 
-		if (minutes < 0 || minutes > 60) {
+		if (seconds < 0 || seconds > 3600) {
 			return interaction.reply({
-				content: 'A minimum of 0 & a maximum of 60 minutes must be provided.',
+				content: 'A minimum of 0 & a maximum of 3600 seconds must be provided.',
 				ephemeral: true,
 			});
 		}
@@ -504,14 +504,14 @@ export class SettingsCommands {
 			await this._settings.set(
 				interaction.guildId,
 				'backToBackCooldown',
-				minutes
+				seconds
 			);
 		}
 
 		return interaction.reply({
 			content: enabled
-				? `Members will now be able to provide an answer every ${minutes} minute${
-						minutes === 1 ? '' : 's'
+				? `Members will now be able to provide an answer every ${seconds} second${
+						seconds === 1 ? '' : 's'
 				  } back to back.`
 				: 'Back to back cooldown has been disabled',
 			ephemeral: true,
