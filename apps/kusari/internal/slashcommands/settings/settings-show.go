@@ -48,9 +48,9 @@ func (m *SettingsShowModule) show(ctx *disgolf.Ctx) {
 		botUpdatesChannelIDText = fmt.Sprintf("<#%s>", botUpdatesChannelID)
 	}
 
-	cooldownText := fmt.Sprintf("%d minutes", cooldown)
+	cooldownText := fmt.Sprintf("%d seconds", cooldown)
 	if cooldown == 1 {
-		cooldownText = fmt.Sprintf("%d minute", cooldown)
+		cooldownText = fmt.Sprintf("%d second", cooldown)
 	}
 	if cooldown == 0 {
 		cooldownText = "None"

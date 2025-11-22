@@ -28,7 +28,7 @@ func (m *SettingsCooldownModule) set(ctx *disgolf.Ctx) {
 	utils.Logger.With("Options", ctx.Options, "GuildID", ctx.Interaction.GuildID).Debug("Cooldown command used")
 	utils.Defer(ctx, true)
 
-	minutes := ctx.Options["minutes"].IntValue()
+	seconds := ctx.Options["seconds"].IntValue()
 
 	settings, err := m.settings.GetByGuildId(ctx.Interaction.GuildID)
 	if err != nil {
@@ -38,20 +38,20 @@ func (m *SettingsCooldownModule) set(ctx *disgolf.Ctx) {
 
 	_, err = m.settings.Update(
 		settings.ID,
-		db.Settings.Cooldown.Set(int(minutes)),
+		db.Settings.Cooldown.Set(int(seconds)),
 	)
 	if err != nil {
 		utils.ErrorResponse(ctx, true)
 		return
 	}
 
-	minutesText := "minutes"
-	if minutes == 1 {
-		minutesText = "minute"
+	secondsText := "seconds"
+	if seconds == 1 {
+		secondsText = "second"
 	}
 
-	content := fmt.Sprintf("Members will now be able to provide a word every %d %s.", minutes, minutesText)
-	if minutes == 0 {
+	content := fmt.Sprintf("Members will now be able to provide a word every %d %s.", seconds, secondsText)
+	if seconds == 0 {
 		content = "Cooldown has been removed!"
 	}
 
@@ -62,7 +62,7 @@ func (m *SettingsCooldownModule) set(ctx *disgolf.Ctx) {
 
 func (m *SettingsCooldownModule) Commands() []*disgolf.Command {
 	minValue := 0.0
-	maxValue := 60.0
+	maxValue := 3600.0
 
 	return []*disgolf.Command{
 		{
@@ -72,8 +72,8 @@ func (m *SettingsCooldownModule) Commands() []*disgolf.Command {
 			Options: []*discordgo.ApplicationCommandOption{
 				{
 					Type:        discordgo.ApplicationCommandOptionInteger,
-					Name:        "minutes",
-					Description: "The amount of minutes between answers.",
+					Name:        "seconds",
+					Description: "The amount of seconds between answers.",
 					Required:    true,
 					MinValue:    &minValue,
 					MaxValue:    maxValue,

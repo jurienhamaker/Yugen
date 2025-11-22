@@ -17,7 +17,7 @@ model Settings {
   botUpdatesChannelId               String?
 
   channelId                         String?
-  cooldown                          Int         @default(1)
+  cooldown                          Int         @default(60)
 
   games                             Game[]
 
