@@ -81,9 +81,9 @@ func (m *SettingsModule) Show(ctx *disgolf.Ctx) {
 		removeShameRoleAfterHighscoreText = "Yes"
 	}
 
-	cooldownText := fmt.Sprintf("%d minutes", cooldown)
+	cooldownText := fmt.Sprintf("%d seconds", cooldown)
 	if cooldown == 1 {
-		cooldownText = fmt.Sprintf("%d minute", cooldown)
+		cooldownText = fmt.Sprintf("%d second", cooldown)
 	}
 
 	mathText := "Disabled"
