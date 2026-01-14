@@ -39,7 +39,7 @@ export class GameMessageService {
 			);
 		}
 
-		if (!channel || channel.type !== ChannelType.GuildText) {
+		if (!channel || !channel.isTextBased()) {
 			this._logger.debug(
 				`Channel is not of type text for guild ${game.guildId}`
 			);
