@@ -109,7 +109,7 @@ func (service *GameService) Start(guildID string, gameType db.GameType, word str
 		utils.Logger.Error(err)
 	}
 
-	if channel.Type == discordgo.ChannelTypeGuildText {
+	if channel.Type == discordgo.ChannelTypeGuildText || channel.Type == discordgo.ChannelTypeGuildPublicThread || channel.Type == discordgo.ChannelTypeGuildPrivateThread {
 		service.bot.ChannelMessageSend(
 			channelID,
 			fmt.Sprintf(
